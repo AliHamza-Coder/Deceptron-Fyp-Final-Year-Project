@@ -61,13 +61,14 @@ DECEPTRON is a professional-grade hybrid desktop application that combines advan
 
 ### Minimum Requirements
 - **OS**: Windows 10/11, macOS 10.14+, or Linux (Ubuntu 18.04+)
-- **Python**: 3.8 or higher
+- **Python**: 3.9 (recommended)
 - **RAM**: 4 GB
 - **Storage**: 2 GB free space
 - **Camera**: Any USB/built-in webcam (720p minimum)
 - **Browser**: Chrome 90+, Edge 90+, or Firefox 88+
 
 ### Recommended Requirements
+- **Python**: 3.9
 - **RAM**: 8 GB or higher
 - **GPU**: NVIDIA GPU with CUDA support (for faster processing)
 - **Camera**: 1080p webcam for optimal accuracy
@@ -79,21 +80,23 @@ DECEPTRON is a professional-grade hybrid desktop application that combines advan
 
 ### Step 1: Install Python
 
-1. Download Python 3.8+ from [python.org](https://www.python.org/downloads/)
+1. Download Python 3.9 from [python.org](https://www.python.org/downloads/release/python-390/)
 2. During installation, **check "Add Python to PATH"**
 3. Verify installation:
    ```bash
    python --version
    ```
+   Should display: `Python 3.9.x`
 
 ### Step 2: Clone/Download Project
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/AliHamza-Coder/Deceptron-Fyp-Final-Year-Project.git
+cd Deceptron-Fyp-Final-Year-Project
 cd "DEceptron Screens/Frontend"
 ```
 
-Or download and extract the ZIP file.
+Or download ZIP from [GitHub Repository](https://github.com/AliHamza-Coder/Deceptron-Fyp-Final-Year-Project) and extract.
 
 ### Step 3: Create Virtual Environment
 
@@ -113,7 +116,7 @@ source myenv/bin/activate
 
 ```bash
 pip install --upgrade pip
-pip install eel opencv-python mediapipe torch torchvision hsemotion numpy
+pip install -r requirements.txt
 ```
 
 **Note**: First run will download AI models (~200MB). Ensure stable internet connection.
@@ -315,9 +318,9 @@ DEceptron Screens/Frontend/
 2. Delete and reinstall dependencies:
    ```bash
    pip uninstall hsemotion torch
-   pip install hsemotion torch
+   pip install -r requirements.txt
    ```
-3. Check Python version (must be 3.8+)
+3. Check Python version (must be 3.9)
 4. Try running as administrator
 
 ### Application Won't Start
@@ -325,7 +328,7 @@ DEceptron Screens/Frontend/
 **Problem**: Window doesn't open or crashes immediately
 
 **Solutions**:
-1. Verify Python installation: `python --version`
+1. Verify Python installation: `python --version` (should be 3.9)
 2. Activate virtual environment
 3. Reinstall dependencies: `pip install -r requirements.txt`
 4. Check console for error messages
