@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deceptron - Welcome</title>
+    <link rel="stylesheet" href="../styles/output.css">
+    <link rel="stylesheet" href="../vendor/font-awesome/css/all.min.css">
+    <style>
+        :root {
+            --accent-cyan: #00DBFF;
+            --bg-dark: #05080f;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+        }
+
+        body.light-mode {
+            --bg-dark: #f8fafc;
+            --text-main: #0f172a;
+            --text-dim: #64748b;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --border-subtle: rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            min-height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 2rem 1rem;
+            transition: all 0.3s ease;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(210,100%,15%,0.15) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(180,100%,10%,0.1) 0, transparent 50%);
+            scroll-behavior: smooth;
+        }
+
+        body.light-mode {
+            background-image: none;
+        }
+
+        .heading-font { font-family: 'Orbitron', sans-serif; }
+        
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .feature-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .feature-card:hover {
+            background: rgba(0, 219, 255, 0.05);
+            border-color: rgba(0, 219, 255, 0.3);
+            transform: translateY(-8px);
+        }
+
+        .btn-launch {
+            background: linear-gradient(135deg, #0076D6, #00DBFF);
+            box-shadow: 0 0 20px rgba(0, 219, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-launch:hover {
+            box-shadow: 0 0 40px rgba(0, 219, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        @keyframes subtle-glow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .animate-glow { animation: subtle-glow 3s infinite ease-in-out; }
+
+        #theme-toggle {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 100;
+        }
+
+        /* Entrance Animations */
+        @keyframes reveal-up {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes reveal-zoom {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .reveal-up { opacity: 0; animation: reveal-up 1s forwards; }
+        .reveal-zoom { opacity: 0; animation: reveal-zoom 1.2s forwards; }
+
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+        .delay-4 { animation-delay: 0.8s; }
+        .delay-5 { animation-delay: 1.0s; }
+
+        /* Auto-scroll and alignment improvements */
+        .main-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3rem;
+        }
+
+        .section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Smooth scroll indicators */
+        .scroll-indicator {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        /* Professional spacing */
+        .hero-section { padding: 2rem 0; }
+        .features-section { padding: 3rem 0; }
+        .action-section { padding: 2rem 0; }
+        .footer-section { padding: 2rem 0; margin-top: auto; }
+
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            body { padding: 1rem 0.5rem; }
+            .main-container { gap: 2rem; }
+            .hero-section, .features-section, .action-section { padding: 1.5rem 0; }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Theme Toggle -->
+    <button id="theme-toggle" class="fixed top-6 right-6 z-50 p-3 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-cyan-400 hover:bg-white/10 transition-all cursor-pointer reveal-zoom" title="Toggle Theme">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Hero Section -->
+        <section class="section hero-section">
+            <div class="relative inline-block mb-8 reveal-zoom">
+                <div class="absolute inset-0 bg-cyan-400/20 blur-[60px] animate-glow rounded-full"></div>
+                <div class="relative z-10 p-3 bg-[#0a1120]/20 rounded-[3rem] border border-white/5 backdrop-blur-md transition-all duration-500 hover:border-cyan-500/30">
+                    <img src="../assets/images/Logo1.png" alt="Deceptron" class="w-48 h-48 mx-auto drop-shadow-[0_0_30px_rgba(0,219,255,0.4)] object-contain">
+                </div>
+            </div>
+            <div class="reveal-up delay-1 max-w-4xl">
+                <h1 class="heading-font text-3xl lg:text-4xl xl:text-5xl font-bold tracking-[0.2em] mb-4 text-white uppercase">DECEPTRON</h1>
+                <h2 class="heading-font text-lg lg:text-xl font-medium tracking-[0.15em] mb-6 text-cyan-400 uppercase">Advanced Truth Analysis System</h2>
+                <p class="text-gray-400 text-base lg:text-lg leading-relaxed max-w-2xl mx-auto opacity-90">
+                    Cutting-edge AI-powered deception detection platform. Analyze voice stress patterns and facial micro-expressions with military-grade precision and real-time accuracy.
+                </p>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="section features-section">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl">
+                <div class="glass feature-card p-6 rounded-2xl text-center reveal-up delay-2">
+                    <div class="w-14 h-14 bg-cyan-500/10 rounded-xl flex items-center justify-center text-cyan-400 mx-auto mb-4 text-xl">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3 class="heading-font text-white font-bold mb-3 uppercase tracking-wider text-sm">Facial Analysis</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">Advanced emotion mapping and micro-expression detection using neural networks to identify deceptive behaviors.</p>
+                </div>
+
+                <div class="glass feature-card p-6 rounded-2xl text-center border-t-2 border-t-cyan-500/30 reveal-up delay-3">
+                    <div class="w-14 h-14 bg-cyan-500/10 rounded-xl flex items-center justify-center text-cyan-400 mx-auto mb-4 text-xl">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <h3 class="heading-font text-white font-bold mb-3 uppercase tracking-wider text-sm">Voice Stress</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">Real-time vocal frequency analysis and stress pattern recognition to detect psychological indicators of deception.</p>
+                </div>
+
+                <div class="glass feature-card p-6 rounded-2xl text-center reveal-up delay-4">
+                    <div class="w-14 h-14 bg-cyan-500/10 rounded-xl flex items-center justify-center text-cyan-400 mx-auto mb-4 text-xl">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="heading-font text-white font-bold mb-3 uppercase tracking-wider text-sm">AI Analytics</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">Comprehensive behavioral analysis reports with confidence scores and detailed psychological profiling data.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Action Section -->
+        <section class="section action-section">
+            <div class="reveal-up delay-5">
+                <button onclick="window.location.href='dashboard.html'" class="btn-launch px-16 py-5 rounded-2xl text-white font-bold heading-font tracking-widest uppercase text-sm cursor-pointer mb-8 transition-all duration-300">
+                    <i class="fas fa-rocket mr-3"></i>Launch Dashboard
+                </button>
+                <div class="flex flex-wrap items-center justify-center gap-8 text-xs text-gray-500 uppercase tracking-wider font-semibold">
+                    <span class="flex items-center"><i class="fas fa-circle text-xs text-emerald-500 mr-2"></i> System Online</span>
+                    <span class="flex items-center"><i class="fas fa-shield-halved text-cyan-500 mr-2"></i> Secure Session</span>
+                    <span class="flex items-center"><i class="fas fa-lock text-blue-500 mr-2"></i> Encrypted</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer Section -->
+        <footer class="section footer-section border-t border-white/5 w-full max-w-4xl">
+            <div class="reveal-up delay-5">
+                <p class="heading-font text-xs lg:text-sm font-black tracking-[0.3em] mb-3 text-cyan-400 uppercase">© 2025 DECEPTRON • ADVANCED TRUTH VERIFICATION SYSTEM</p>
+                <p class="text-xs text-gray-600 uppercase tracking-[0.2em] opacity-60 mb-2">Advanced Digital Intelligence Unit • Version 2.5.0</p>
+                <p class="text-xs text-gray-700 opacity-40">Developed by Ali Hamza • Empowering Truth Through Technology</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator text-cyan-400 opacity-60">
+        <i class="fas fa-chevron-down text-lg"></i>
+    </div>
+
+    <script>
+        const body = document.body;
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+
+        function toggleTheme() {
+            const isLight = body.classList.toggle('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            updateThemeUI(isLight);
+        }
+
+        function updateThemeUI(isLight) {
+            themeIcon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+            themeToggle.classList.toggle('light-mode-btn', isLight);
+        }
+
+        themeToggle.addEventListener('click', toggleTheme);
+
+        // Auto-scroll functionality
+        function smoothScrollToSection(sectionIndex) {
+            const sections = document.querySelectorAll('.section');
+            if (sections[sectionIndex]) {
+                sections[sectionIndex].scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+            }
+        }
+
+        // Auto-scroll through sections
+        let currentSection = 0;
+        const totalSections = 4;
+        
+        function autoScroll() {
+            setTimeout(() => {
+                if (currentSection < totalSections - 1) {
+                    currentSection++;
+                    smoothScrollToSection(currentSection);
+                    autoScroll();
+                } else {
+                    // Hide scroll indicator when done
+                    document.querySelector('.scroll-indicator').style.opacity = '0';
+                }
+            }, 3000);
+        }
+
+        // Initial Load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'light') {
+                body.classList.add('light-mode');
+                updateThemeUI(true);
+            } else {
+                updateThemeUI(false);
+            }
+            
+            // Start auto-scroll after initial animations
+            setTimeout(() => {
+                autoScroll();
+            }, 2000);
+        });
+
+        // Manual scroll control
+        document.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            if (e.deltaY > 0 && currentSection < totalSections - 1) {
+                currentSection++;
+                smoothScrollToSection(currentSection);
+            } else if (e.deltaY < 0 && currentSection > 0) {
+                currentSection--;
+                smoothScrollToSection(currentSection);
+            }
+        }, { passive: false });
+    </script>
+</body>
+</html>

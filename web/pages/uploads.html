@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deceptron - Media Uploads</title>
+    <link rel="stylesheet" href="../styles/output.css">
+    <link rel="stylesheet" href="../vendor/font-awesome/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0076D6;
+            --accent-cyan: #00DBFF;
+            --accent-cyan-glow: rgba(0, 219, 255, 0.4);
+            --bg-dark: #070B14;
+            --sidebar-width: 260px;
+            --glass-bg: rgba(10, 17, 32, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        :root {
+            --primary-blue: #0076D6;
+            --accent-cyan: #00DBFF;
+            --bg-dark: #070B14;
+            --sidebar-width: 260px;
+
+            /* Theme Tokens */
+            --bg-main: #05080f;
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --sidebar-bg: rgba(10, 17, 32, 0.98);
+            --card-bg: rgba(16, 28, 45, 0.4);
+            --border-subtle: rgba(255, 255, 255, 0.05);
+        }
+
+        body.light-mode {
+            --bg-main: #f0f9ff;
+            --text-main: #1e293b;
+            --text-dim: #64748b;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --sidebar-bg: rgba(255, 255, 255, 0.9);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --border-subtle: rgba(0, 219, 255, 0.5);
+        }
+
+        body.light-mode .active-member-info {
+            color: #22d3ee !important; /* cyan-400 */
+            font-weight: 500;
+        }
+
+        /* Light Mode Utility Overrides */
+        body.light-mode .bg-white\/5 {
+            background-color: rgba(0, 118, 214, 0.05) !important;
+        }
+
+        body.light-mode .border-white\/10,
+        body.light-mode .border-white\/5 {
+            border-color: rgba(0, 118, 214, 0.1) !important;
+        }
+
+        body.light-mode .text-gray-400 {
+            color: #475569 !important;
+        }
+
+        body.light-mode .text-gray-500 {
+            color: #64748b !important;
+        }
+
+        body.light-mode .text-gray-600 {
+            color: #94a3b8 !important;
+        }
+
+        body.light-mode .bg-slate-800 {
+            background-color: rgba(0, 118, 214, 0.1) !important;
+        }
+
+        body.light-mode h1, 
+        body.light-mode h2, 
+        body.light-mode h3 {
+            color: #1e293b !important;
+        }
+
+        body.light-mode .text-white,
+        body.light-mode .text-gray-100,
+        body.light-mode .text-gray-200,
+        body.light-mode .text-gray-300 {
+            color: #0f172a !important;
+        }
+
+        body.light-mode .bg-primary-blue .text-white,
+        body.light-mode .bg-blue-600 .text-white,
+        body.light-mode button.bg-primary-blue,
+        body.light-mode button.bg-blue-600,
+        body.light-mode .filter-btn.active {
+            background-color: #00DBFF !important;
+            color: #05080f !important;
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(0, 219, 255, 0.3) !important;
+        }
+
+        body.light-mode button.bg-primary-blue:hover,
+        body.light-mode button.bg-blue-600:hover,
+        body.light-mode .filter-btn.active:hover {
+            background-color: #00c4e0 !important;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 219, 255, 0.4) !important;
+        }
+
+        body.light-mode .text-gray-400,
+        body.light-mode .text-gray-500 {
+            color: #334155 !important;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px #10b981; }
+            50% { box-shadow: 0 0 20px #10b981; }
+            100% { box-shadow: 0 0 5px #10b981; }
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            overflow: hidden;
+            width: 100vw;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body:not(.light-mode) {
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(210,100%,15%,0.15) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(180,100%,10%,0.1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(210,100%,15%,0.15) 0, transparent 50%),
+                radial-gradient(at 50% 100%, hsla(340,100%,10%,0.05) 0, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        body.light-mode {
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(224, 242, 254, 0.8) 0, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(207, 250, 254, 0.8) 0, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(240, 249, 255, 1) 0, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        .heading-font { font-family: 'Orbitron', sans-serif; }
+
+        button, a, select, input[type="file"], .nav-item, .cursor-pointer, .upload-zone, .media-item, .filter-btn {
+            cursor: pointer !important;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--glass-bg);
+            border-right: 1px solid var(--glass-border);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(30px) saturate(150%);
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .sidebar::-webkit-scrollbar { display: none; }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 3rem;
+            max-width: 100%;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.6rem 1.5rem;
+            color: #94a3b8;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--accent-cyan);
+            background: rgba(0, 219, 255, 0.05);
+            border-left-color: var(--accent-cyan);
+        }
+
+        .nav-item i { width: 24px; font-size: 1rem; margin-right: 1rem; }
+
+        /* Sidebar Transition Logic */
+        .sidebar {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .main-content {
+            transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.sidebar-collapsed .sidebar {
+            transform: translateX(-100%);
+        }
+
+        body.sidebar-collapsed .main-content {
+            margin-left: 0;
+            padding-left: 4.5rem;
+        }
+
+        .collapse-btn {
+            position: absolute;
+            top: 1.25rem;
+            right: 0.5rem;
+            width: 26px;
+            height: 26px;
+            background: var(--accent-cyan);
+            color: #05080f;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 0 15px rgba(0, 219, 255, 0.4);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid var(--border-subtle);
+            border-radius: 2rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.light-mode .glass {
+            background: rgba(255, 255, 255, 0.98) !important;
+            border: 2px solid rgba(0, 219, 255, 0.5) !important;
+            box-shadow: 0 10px 40px rgba(0, 118, 214, 0.1) !important;
+            border-radius: 2.5rem;
+        }
+
+        body.light-mode .glass:hover {
+            border-color: rgba(0, 219, 255, 0.8) !important;
+            box-shadow: 0 0 40px rgba(0, 219, 255, 0.25), 0 15px 45px rgba(0, 118, 214, 0.15) !important;
+            transform: translateY(-2px);
+        }
+
+        body.light-mode .glass:hover {
+            border-color: rgba(0, 219, 255, 0.8) !important;
+            box-shadow: 0 0 40px rgba(0, 219, 255, 0.25), 0 15px 45px rgba(0, 118, 214, 0.15) !important;
+            transform: translateY(-2px);
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-subtle);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(20px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
+        }
+
+        .collapse-btn:hover {
+            transform: scale(1.1);
+        }
+
+        #restore-sidebar {
+            position: fixed;
+            top: 1.5rem;
+            left: 1rem;
+            width: 38px;
+            height: 38px;
+            background: var(--accent-cyan);
+            color: #05080f;
+            border: none;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 55;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 219, 255, 0.4);
+        }
+
+        .fa-trash:hover {
+            color: #ef4444 !important;
+            filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.4));
+            cursor: pointer;
+        }
+
+        body.sidebar-collapsed #restore-sidebar {
+            display: flex;
+        }
+
+        .upload-zone {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2rem;
+            padding: 5rem 2rem;
+            text-align: center;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(16, 28, 45, 0.6);
+            backdrop-filter: blur(25px) saturate(180%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.light-mode .upload-zone {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(0, 219, 255, 0.4);
+            box-shadow: 0 10px 40px rgba(0, 118, 214, 0.08);
+            border-radius: 2.5rem;
+        }
+
+        .upload-zone:hover {
+            border-color: rgba(0, 219, 255, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        body.light-mode .upload-zone:hover {
+            background: rgba(255, 255, 255, 0.98);
+            border-color: rgba(0, 219, 255, 0.8);
+            box-shadow: 0 0 40px rgba(0, 219, 255, 0.25), 0 25px 60px rgba(0, 118, 214, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .upload-zone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 219, 255, 0.05), transparent);
+            transition: 0.8s;
+            pointer-events: none;
+        }
+
+        .upload-zone:hover::before {
+            left: 100%;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 9999px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+        }
+
+        .filter-btn.active {
+            background: var(--accent-cyan);
+            color: #05080f;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(0, 219, 255, 0.3);
+        }
+
+        .media-item {
+            background: rgba(16, 28, 45, 0.6);
+            backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1.25rem;
+            padding: 1.25rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.light-mode .media-item {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(0, 219, 255, 0.4);
+            box-shadow: 0 10px 40px rgba(0, 118, 214, 0.08);
+            border-radius: 1.5rem;
+        }
+
+        .media-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(0, 219, 255, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        body.light-mode .media-item:hover {
+            background: rgba(255, 255, 255, 0.98);
+            border-color: rgba(0, 219, 255, 0.8);
+            box-shadow: 0 0 40px rgba(0, 219, 255, 0.25), 0 15px 45px rgba(0, 118, 214, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .media-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 219, 255, 0.05), transparent);
+            transition: 0.6s;
+            pointer-events: none;
+        }
+
+        .media-item:hover::before {
+            left: 100%;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+
+        .logo-section {
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 120px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-section img {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 10px rgba(0, 219, 255, 0.5));
+        }
+
+        /* Light Mode Utility Overrides */
+        body.light-mode .bg-white\/5 {
+            background-color: rgba(0, 118, 214, 0.05) !important;
+        }
+
+        body.light-mode .border-white\/10,
+        body.light-mode .border-white\/5 {
+            border-color: rgba(0, 118, 214, 0.1) !important;
+        }
+
+        body.light-mode .text-gray-400 {
+            color: #475569 !important;
+        }
+
+        body.light-mode .text-gray-500 {
+            color: #64748b !important;
+        }
+
+        body.light-mode .text-gray-600 {
+            color: #94a3b8 !important;
+        }
+        
+        body.light-mode .text-white,
+        body.light-mode .text-gray-100,
+        body.light-mode .text-gray-200,
+        body.light-mode .text-gray-300 {
+            color: #0f172a !important;
+        }
+
+        body.light-mode .text-gray-400,
+        body.light-mode .text-gray-500 {
+            color: #334155 !important;
+        }
+
+        body.light-mode h1, 
+        body.light-mode h2, 
+        body.light-mode h3 {
+            color: #1e293b !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <button id="restore-sidebar" title="Show Sidebar" onclick="toggleSidebar()">
+        <i class="fas fa-chevron-right"></i>
+    </button>
+    <aside class="sidebar flex flex-col">
+        <button class="collapse-btn" onclick="toggleSidebar()" title="Hide Sidebar">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="logo-section">
+            <img src="../assets/images/Logo2.png" alt="Logo">
+        </div>
+        <nav class="flex-1">
+            <div class="nav-item cursor-pointer" onclick="window.location.href='dashboard.html'">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard Hub</span>
+            </div>
+            <div class="nav-item cursor-pointer" onclick="window.location.href='live-session.html'">
+                <i class="fas fa-video"></i>
+                <span>Live Session</span>
+            </div>
+            <div class="nav-item cursor-pointer" onclick="window.location.href='reports.html'">
+                <i class="fas fa-file-alt"></i>
+                <span>Reports</span>
+            </div>
+            <div class="nav-item active cursor-pointer" onclick="window.location.href='uploads.html'">
+                <i class="fas fa-upload"></i>
+                <span>Uploads</span>
+            </div>
+
+            <div class="mt-8 px-6 mb-2 nav-category">
+                <p class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Modules</p>
+            </div>
+            <div class="nav-item cursor-pointer" onclick="window.location.href='facial-expression.html'">
+                <i class="fas fa-user-astronaut"></i>
+                <span>Facial Micro-Exp</span>
+            </div>
+            <div class="nav-item cursor-pointer" onclick="window.location.href='voice-analysis.html'">
+                <i class="fas fa-microphone-lines"></i>
+                <span>Voice Analysis</span>
+            </div>
+        </nav>
+
+        <div class="p-4 border-t border-white/5">
+            <div class="nav-item cursor-pointer" onclick="window.location.href='profile.html'">
+                <i class="fas fa-user-circle"></i>
+                <span>Profile</span>
+            </div>
+            <div class="nav-item cursor-pointer" onclick="window.location.href='settings.html'">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+            <div class="nav-item text-red-400 hover:text-red-300 hover:bg-red-500/5 cursor-pointer"
+                onclick="window.location.href='login.html'">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Exit</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="p-8 pb-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold heading-font">Upload Media</h1>
+                <div class="flex items-center mt-2 text-xs text-cyan-400 font-medium tracking-wide active-member-info">
+                    <span class="status-dot"></span>
+                    Active Member: <span class="ml-1 opacity-80">John Doe • Unit #DECEP-09</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="theme-toggle" class="p-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-cyan-400 hover:bg-white/10 transition-all cursor-pointer" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="flex space-x-2">
+                    <button class="filter-btn active" onclick="filterMedia('all', this)">All</button>
+                    <button class="filter-btn" onclick="filterMedia('video', this)">Videos</button>
+                    <button class="filter-btn" onclick="filterMedia('audio', this)">Audio</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="max-w-5xl mx-auto w-full space-y-10 px-8">
+
+            <div class="upload-zone group cursor-pointer" onclick="document.getElementById('fileInput').click()">
+                <input type="file" id="fileInput" class="hidden">
+                <div class="w-20 h-20 bg-cyan-500/10 rounded-3xl flex items-center justify-center text-cyan-400 mx-auto mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-cloud-arrow-up text-3xl"></i>
+                </div>
+                <h2 class="text-xl font-bold text-white mb-2">Upload for Analysis</h2>
+                <p class="text-gray-500 text-xs uppercase tracking-widest">Drag and drop or browse files</p>
+                <p class="text-[10px] text-gray-600 mt-4">MP4, AVI, WAV, MP3 (MAX 1GB)</p>
+            </div>
+
+            <div class="space-y-4" id="mediaList">
+                <!-- Video Item -->
+                <div class="media-item flex items-center justify-between group" data-type="video">
+                    <div class="flex items-center space-x-5">
+                        <div class="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">suspect_interview_2024.mp4</h3>
+                            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-tighter mt-1">1080p • 12:45 • 245MB</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button class="px-5 py-2.5 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold uppercase rounded-xl hover:bg-cyan-500 hover:text-black transition-all duration-300 shadow-[0_4px_12px_rgba(0,219,255,0.1)] hover:shadow-[0_0_20px_rgba(0,219,255,0.4)]" onclick="window.location.href='facial-expression.html'">
+                            Analyze Face Emotion
+                        </button>
+                        <button class="p-2.5 text-gray-600 hover:text-red-500 transition-colors cursor-pointer"><i class="fas fa-trash-can"></i></button>
+                    </div>
+                </div>
+
+                <!-- Audio Item -->
+                <div class="media-item flex items-center justify-between group" data-type="audio">
+                    <div class="flex items-center space-x-5">
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
+                            <i class="fas fa-microphone"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">witness_call_log_09.wav</h3>
+                            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-tighter mt-1">Mono • 05:20 • 42MB</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button class="px-5 py-2.5 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold uppercase rounded-xl hover:bg-cyan-500 hover:text-black transition-all duration-300 shadow-[0_4px_12px_rgba(0,219,255,0.1)] hover:shadow-[0_0_20px_rgba(0,219,255,0.4)]" onclick="window.location.href='voice-analysis.html'">
+                            Analyze Voice Stress
+                        </button>
+                        <button class="p-2.5 text-gray-600 hover:text-red-500 transition-colors cursor-pointer"><i class="fas fa-trash-can"></i></button>
+                    </div>
+                </div>
+
+                <!-- Video Item 2 -->
+                <div class="media-item flex items-center justify-between group" data-type="video">
+                    <div class="flex items-center space-x-5">
+                        <div class="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">debrief_session_cam1.mp4</h3>
+                            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-tighter mt-1">720p • 08:30 • 110MB</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button class="px-5 py-2.5 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold uppercase rounded-xl hover:bg-cyan-500 hover:text-black transition-all duration-300 shadow-[0_4px_12px_rgba(0,219,255,0.1)] hover:shadow-[0_0_20px_rgba(0,219,255,0.4)]" onclick="window.location.href='facial-expression.html'">
+                            Analyze Face Emotion
+                        </button>
+                        <button class="p-2.5 text-gray-600 hover:text-red-500 transition-colors cursor-pointer"><i class="fas fa-trash-can"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function filterMedia(type, btn) {
+            // Update buttons
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Filter items
+            const items = document.querySelectorAll('.media-item');
+            items.forEach(item => {
+                if (type === 'all' || item.getAttribute('data-type') === type) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
+    <script>
+        const body = document.body;
+
+        function toggleSidebar() {
+            body.classList.toggle('sidebar-collapsed');
+            localStorage.setItem('sidebarCollapsed', body.classList.contains('sidebar-collapsed'));
+        }
+
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+
+        function toggleTheme() {
+            const isLight = body.classList.toggle('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            updateThemeUI(isLight);
+        }
+
+        function updateThemeUI(isLight) {
+            themeIcon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+            themeToggle.classList.toggle('bg-gray-200', isLight);
+            themeToggle.classList.toggle('text-gray-900', isLight);
+            themeToggle.classList.toggle('border-gray-300', isLight);
+        }
+
+        themeToggle.addEventListener('click', toggleTheme);
+
+        // Initial Load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('sidebarCollapsed') === 'true') {
+                body.classList.add('sidebar-collapsed');
+            }
+            if (localStorage.getItem('theme') === 'light' || (!localStorage.getItem('theme') && body.classList.contains('light-mode'))) {
+                body.classList.add('light-mode');
+                updateThemeUI(true);
+            } else {
+                updateThemeUI(false);
+            }
+        });
+    </script>
+</body>
+
+</html>

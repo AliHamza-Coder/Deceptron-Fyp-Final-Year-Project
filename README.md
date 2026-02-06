@@ -1,63 +1,92 @@
-# Deceptron - Lying Detection System (Phase 1 & 2)
+# DECEPTRON - Advanced Truth Verification System
 
-Deceptron is a computer vision-based lying detection system. This current version focuses on high-accuracy facial emotion recognition and real-time face tracking.
+DECEPTRON is a cutting-edge hybrid desktop application designed for advanced truth verification using multi-modal analysis. It combines a high-performance Python backend for AI/ML processing with a modern, responsive JavaScript-based frontend for a seamless user experience.
 
 ## 🚀 Features
 
-- **Real-time Face Detection**: Powered by MediaPipe for robust face tracking.
-- **Micro-Expression Analysis**: Uses HSEmotion (High-Speed Facial Emotion Recognition) to detect emotions like Happiness, Anger, Sadness, etc.
-- **Optimized Performance**: Configured for Python 3.9 with specific library versions to ensure stability on Windows.
+- **Real-time Analysis Dashboard**: Centralized hub for all verification activities.
+- **Live Session Mode**: Conduct interviews with real-time feedback.
+- **Facial Expression Analysis**: Detect micro-expressions and emotional cues using computer vision.
+- **Voice Stress Analysis**: Analyze vocal patterns for signs of deception.
+- **Detailed Reporting**: Generation of comprehensive reports with data visualization (`report-detail.html`).
+- **Uploads & File Processing**: Analyze pre-recorded media.
+- **Secure Authentication**: Integrated Login and Signup workflow.
+- **Customizable Settings**: Light/Dark modes, parameter tuning.
 
-## 🛠️ Prerequisites
+## 🛠 Tech Stack
 
-- **Python 3.9**: The project is optimized and tested for this version.
-- **Virtual Environment**: It is highly recommended to run this in a virtual environment (`myenv`).
+- **Backend**: Python (Logic, AI Models, File I/O)
+- **Frontend**: HTML5, CSS3, JavaScript (UI, Camera Handling, Charts)
+- **Middleware**: **Eel** (Bridges Python and JavaScript)
 
-## 📥 Installation
+## 📦 Installation & Setup
 
-1. **Clone or Open the directory**:
+1.  **Prerequisites**:
+    - Python 3.8 or higher installed.
+    - Modern Web Browser (Chrome/Edge) installed.
 
-   ```bash
-   cd d:\Deceptron-fyp-fnl
-   ```
+2.  **Clone/Download the Repository**.
 
-2. **Activate your Virtual Environment**:
+3.  **Set up the Virtual Environment** (Recommended):
+    - Windows:
+      ```bash
+      python -m venv myenv
+      myenv\Scripts\activate
+      ```
 
-   ```bash
-   # Windows
-   .\myenv\Scripts\activate
-   ```
+4.  **Install Dependencies**:
+    ```bash
+    pip install eel
+    # Add other future AI dependencies here (e.g., opencv-python, numpy)
+    ```
 
-3. **Install Dependencies**:
-   The project requires specific versions of libraries to avoid common crashes (OpenCV/NumPy mismatches).
-   ```bash
-   pip install -r requirements.txt
-   ```
+## 🖥️ How to Run
 
-## 🏃 How to Run
+**Option 1: Quick Launch (Windows)**
+Double-click the `RUN.bat` file in the root directory.
 
-To start the real-time camera feed with emotion detection, run:
+**Option 2: Manual Start**
+Open your terminal in the project folder and run:
 
 ```bash
-python CAmera-Module.py
+# Ensure your environment is active
+python main.py
 ```
 
-### Controls:
+The application will launch in a dedicated application window.
 
-- **'q'**: Press the 'q' key while the camera window is focused to exit.
+## 🏗️ Architecture & Development Guide
 
-## 📁 Project Structure
+### How it Works
 
-- `CAmera-Module.py`: The main entry point that handles camera input, face detection, and UI overlay.
-- `EmotionDetection.py`: Backend module that manages the HSEmotion model loading and inference.
-- `requirements.txt`: List of all verified compatible library versions.
+DECEPTRON uses **Eel** to host a local web server that communicates with a Python backend.
 
-## ⚠️ Important Notes
+1.  **Frontend (`/web`)**: Handles the User Interface, animations, and camera inputs. To open a camera:
+    - Use Standard HTML5/JS: `navigator.mediaDevices.getUserMedia()` for the smoothest video preview.
+2.  **Backend (`main.py`)**: Handles the heavy lifting.
+    - Use Python for: Database storage, complex math, running AI models (PyTorch/TensorFlow), and saving reports.
 
-- **Library Patching**: `EmotionDetection.py` includes a built-in patch for `torch.load` to handle security changes in newer PyTorch versions.
-- **Protobuf**: If you encounter Protobuf errors, the system is configured to use the `python` implementation via environment variables (handled automatically in most CLI setups).
-- **First Run**: On the first execution, the system will automatically download the required emotion detection model (`enet_b0_8_best_vgaf.pt`). This may take a few minutes depending on your internet speed.
+### Adding New Features (Best Practices)
+
+- **Camera/Video**:
+  - **Display**: strict usage of JavaScript (Frontend) for showing the live feed to the user.
+  - **Processing**: Capture frames in JS, send them to Python via `eel.process_frame(data_url)`, analyze in Python with OpenCV, and return the result.
+- **Charts**: Use JavaScript libraries (like Chart.js) in the frontend. Fetch the _data_ from Python.
+
+## 📂 Project Structure
+
+```
+DEceptron Screens/Frontend/
+├── main.py              # Entry point & Python backend logic
+├── RUN.bat              # One-click launcher
+├── web/                 # Frontend Assets
+│   ├── pages/           # HTML Views (Dashboard, Live Session, etc.)
+│   ├── scripts/         # JavaScript logic
+│   ├── styles/          # CSS Stylesheets
+│   └── assets/          # Images and Icons
+└── myenv/               # Python Virtual Environment
+```
 
 ---
 
-_Developed for Advanced Agentic Coding - FYP Project Path_
+**Developed by Ali Hamza-Coder**
