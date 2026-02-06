@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deceptron - Facial Micro-Expression</title>
+    <!-- Eel for Python-JavaScript Communication -->
+    <script src="/eel.js"></script>
     <link rel="stylesheet" href="../styles/output.css">
     <script src="../scripts/chart.min.js"></script>
     <link rel="stylesheet" href="../vendor/font-awesome/css/all.min.css">
@@ -779,36 +781,9 @@
                 </div>
                 
                 <div id="camOnState" class="absolute inset-0 hidden">
-                    <video id="webcam" class="absolute inset-0 w-full h-full object-cover grayscale opacity-60"></video>
-                    <div class="scanline"></div>
-                    <!-- Mock HUD Elements -->
-                    <div class="absolute inset-0 p-8 flex flex-col justify-between pointer-events-none">
-                        <div class="flex justify-between">
-                            <div class="text-[10px] font-mono text-cyan-400">
-                                [ SCANNING LANDMARKS... ]<br>
-                                [ POINTS: 68 DETECTED ]
-                            </div>
-                            <div class="text-[10px] font-mono text-cyan-400 text-right">
-                                [ FR: 60FPS ]<br>
-                                [ LATENCY: 12ms ]
-                            </div>
-                        </div>
-                        <div class="flex justify-center">
-                            <div class="border-2 border-cyan-500/50 w-64 h-64 rounded-full flex items-center justify-center">
-                                <div class="w-32 h-32 border border-cyan-500/20 rounded-full animate-ping"></div>
-                            </div>
-                        </div>
-                        <div class="flex justify-between">
-                            <div class="text-[10px] font-mono text-rose-500">
-                                [ STRESS_INDICATOR: ELEVATED ]<br>
-                                [ MICRO_TREMOR: POSITIVE ]
-                            </div>
-                            <div class="text-[10px] font-mono text-cyan-400 text-right">
-                                [ XY: 102.4, 305.8 ]<br>
-                                [ Z_DEPTH: 0.82m ]
-                            </div>
-                        </div>
-                    </div>
+                    <video id="webcam" class="absolute inset-0 w-full h-full object-cover"></video>
+                    <!-- Canvas overlay for emotion detection -->
+                    <canvas id="emotionCanvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
                 </div>
             </div>
         </div>
@@ -877,6 +852,75 @@
         </div>
     </main>
 
+    <!-- Load File Modal -->
+    <div id="vaultModal" style="display: none;" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-cyan-500/30 rounded-2xl max-w-2xl w-full p-8 shadow-2xl shadow-cyan-500/20">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-black text-white uppercase tracking-wider">
+                    <i class="fas fa-folder-open text-cyan-400 mr-3"></i>Load File
+                </h2>
+                <button onclick="closeVault()" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+
+            <div class="h-[1px] bg-gradient-to-r from-cyan-500/50 to-transparent mb-6"></div>
+
+            <div class="space-y-3 max-h-96 overflow-y-auto">
+                <!-- Sample Files -->
+                <div onclick="loadMockFile('Session_2025_01_15_Interview.mp4')" class="p-4 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/50 rounded-xl cursor-pointer transition-all group">
+                    <div class="flex items-center gap-4">
+                        <i class="fas fa-video text-cyan-400 text-2xl group-hover:scale-110 transition-transform"></i>
+                        <div class="flex-1">
+                            <div class="font-bold text-white">Session_2025_01_15_Interview.mp4</div>
+                            <div class="text-xs text-gray-400">Video • 15:32 • 245 MB</div>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-600 group-hover:text-cyan-400 transition-colors"></i>
+                    </div>
+                </div>
+
+                <div onclick="loadMockFile('Audio_Recording_Suspect_A.wav')" class="p-4 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/50 rounded-xl cursor-pointer transition-all group">
+                    <div class="flex items-center gap-4">
+                        <i class="fas fa-microphone text-amber-400 text-2xl group-hover:scale-110 transition-transform"></i>
+                        <div class="flex-1">
+                            <div class="font-bold text-white">Audio_Recording_Suspect_A.wav</div>
+                            <div class="text-xs text-gray-400">Audio • 08:45 • 89 MB</div>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-600 group-hover:text-cyan-400 transition-colors"></i>
+                    </div>
+                </div>
+
+                <div onclick="loadMockFile('Interrogation_Room_2_Cam1.mp4')" class="p-4 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/50 rounded-xl cursor-pointer transition-all group">
+                    <div class="flex items-center gap-4">
+                        <i class="fas fa-video text-rose-400 text-2xl group-hover:scale-110 transition-transform"></i>
+                        <div class="flex-1">
+                            <div class="font-bold text-white">Interrogation_Room_2_Cam1.mp4</div>
+                            <div class="text-xs text-gray-400">Video • 22:18 • 512 MB</div>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-600 group-hover:text-cyan-400 transition-colors"></i>
+                    </div>
+                </div>
+
+                <div onclick="loadMockFile('Voice_Sample_Baseline.mp3')" class="p-4 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/50 rounded-xl cursor-pointer transition-all group">
+                    <div class="flex items-center gap-4">
+                        <i class="fas fa-file-audio text-emerald-400 text-2xl group-hover:scale-110 transition-transform"></i>
+                        <div class="flex-1">
+                            <div class="font-bold text-white">Voice_Sample_Baseline.mp3</div>
+                            <div class="text-xs text-gray-400">Audio • 03:12 • 12 MB</div>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-600 group-hover:text-cyan-400 transition-colors"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-6 border-t border-white/10">
+                <button onclick="closeVault()" class="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl transition-all">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Init Radar Chart
         const ctxRadar = document.getElementById('radarChart').getContext('2d');
@@ -920,7 +964,10 @@
             }
         });
 
+        // Camera and Emotion Detection Variables
         let cameraOn = false;
+        let mediaStream = null;
+        let emotionDetectionInterval = null;
 
         function openVault() {
             document.getElementById('vaultModal').style.display = 'flex';
@@ -938,23 +985,45 @@
             document.querySelector('h1').innerHTML = filename + ' <span class="text-cyan-400 font-normal">| ANALYZING</span>';
         }
 
-        function toggleCamera() {
+        async function toggleCamera() {
             const off = document.getElementById('camOffState');
             const on = document.getElementById('camOnState');
             const btn = document.getElementById('mainCamBtn');
+            const video = document.getElementById('webcam');
             
             if (!cameraOn) {
-                cameraOn = true;
-                off.classList.add('opacity-0');
-                setTimeout(() => {
-                    off.classList.add('hidden');
-                    on.classList.remove('hidden');
-                    on.classList.add('flex');
-                }, 500);
-                btn.innerHTML = '<i class="fas fa-video mr-2"></i> Camera On';
-                btn.classList.remove('bg-rose-500/10', 'text-rose-500', 'border-rose-500/30');
-                btn.classList.add('bg-cyan-500/10', 'text-cyan-500', 'border-cyan-500/30', 'hover:bg-cyan-500', 'hover:text-white');
+                try {
+                    mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    video.srcObject = mediaStream;
+                    await video.play();
+
+                    cameraOn = true;
+                    off.classList.add('opacity-0');
+                    setTimeout(() => {
+                        off.classList.add('hidden');
+                        on.classList.remove('hidden');
+                        on.classList.add('flex');
+                        
+                        // Start emotion detection
+                        startEmotionDetection();
+                    }, 500);
+                    btn.innerHTML = '<i class="fas fa-video mr-2"></i> Camera On';
+                    btn.classList.remove('bg-rose-500/10', 'text-rose-500', 'border-rose-500/30');
+                    btn.classList.add('bg-cyan-500/10', 'text-cyan-500', 'border-cyan-500/30', 'hover:bg-cyan-500', 'hover:text-white');
+                } catch (err) {
+                    console.error("Error accessing camera:", err);
+                    alert("Could not access camera. Please check permissions.");
+                }
             } else {
+                // Stop emotion detection
+                stopEmotionDetection();
+                
+                if(mediaStream) {
+                    mediaStream.getTracks().forEach(track => track.stop());
+                    mediaStream = null;
+                }
+                video.srcObject = null;
+                
                 cameraOn = false;
                 on.classList.add('hidden');
                 on.classList.remove('flex');
@@ -963,6 +1032,94 @@
                 btn.innerHTML = '<i class="fas fa-video-slash"></i> Camera Off';
                 btn.classList.add('bg-rose-500/10', 'text-rose-500', 'border-rose-500/30');
                 btn.classList.remove('bg-cyan-500/10', 'text-cyan-500', 'border-cyan-500/30', 'hover:bg-cyan-500', 'hover:text-white');
+            }
+        }
+
+        // Real-time Emotion Detection Functions
+        function startEmotionDetection() {
+            const videoElement = document.getElementById("webcam");
+            const canvas = document.getElementById("emotionCanvas");
+            const ctx = canvas.getContext("2d");
+
+            console.log("🚀 Starting emotion detection...");
+
+            function resizeCanvas() {
+                canvas.width = videoElement.videoWidth;
+                canvas.height = videoElement.videoHeight;
+            }
+
+            videoElement.addEventListener('loadedmetadata', resizeCanvas);
+            resizeCanvas();
+
+            emotionDetectionInterval = setInterval(async () => {
+                if (!videoElement.videoWidth) return;
+
+                try {
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = videoElement.videoWidth;
+                    tempCanvas.height = videoElement.videoHeight;
+                    const tempCtx = tempCanvas.getContext('2d');
+                    
+                    // Flip horizontally for mirror effect
+                    tempCtx.translate(tempCanvas.width, 0);
+                    tempCtx.scale(-1, 1);
+                    tempCtx.drawImage(videoElement, 0, 0);
+                    tempCtx.setTransform(1, 0, 0, 1, 0, 0);
+
+                    const base64Image = tempCanvas.toDataURL('image/jpeg', 0.8);
+                    const result = await eel.process_frame(base64Image)();
+
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    if (result.success && result.face_found) {
+                        const box = result.face_box;
+                        const mirroredX = canvas.width - box.x - box.w;
+                        
+                        const padding = 10;
+                        const x = Math.max(0, mirroredX - padding);
+                        const y = Math.max(0, box.y - padding);
+                        const w = Math.min(canvas.width - x, box.w + padding * 2);
+                        const h = Math.min(canvas.height - y, box.h + padding * 2);
+
+                        ctx.strokeStyle = '#00DBFF';
+                        ctx.lineWidth = 4;
+                        ctx.strokeRect(x, y, w, h);
+
+                        const emotion = result.emotion;
+                        const confidence = (result.confidence * 100).toFixed(1);
+                        const label = `${emotion} (${confidence}%)`;
+                        
+                        ctx.font = 'bold 22px Inter, sans-serif';
+                        const textWidth = ctx.measureText(label).width;
+                        
+                        const labelY = y > 40 ? y - 40 : y + h + 5;
+                        ctx.fillStyle = 'rgba(0, 219, 255, 0.95)';
+                        ctx.fillRect(x, labelY, textWidth + 20, 35);
+                        
+                        ctx.fillStyle = '#000000';
+                        ctx.fillText(label, x + 10, labelY + 24);
+
+                        console.log(`Detected: ${emotion} (${confidence}%)`);
+                    } else if (result.success && !result.face_found) {
+                        ctx.font = 'bold 24px Inter, sans-serif';
+                        ctx.fillStyle = 'rgba(244, 63, 94, 0.9)';
+                        ctx.fillText('No Face Detected', 20, 40);
+                    }
+                } catch (error) {
+                    console.error("Emotion detection error:", error);
+                }
+            }, 500);
+        }
+
+        function stopEmotionDetection() {
+            if (emotionDetectionInterval) {
+                clearInterval(emotionDetectionInterval);
+                emotionDetectionInterval = null;
+                console.log("⏹️ Stopped emotion detection");
+
+                const canvas = document.getElementById("emotionCanvas");
+                const ctx = canvas.getContext("2d");
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
         }
 

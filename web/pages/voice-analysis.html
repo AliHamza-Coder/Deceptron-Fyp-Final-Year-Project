@@ -962,26 +962,39 @@
         }
 
         // Mock Logic
-        let isRecording = false;
-        let timerInterval;
+        // Real Microphone Control
+        let mediaStream = null;
 
-        function toggleRecording() {
+        async function toggleRecording() {
             const btn = document.getElementById('recordBtn');
             const status = document.getElementById('statusLabel');
-            const timer = document.getElementById('timer');
-
+            
             if (!isRecording) {
-                isRecording = true;
-                btn.classList.add('bg-red-500', 'text-white');
-                status.innerText = "Recording Active...";
-                status.classList.add('text-red-500');
-                
-                // Clear state
-                document.getElementById('transcript').innerHTML = '<p class="text-cyan-400">Processing signal in real-time...</p>';
-                
-                startTimer();
-                simulateRealTimeAnalysis();
+                try {
+                    // Request Microphone Access
+                    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    
+                    isRecording = true;
+                    btn.classList.add('bg-red-500', 'text-white');
+                    status.innerText = "Microphone Active - Recording...";
+                    status.classList.add('text-red-500');
+                    
+                    // Clear state
+                    document.getElementById('transcript').innerHTML = '<p class="text-cyan-400">Listening to audio input stream...</p>';
+                    
+                    startTimer();
+                    simulateRealTimeAnalysis();
+                } catch (err) {
+                    console.error("Mic Error:", err);
+                    alert("Microphone access denied or not available.");
+                }
             } else {
+                // Stop Microphone
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(track => track.stop());
+                    mediaStream = null;
+                }
+                
                 isRecording = false;
                 btn.classList.remove('bg-red-500', 'text-white');
                 status.innerText = "Processing Complete";

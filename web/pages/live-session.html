@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Deceptron - Live Analysis Unit</title>
+    <!-- Eel for Python-JavaScript Communication -->
+    <script src="/eel.js"></script>
     <link rel="stylesheet" href="../styles/output.css" />
     <script src="../scripts/chart.min.js"></script>
     <link rel="stylesheet" href="../vendor/font-awesome/css/all.min.css" />
@@ -705,7 +707,7 @@
             <h2
               class="text-2xl font-bold heading-font text-white uppercase tracking-wider"
             >
-              Recording Library
+              <i class="fas fa-folder-open text-cyan-400 mr-3"></i>Load File
             </h2>
             <p
               class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1"
@@ -893,8 +895,8 @@
                 id="webcam"
                 class="absolute inset-0 w-full h-full object-cover"
               ></video>
-              <div class="hud-overlay"></div>
-              <div class="scanline"></div>
+              <!-- Canvas overlay for emotion detection drawing -->
+              <canvas id="emotionCanvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
             </div>
 
             <!-- Floating HUD -->
@@ -1492,32 +1494,167 @@
       }
 
       // UI Interactions
-      function toggleCamera() {
+      // Camera Logic
+      let mediaStream = null;
+      let emotionDetectionInterval = null;
+
+      async function toggleCamera() {
         const off = document.getElementById("camOffState");
         const on = document.getElementById("camOnState");
         const btn = document.getElementById("camBtn");
         const toast = document.getElementById("videoToast");
+        const videoElement = document.getElementById("webcam");
+        const canvas = document.getElementById("emotionCanvas");
 
         if (on.classList.contains("hidden")) {
-          off.style.opacity = "0";
-          setTimeout(() => {
-            off.classList.add("hidden");
-            on.classList.remove("hidden");
-            btn.classList.add("active");
-            on.style.opacity = "1";
+          // Turning ON
+          try {
+            mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            videoElement.srcObject = mediaStream;
+            videoElement.play();
 
-            // Show Toast
-            toast.classList.remove("opacity-0", "translate-y-4");
-            toast.classList.add("opacity-1", "translate-y-0");
+            off.style.opacity = "0";
             setTimeout(() => {
-              toast.classList.add("opacity-0", "translate-y-4");
-            }, 2000);
-          }, 300);
+              off.classList.add("hidden");
+              on.classList.remove("hidden");
+              btn.classList.add("active");
+              on.style.opacity = "1";
+
+              // Show Toast
+              toast.querySelector("div").innerText = "Camera & Mic Online";
+              toast.classList.remove("opacity-0", "translate-y-4");
+              toast.classList.add("opacity-1", "translate-y-0");
+              setTimeout(() => {
+                toast.classList.add("opacity-0", "translate-y-4");
+              }, 2000);
+
+              // Start emotion detection after camera is ready
+              startEmotionDetection();
+            }, 300);
+          } catch (err) {
+            console.error("Error accessing webcam:", err);
+            alert("Could not access camera/microphone. Please check permissions.");
+          }
         } else {
+          // Turning OFF
+          stopEmotionDetection();
+          
+          if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream = null;
+          }
+          videoElement.srcObject = null;
+          
           on.classList.add("hidden");
           off.classList.remove("hidden");
           btn.classList.remove("active");
           off.style.opacity = "1";
+        }
+      }
+
+      // Real-time emotion detection function
+      function startEmotionDetection() {
+        const videoElement = document.getElementById("webcam");
+        const canvas = document.getElementById("emotionCanvas");
+        const ctx = canvas.getContext("2d");
+
+        console.log("🚀 Starting real-time emotion detection...");
+
+        // Set canvas size to match video
+        function resizeCanvas() {
+          canvas.width = videoElement.videoWidth;
+          canvas.height = videoElement.videoHeight;
+        }
+
+        videoElement.addEventListener('loadedmetadata', resizeCanvas);
+        resizeCanvas();
+
+        // Detection loop - runs every 500ms (2 times per second)
+        emotionDetectionInterval = setInterval(async () => {
+          if (!videoElement.videoWidth) return;
+
+          try {
+            // Capture frame from video
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = videoElement.videoWidth;
+            tempCanvas.height = videoElement.videoHeight;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // Flip horizontally for mirror effect (like original CAmera-Module.py)
+            tempCtx.translate(tempCanvas.width, 0);
+            tempCtx.scale(-1, 1);
+            tempCtx.drawImage(videoElement, 0, 0);
+            tempCtx.setTransform(1, 0, 0, 1, 0, 0);
+
+            // Convert to base64
+            const base64Image = tempCanvas.toDataURL('image/jpeg', 0.8);
+
+            // Send to Python backend
+            const result = await eel.process_frame(base64Image)();
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (result.success && result.face_found) {
+              // Get bounding box coordinates
+              const box = result.face_box;
+              
+              // Mirror the x-coordinate since we flipped the image
+              const mirroredX = canvas.width - box.x - box.w;
+              
+              // Add padding to bounding box for better visibility
+              const padding = 10;
+              const x = Math.max(0, mirroredX - padding);
+              const y = Math.max(0, box.y - padding);
+              const w = Math.min(canvas.width - x, box.w + padding * 2);
+              const h = Math.min(canvas.height - y, box.h + padding * 2);
+
+              // Draw bounding box with thicker border
+              ctx.strokeStyle = '#00DBFF';  // Cyan color
+              ctx.lineWidth = 4;  // Thicker border
+              ctx.strokeRect(x, y, w, h);
+
+              // Draw emotion label background
+              const emotion = result.emotion;
+              const confidence = (result.confidence * 100).toFixed(1);
+              const label = `${emotion} (${confidence}%)`;
+              
+              ctx.font = 'bold 22px Inter, sans-serif';
+              const textWidth = ctx.measureText(label).width;
+              
+              // Background rectangle with better positioning
+              const labelY = y > 40 ? y - 40 : y + h + 5;
+              ctx.fillStyle = 'rgba(0, 219, 255, 0.95)';
+              ctx.fillRect(x, labelY, textWidth + 20, 35);
+              
+              // Text
+              ctx.fillStyle = '#000000';
+              ctx.fillText(label, x + 10, labelY + 24);
+
+              // Optional: Log to console
+              console.log(`Detected: ${emotion} (${confidence}%)`);
+            } else if (result.success && !result.face_found) {
+              // Draw "No Face" message
+              ctx.font = 'bold 24px Inter, sans-serif';
+              ctx.fillStyle = 'rgba(244, 63, 94, 0.9)';
+              ctx.fillText('No Face Detected', 20, 40);
+            }
+          } catch (error) {
+            console.error("Error in emotion detection:", error);
+          }
+        }, 500);  // Run every 500ms
+      }
+
+      function stopEmotionDetection() {
+        if (emotionDetectionInterval) {
+          clearInterval(emotionDetectionInterval);
+          emotionDetectionInterval = null;
+          console.log("⏹️ Stopped emotion detection");
+
+          // Clear canvas
+          const canvas = document.getElementById("emotionCanvas");
+          const ctx = canvas.getContext("2d");
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
       }
 
