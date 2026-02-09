@@ -167,7 +167,7 @@ if __name__ == "__main__":
     try:
         # Start Eel - will open in default browser or Edge
         eel.start(
-            'pages/welcome.html',  # Starting page
+            'index.html',          # Starting page
             size=(1400, 900),      # Window size
             port=8000,             # Port number
             mode=None,             # Let Eel choose best available browser
@@ -181,4 +181,4 @@ if __name__ == "__main__":
     except EnvironmentError:
         # Fallback if no browser found
         print("⚠️  No suitable browser found. Opening in default browser...")
-        eel.start('pages/welcome.html', size=(1400, 900), port=8000)
+        eel.start('index.html', size=(1400, 900), port=8000)
