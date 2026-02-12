@@ -16,13 +16,7 @@
             --border-subtle: rgba(255, 255, 255, 0.08);
         }
 
-        body.light-mode {
-            --bg-dark: #f8fafc;
-            --text-main: #0f172a;
-            --text-dim: #64748b;
-            --glass-bg: rgba(255, 255, 255, 0.8);
-            --border-subtle: rgba(0, 0, 0, 0.05);
-        }
+
 
         body {
             font-family: 'Inter', sans-serif;
@@ -38,28 +32,28 @@
             align-items: center;
             justify-content: flex-start;
             padding: 2rem 1rem;
-            transition: all 0.3s ease;
+            transition: none;
             background-image: 
                 radial-gradient(at 0% 0%, hsla(210,100%,15%,0.15) 0, transparent 50%), 
-                radial-gradient(at 100% 0%, hsla(180,100%,10%,0.1) 0, transparent 50%);
+                radial-gradient(at 50% 0%, hsla(180,100%,10%,0.1) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(210,100%,15%,0.15) 0, transparent 50%);
+            background-attachment: fixed;
             scroll-behavior: smooth;
         }
 
-        body.light-mode {
-            background-image: none;
-        }
+
 
         .heading-font { font-family: 'Orbitron', sans-serif; }
         
         .glass {
             background: var(--glass-bg);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(25px) saturate(180%);
             border: 1px solid var(--border-subtle);
-        }
-
-        .feature-card {
+            border-radius: 2rem;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
+
 
         .feature-card:hover {
             background: rgba(0, 219, 255, 0.05);
@@ -67,10 +61,13 @@
             transform: translateY(-8px);
         }
 
+
+
         .btn-launch {
             background: linear-gradient(135deg, #0076D6, #00DBFF);
             box-shadow: 0 0 20px rgba(0, 219, 255, 0.3);
             transition: all 0.3s ease;
+            color: white;
         }
 
         .btn-launch:hover {
@@ -84,13 +81,6 @@
         }
 
         .animate-glow { animation: subtle-glow 3s infinite ease-in-out; }
-
-        #theme-toggle {
-            position: fixed;
-            top: 2rem;
-            right: 2rem;
-            z-index: 100;
-        }
 
         /* Entrance Animations */
         @keyframes reveal-up {
@@ -153,7 +143,8 @@
         .action-section { padding: 2rem 0; }
         .footer-section { padding: 2rem 0; margin-top: auto; }
 
-        /* Responsive improvements */
+
+
         @media (max-width: 768px) {
             body { padding: 1rem 0.5rem; }
             .main-container { gap: 2rem; }
@@ -163,10 +154,7 @@
 </head>
 <body>
     
-    <!-- Theme Toggle -->
-    <button id="theme-toggle" class="fixed top-6 right-6 z-50 p-3 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-cyan-400 hover:bg-white/10 transition-all cursor-pointer reveal-zoom" title="Toggle Theme">
-        <i class="fas fa-moon"></i>
-    </button>
+
 
     <!-- Main Container -->
     <div class="main-container">
@@ -246,22 +234,7 @@
     </div>
 
     <script>
-        const body = document.body;
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = themeToggle.querySelector('i');
 
-        function toggleTheme() {
-            const isLight = body.classList.toggle('light-mode');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            updateThemeUI(isLight);
-        }
-
-        function updateThemeUI(isLight) {
-            themeIcon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
-            themeToggle.classList.toggle('light-mode-btn', isLight);
-        }
-
-        themeToggle.addEventListener('click', toggleTheme);
 
         // Auto-scroll functionality
         function smoothScrollToSection(sectionIndex) {
@@ -293,12 +266,6 @@
 
         // Initial Load
         document.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('theme') === 'light') {
-                body.classList.add('light-mode');
-                updateThemeUI(true);
-            } else {
-                updateThemeUI(false);
-            }
             
             // Start auto-scroll after initial animations
             setTimeout(() => {

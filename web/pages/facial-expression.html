@@ -32,21 +32,39 @@
         }
 
         body.light-mode {
-            --bg-main: #eef7f9;
-            --text-main: #27374d;
-            --text-dim: #526d82;
-            --glass-bg: rgba(255, 255, 255, 0.8);
-            --sidebar-bg: rgba(255, 255, 255, 0.95);
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --border-subtle: rgba(0, 219, 255, 0.3);
+            --bg-main: #f0f9ff;
+            --text-main: #1e293b;
+            --text-dim: #64748b;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --sidebar-bg: rgba(255, 255, 255, 0.9);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --border-subtle: rgba(0, 219, 255, 0.5);
         }
 
         body.light-mode .active-member-info {
-            color: #00DBFF !important;
-            font-weight: 600;
+            color: #22d3ee !important;
+            font-weight: 500;
         }
 
         /* Light Mode Utility Overrides */
+        body.light-mode h1, 
+        body.light-mode h2, 
+        body.light-mode h3 {
+            color: #1e293b !important;
+        }
+
+        body.light-mode .text-white,
+        body.light-mode .text-gray-100,
+        body.light-mode .text-gray-200,
+        body.light-mode .text-gray-300 {
+            color: #0f172a !important;
+        }
+
+        body.light-mode .text-gray-400,
+        body.light-mode .text-gray-500 {
+            color: #334155 !important;
+        }
+
         body.light-mode .bg-white\/5 {
             background-color: rgba(0, 118, 214, 0.05) !important;
         }
