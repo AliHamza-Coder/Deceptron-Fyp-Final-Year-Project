@@ -165,13 +165,15 @@ if __name__ == "__main__":
     print("="*60 + "\n")
     
     try:
-        # Start Eel - will open in default browser or Edge
+        # Force 'chrome' for a true desktop app feel. If Chrome isn't found, Eel will try others.
+        # Setting port to 0 lets Eel find any available open port.
+        print("🖥️  Opening desktop window...")
         eel.start(
-            'index.html',          # Starting page
-            size=(1400, 900),      # Window size
-            port=8000,             # Port number
-            mode=None,             # Let Eel choose best available browser
-            close_callback=lambda page, sockets: None  # Prevent exit on close
+            'index.html',
+            size=(1400, 900),
+            port=0, 
+            mode='chrome',
+            close_callback=lambda page, sockets: None
         )
     except (SystemExit, KeyboardInterrupt):
         print("\n\n" + "="*60)
