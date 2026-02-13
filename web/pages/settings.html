@@ -494,7 +494,7 @@
             <div class="nav-item text-red-400 hover:text-red-300 hover:bg-red-500/5 cursor-pointer"
                 onclick="window.location.href='login.html'">
                 <i class="fas fa-sign-out-alt"></i>
-                <span>Exit</span>
+                <span>Logout</span>
             </div>
         </div>
     </aside>
@@ -531,23 +531,23 @@
                         <div class="space-y-2">
                             <div class="flex justify-between text-[10px] font-bold uppercase tracking-widest text-gray-400">
                                 <span>Brightness Intensity</span>
-                                <span class="text-cyan-400">65%</span>
+                                <span class="text-cyan-400">50%</span>
                             </div>
-                            <input type="range" class="range-slider" value="65">
+                            <input type="range" id="brightnessSlider" class="range-slider" min="0" max="100" value="50">
                         </div>
                         <div class="space-y-2">
                             <div class="flex justify-between text-[10px] font-bold uppercase tracking-widest text-gray-400">
                                 <span>Contrast Ratio</span>
                                 <span class="text-cyan-400">50%</span>
                             </div>
-                            <input type="range" class="range-slider" value="50">
+                            <input type="range" id="contrastSlider" class="range-slider" min="0" max="100" value="50">
                         </div>
                         <div class="space-y-2">
                             <div class="flex justify-between text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                                <span>Sharpness (Edge Detection)</span>
-                                <span class="text-cyan-400">80%</span>
+                                <span>Saturation</span>
+                                <span class="text-cyan-400">50%</span>
                             </div>
-                            <input type="range" class="range-slider" value="80">
+                            <input type="range" id="saturationSlider" class="range-slider" min="0" max="100" value="50">
                         </div>
                     </div>
                 </div>
@@ -567,7 +567,7 @@
 
                 <div class="flex space-x-4">
                     <button class="flex-1 py-4 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold uppercase rounded-xl shadow-[0_4px_15px_rgba(0,219,255,0.1)] hover:bg-cyan-500 hover:text-black transition-all duration-300">Apply Configuration</button>
-                    <button class="flex-1 py-4 bg-white/5 border border-white/10 text-white text-[10px] font-bold uppercase rounded-xl hover:bg-white/10 transition-all">Reset Default</button>
+                    <button onclick="resetSettings()" class="flex-1 py-4 bg-white/5 border border-white/10 text-white text-[10px] font-bold uppercase rounded-xl hover:bg-white/10 transition-all cursor-pointer">Reset Default</button>
                 </div>
             </div>
 
@@ -611,45 +611,18 @@
     </main>
 
     <script>
-        let isCamOn = false;
-        async function toggleCam() {
-            const video = document.getElementById('webcamPreview');
-            const off = document.getElementById('camOff');
-            const tag = document.getElementById('statusTag');
-            const btn = document.getElementById('toggleBtn');
-
-            if (!isCamOn) {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                    video.srcObject = stream;
-                    video.style.display = 'block';
-                    off.style.display = 'none';
-                    tag.classList.remove('hidden');
-                    btn.classList.replace('bg-rose-500/20', 'bg-emerald-500/20');
-                    btn.classList.replace('text-rose-500', 'text-emerald-400');
-                    btn.classList.replace('border-rose-500/30', 'border-emerald-500/30');
-                    isCamOn = true;
-                } catch (e) { alert("Hardware Error: Sensor Access Denied."); }
-            } else {
-                video.srcObject.getTracks().forEach(t => t.stop());
-                video.style.display = 'none';
-                off.style.display = 'flex';
-                tag.classList.add('hidden');
-                btn.classList.replace('bg-emerald-500/20', 'bg-rose-500/20');
-                btn.classList.replace('text-emerald-400', 'text-rose-500');
-                btn.classList.replace('border-emerald-500/30', 'border-rose-500/30');
-                isCamOn = false;
-            }
-        }
 
         const body = document.body;
+        let mediaStream = null;
+        let videoTrack = null;
 
+        // --- Sidebar Logic ---
         function toggleSidebar() {
             body.classList.toggle('sidebar-collapsed');
             localStorage.setItem('sidebarCollapsed', body.classList.contains('sidebar-collapsed'));
         }
 
-        // Theme Toggle Logic
+        // --- Theme Logic ---
         const themeToggle = document.getElementById('theme-toggle');
         const themeIcon = themeToggle.querySelector('i');
 
@@ -668,8 +641,9 @@
 
         themeToggle.addEventListener('click', toggleTheme);
 
-        // Initial Load
-        document.addEventListener('DOMContentLoaded', () => {
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Restore UI State
             if (localStorage.getItem('sidebarCollapsed') === 'true') {
                 body.classList.add('sidebar-collapsed');
             }
@@ -679,7 +653,217 @@
             } else {
                 updateThemeUI(false);
             }
+
+            // Populate Camera Dropdown
+            await populateCameras();
+
+            // Initialize Sliders
+            setupSliders();
+            
+            // Load saved slider values from localStorage
+            loadSliderValues();
+
+            // Attach Logout Handler
+            setupLogoutHandler();
         });
+
+        // --- Camera & Settings Logic ---
+        async function populateCameras() {
+            const select = document.getElementById('camSelect');
+            select.innerHTML = ''; // Clear existing
+            
+            try {
+                // Don't request permission here - just enumerate without labels
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+
+                videoDevices.forEach((device, index) => {
+                    const option = document.createElement('option');
+                    option.value = device.deviceId;
+                    option.text = device.label || `Camera ${index + 1}`;
+                    select.appendChild(option);
+                });
+            } catch (err) {
+                console.error("Error enumerating devices:", err);
+                const option = document.createElement('option');
+                option.text = "Camera Access Denied";
+                select.appendChild(option);
+            }
+        }
+
+        async function toggleCam() {
+            const video = document.getElementById('webcamPreview');
+            const camOff = document.getElementById('camOff');
+            const toggleBtn = document.getElementById('toggleBtn');
+            const statusTag = document.getElementById('statusTag');
+            const select = document.getElementById('camSelect');
+
+            if (!mediaStream) {
+                // Turn On
+                try {
+                    const deviceId = select.value;
+                    const constraints = {
+                        video: {
+                            deviceId: deviceId ? { exact: deviceId } : undefined,
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        }
+                    };
+
+                    mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    video.srcObject = mediaStream;
+                    videoTrack = mediaStream.getVideoTracks()[0];
+                    
+                    // Force display block and wait a moment for video to be ready
+                    video.style.display = 'block';
+                    camOff.classList.add('hidden');
+                    statusTag.classList.remove('hidden');
+                    
+                    toggleBtn.innerHTML = '<i class="fas fa-video"></i>';
+                    toggleBtn.classList.remove('bg-rose-500/20', 'text-rose-500', 'border-rose-500/30');
+                    toggleBtn.classList.add('bg-emerald-500/20', 'text-emerald-500', 'border-emerald-500/30');
+
+                    // Apply current slider values immediately
+                    setTimeout(applySettings, 500);
+
+                } catch (err) {
+                    console.error("Error starting camera:", err);
+                }
+            } else {
+                // Turn Off
+                if(videoTrack) videoTrack.stop();
+                mediaStream = null;
+                videoTrack = null;
+                video.srcObject = null;
+
+                video.style.display = 'none';
+                camOff.classList.remove('hidden');
+                statusTag.classList.add('hidden');
+
+                toggleBtn.innerHTML = '<i class="fas fa-power-off"></i>';
+                toggleBtn.classList.add('bg-rose-500/20', 'text-rose-500', 'border-rose-500/30');
+                toggleBtn.classList.remove('bg-emerald-500/20', 'text-emerald-500', 'border-emerald-500/30');
+            }
+        }
+
+        function setupSliders() {
+            const sliders = document.querySelectorAll('.range-slider');
+            sliders.forEach(slider => {
+                // Use 'input' event for real-time updates while dragging
+                slider.addEventListener('input', (e) => {
+                    // Update the value display next to slider
+                    const display = e.target.previousElementSibling.querySelector('.text-cyan-400');
+                    if(display) display.innerText = e.target.value + (e.target.dataset.unit || '%');
+                    
+                    // Save to localStorage
+                    localStorage.setItem(e.target.id, e.target.value);
+                    
+                    // Apply to camera
+                    applySettings();
+                });
+            });
+        }
+
+        function applySettings() {
+            const brightness = document.getElementById('brightnessSlider').value;
+            const contrast = document.getElementById('contrastSlider').value;
+            const saturation = document.getElementById('saturationSlider').value;
+            
+            const video = document.getElementById('webcamPreview');
+
+            // 1. ALWAYS Apply CSS Filter (Visual Feedback)
+            // Mapping: 0-100 -> CSS 0.5 - 1.5 (centered at 50/1.0)
+            const bVal = 0.5 + (brightness / 100);
+            const cVal = 0.5 + (contrast / 100);
+            const sVal = 0.5 + (saturation / 100);
+            
+            // Apply scaleX(-1) if you want mirroring in details, but user asked for "transformer scale issue" fix in other pages. 
+            // In settings, mirroring is usually standard for self-view.
+            video.style.filter = `brightness(${bVal}) contrast(${cVal}) saturate(${sVal})`;
+
+            // 2. Try Hardware Constraints (if stream exists)
+            if (videoTrack) {
+                // Note: Constraints often require advanced capability check
+                const constraints = {
+                    advanced: [{
+                        brightness: parseInt(brightness), // Hardware often expects specific ranges
+                        contrast: parseInt(contrast),
+                        saturation: parseInt(saturation)
+                    }]
+                };
+
+                videoTrack.applyConstraints(constraints).catch(err => {
+                    // Ignore errors here, as we rely on CSS filter for the user experience
+                    // console.warn("Hardware constraints not supported:", err);
+                });
+            }
+        }
+
+        function loadSliderValues() {
+            const brightness = localStorage.getItem('brightnessSlider') || '50';
+            const contrast = localStorage.getItem('contrastSlider') || '50';
+            const saturation = localStorage.getItem('saturationSlider') || '50';
+            
+            document.getElementById('brightnessSlider').value = brightness;
+            document.getElementById('contrastSlider').value = contrast;
+            document.getElementById('saturationSlider').value = saturation;
+            
+            // Update UI text
+            document.querySelectorAll('.range-slider').forEach(s => {
+                const val = localStorage.getItem(s.id) || '50';
+                const display = s.previousElementSibling.querySelector('.text-cyan-400');
+                if(display) display.innerText = val + '%';
+            });
+        }
+
+        function resetSettings() {
+            // Reset values to 50
+            document.getElementById('brightnessSlider').value = 50;
+            document.getElementById('contrastSlider').value = 50;
+            document.getElementById('saturationSlider').value = 50;
+            
+            // Clear localStorage
+            localStorage.removeItem('brightnessSlider');
+            localStorage.removeItem('contrastSlider');
+            localStorage.removeItem('saturationSlider');
+            
+            // Update UI text
+            document.querySelectorAll('.range-slider').forEach(s => {
+                const display = s.previousElementSibling.querySelector('.text-cyan-400');
+                if(display) display.innerText = '50%';
+            });
+
+            applySettings();
+        }
+
+        // --- Logout App Logic ---
+        function setupLogoutHandler() {
+            const exitBtns = document.querySelectorAll('.nav-item span');
+            // Find the "Logout" button in nav
+            document.querySelectorAll('.nav-item').forEach(item => {
+                if(item.innerText.includes('Logout')) {
+                   item.onclick = (e) => {
+                       e.preventDefault();
+                       e.stopPropagation();
+                       closeApp();
+                   }
+                }
+            });
+        }
+
+        function closeApp() {
+            if(confirm("Are you sure you want to close DECEPTRON?")) {
+                // Try Python backend close first
+                try {
+                    if(typeof eel !== 'undefined') {
+                        eel.close_python_app(); 
+                    }
+                } catch(e) {}
+                
+                // Close browser window
+                window.close();
+            }
+        }
     </script>
 </body>
 </html>

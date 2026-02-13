@@ -170,7 +170,7 @@ if __name__ == "__main__":
         print("🖥️  Opening desktop window...")
         eel.start(
             'index.html',
-            size=(1400, 900),
+            size=(1500, 950),
             port=0, 
             mode='chrome',
             close_callback=lambda page, sockets: None

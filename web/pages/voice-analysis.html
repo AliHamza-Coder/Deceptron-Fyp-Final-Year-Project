@@ -645,9 +645,9 @@
                 <span>Settings</span>
             </div>
             <div class="nav-item text-red-400 hover:text-red-300 hover:bg-red-500/5 cursor-pointer"
-                onclick="window.location.href='login.html'">
+                onclick="closeApp()">
                 <i class="fas fa-sign-out-alt"></i>
-                <span>Exit</span>
+                <span>Logout</span>
             </div>
         </div>
     </aside>
@@ -990,11 +990,12 @@
             
             if (!isRecording) {
                 try {
-                    // Request Microphone Access
+                    // Frontend-only Mic Access
                     mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     
                     isRecording = true;
                     btn.classList.add('bg-red-500', 'text-white');
+                    btn.innerHTML = '<i class="fas fa-stop"></i> Stop Recording';
                     status.innerText = "Microphone Active - Recording...";
                     status.classList.add('text-red-500');
                     
@@ -1005,7 +1006,7 @@
                     simulateRealTimeAnalysis();
                 } catch (err) {
                     console.error("Mic Error:", err);
-                    alert("Microphone access denied or not available.");
+                    alert("Microphone access denied or not available. Please check permissions.");
                 }
             } else {
                 // Stop Microphone
@@ -1016,6 +1017,7 @@
                 
                 isRecording = false;
                 btn.classList.remove('bg-red-500', 'text-white');
+                btn.innerHTML = '<i class="fas fa-microphone"></i> Start Recording';
                 status.innerText = "Processing Complete";
                 status.classList.remove('text-red-500');
                 status.classList.add('text-emerald-500');
@@ -1164,6 +1166,12 @@
                 updateThemeUI(false);
             }
         });
+        function closeApp() {
+            if(confirm("Are you sure you want to close DECEPTRON?")) {
+                try { if(typeof eel !== 'undefined') { eel.close_python_app(); } } catch(e) {}
+                window.close();
+            }
+        }
     </script>
 </body>
 

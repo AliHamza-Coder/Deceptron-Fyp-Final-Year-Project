@@ -494,9 +494,9 @@
                 <span>Settings</span>
             </div>
             <div class="nav-item text-red-400 hover:text-red-300 hover:bg-red-500/5 cursor-pointer"
-                onclick="window.location.href='login.html'">
+                onclick="closeApp()">
                 <i class="fas fa-sign-out-alt"></i>
-                <span>Exit</span>
+                <span>Logout</span>
             </div>
         </div>
     </aside>
@@ -853,6 +853,12 @@
                 updateThemeUI(false);
             }
         });
+        function closeApp() {
+            if(confirm("Are you sure you want to close DECEPTRON?")) {
+                try { if(typeof eel !== 'undefined') { eel.close_python_app(); } } catch(e) {}
+                window.close();
+            }
+        }
     </script>
 </body>
 </html>

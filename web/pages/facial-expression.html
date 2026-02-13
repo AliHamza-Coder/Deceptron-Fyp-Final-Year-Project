@@ -1,1226 +1,1599 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Deceptron - Facial Micro-Expression</title>
     <!-- Eel for Python-JavaScript Communication -->
     <script src="/eel.js"></script>
-    <link rel="stylesheet" href="../styles/output.css">
+    <link rel="stylesheet" href="../styles/output.css" />
     <script src="../scripts/chart.min.js"></script>
-    <link rel="stylesheet" href="../vendor/font-awesome/css/all.min.css">
+    <link rel="stylesheet" href="../vendor/font-awesome/css/all.min.css" />
     <style>
-        :root {
-            --primary-blue: #0076D6;
-            --accent-cyan: #00DBFF;
-            --accent-cyan-glow: rgba(0, 219, 255, 0.4);
-            --accent-rose: #f43f5e;
-            --bg-dark: #070B14;
-            --sidebar-width: 260px;
-            --config-width: 320px;
-            --glass-bg: rgba(10, 17, 32, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.08);
+      :root {
+        --primary-blue: #0076d6;
+        --accent-cyan: #00dbff;
+        --accent-cyan-glow: rgba(0, 219, 255, 0.4);
+        --accent-rose: #f43f5e;
+        --bg-dark: #070b14;
+        --sidebar-width: 260px;
+        --config-width: 320px;
+        --glass-bg: rgba(10, 17, 32, 0.85);
+        --glass-border: rgba(255, 255, 255, 0.08);
 
-            /* Theme Tokens */
-            --bg-main: #05080f;
-            --text-main: #e2e8f0;
-            --text-dim: #94a3b8;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --sidebar-bg: rgba(10, 17, 32, 0.98);
-            --card-bg: rgba(16, 28, 45, 0.4);
-            --border-subtle: rgba(255, 255, 255, 0.05);
+        /* Theme Tokens */
+        --bg-main: #05080f;
+        --text-main: #e2e8f0;
+        --text-dim: #94a3b8;
+        --glass-bg: rgba(255, 255, 255, 0.03);
+        --sidebar-bg: rgba(10, 17, 32, 0.98);
+        --card-bg: rgba(16, 28, 45, 0.4);
+        --border-subtle: rgba(255, 255, 255, 0.05);
+      }
+
+      body.light-mode {
+        --bg-main: #f0f9ff;
+        --text-main: #1e293b;
+        --text-dim: #64748b;
+        --glass-bg: rgba(255, 255, 255, 0.7);
+        --sidebar-bg: rgba(255, 255, 255, 0.9);
+        --card-bg: rgba(255, 255, 255, 0.85);
+        --border-subtle: rgba(0, 219, 255, 0.5);
+      }
+
+      body.light-mode .active-member-info {
+        color: #22d3ee !important;
+        font-weight: 500;
+      }
+
+      /* Light Mode Utility Overrides */
+      body.light-mode h1,
+      body.light-mode h2,
+      body.light-mode h3 {
+        color: #1e293b !important;
+      }
+
+      body.light-mode .text-white,
+      body.light-mode .text-gray-100,
+      body.light-mode .text-gray-200,
+      body.light-mode .text-gray-300 {
+        color: #0f172a !important;
+      }
+
+      body.light-mode .text-gray-400,
+      body.light-mode .text-gray-500 {
+        color: #334155 !important;
+      }
+
+      body.light-mode .bg-white\/5 {
+        background-color: rgba(0, 118, 214, 0.05) !important;
+      }
+
+      body.light-mode .border-white\/10,
+      body.light-mode .border-white\/5 {
+        border-color: rgba(0, 118, 214, 0.1) !important;
+      }
+
+      body.light-mode .text-gray-400 {
+        color: #475569 !important;
+      }
+
+      body.light-mode .text-gray-500 {
+        color: #64748b !important;
+      }
+
+      body.light-mode .text-gray-600 {
+        color: #94a3b8 !important;
+      }
+
+      body.light-mode .bg-slate-800 {
+        background-color: rgba(0, 118, 214, 0.1) !important;
+      }
+
+      body.light-mode h1,
+      body.light-mode h2,
+      body.light-mode h3 {
+        color: #1e293b !important;
+      }
+
+      body.light-mode .text-white,
+      body.light-mode .text-gray-100,
+      body.light-mode .text-gray-200,
+      body.light-mode .text-gray-300 {
+        color: #0f172a !important;
+      }
+
+      body.light-mode .bg-primary-blue .text-white,
+      body.light-mode .bg-blue-600 .text-white,
+      body.light-mode button.bg-primary-blue,
+      body.light-mode button.bg-blue-600 {
+        color: white !important;
+      }
+
+      body.light-mode .text-gray-400,
+      body.light-mode .text-gray-500 {
+        color: #334155 !important;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        background: #10b981;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 0.5rem;
+        animation: pulse-glow 2s infinite;
+      }
+
+      @keyframes pulse-glow {
+        0% {
+          box-shadow: 0 0 5px #10b981;
         }
-
-        body.light-mode {
-            --bg-main: #f0f9ff;
-            --text-main: #1e293b;
-            --text-dim: #64748b;
-            --glass-bg: rgba(255, 255, 255, 0.7);
-            --sidebar-bg: rgba(255, 255, 255, 0.9);
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --border-subtle: rgba(0, 219, 255, 0.5);
+        50% {
+          box-shadow: 0 0 20px #10b981;
         }
-
-        body.light-mode .active-member-info {
-            color: #22d3ee !important;
-            font-weight: 500;
+        100% {
+          box-shadow: 0 0 5px #10b981;
         }
+      }
 
-        /* Light Mode Utility Overrides */
-        body.light-mode h1, 
-        body.light-mode h2, 
-        body.light-mode h3 {
-            color: #1e293b !important;
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--bg-main);
+        color: var(--text-main);
+        margin: 0;
+        overflow: hidden;
+        width: 100vw;
+        transition:
+          background 0.3s ease,
+          color 0.3s ease;
+      }
+
+      body:not(.light-mode) {
+        background-image:
+          radial-gradient(
+            at 0% 0%,
+            hsla(210, 100%, 15%, 0.15) 0,
+            transparent 50%
+          ),
+          radial-gradient(
+            at 50% 0%,
+            hsla(180, 100%, 10%, 0.1) 0,
+            transparent 50%
+          ),
+          radial-gradient(
+            at 100% 0%,
+            hsla(210, 100%, 15%, 0.15) 0,
+            transparent 50%
+          ),
+          radial-gradient(
+            at 50% 100%,
+            hsla(340, 100%, 10%, 0.05) 0,
+            transparent 50%
+          );
+        background-attachment: fixed;
+      }
+
+      .heading-font {
+        font-family: "Orbitron", sans-serif;
+      }
+
+      .glass {
+        background: var(--card-bg);
+        backdrop-filter: blur(25px) saturate(180%);
+        border: 1px solid var(--border-subtle);
+        border-radius: 1.5rem;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      }
+
+      button,
+      a,
+      select,
+      input[type="checkbox"],
+      .nav-item,
+      .cursor-pointer {
+        cursor: pointer !important;
+      }
+
+      /* Sidebar & Layout */
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--border-subtle);
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        flex-direction: column;
+        backdrop-filter: blur(30px) saturate(150%);
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      .sidebar::-webkit-scrollbar {
+        display: none;
+      }
+
+      .config-panel {
+        width: var(--config-width);
+        height: 100vh;
+        background: var(--glass-bg);
+        border-left: 1px solid var(--glass-border);
+        position: fixed;
+        right: 0;
+        top: 0;
+        z-index: 50;
+        padding: 2rem;
+        backdrop-filter: blur(30px) saturate(150%);
+        overflow-y: auto;
+      }
+
+      .main-content {
+        margin-left: var(--sidebar-width);
+        margin-right: var(--config-width);
+        height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        max-width: 100%;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 0.6rem 1.5rem;
+        color: #94a3b8;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border-left: 3px solid transparent;
+      }
+
+      .nav-item:hover,
+      .nav-item.active {
+        color: var(--accent-cyan);
+        background: rgba(0, 219, 255, 0.05);
+        border-left-color: var(--accent-cyan);
+      }
+
+      .nav-item i {
+        width: 24px;
+        font-size: 1rem;
+        margin-right: 1rem;
+      }
+
+      /* Sidebar Transition Logic */
+      .sidebar {
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .main-content {
+        transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      body.sidebar-collapsed .sidebar {
+        transform: translateX(-100%);
+      }
+
+      body.sidebar-collapsed .main-content {
+        margin-left: 0;
+        padding-left: 4.5rem;
+      }
+
+      .collapse-btn {
+        position: absolute;
+        top: 1.25rem;
+        right: 0.5rem;
+        width: 26px;
+        height: 26px;
+        background: var(--accent-cyan);
+        color: #05080f;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 100;
+        box-shadow: 0 0 15px rgba(0, 219, 255, 0.4);
+        border: none;
+        transition: all 0.3s ease;
+      }
+
+      .glass {
+        background: var(--card-bg);
+        backdrop-filter: blur(25px) saturate(180%);
+        border: 1px solid var(--border-subtle);
+        border-radius: 1.5rem;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      body.light-mode .glass,
+      body.light-mode .video-container {
+        background: #ffffff !important;
+        border: 2px solid rgba(0, 219, 255, 0.5) !important;
+        box-shadow: 0 15px 35px rgba(0, 118, 214, 0.1) !important;
+        border-radius: 2.5rem !important;
+      }
+
+      body.light-mode .glass:hover,
+      body.light-mode .video-container:hover {
+        border-color: #00dbff !important;
+        box-shadow:
+          0 0 30px rgba(0, 219, 255, 0.2),
+          0 20px 50px rgba(0, 118, 214, 0.15) !important;
+        transform: translateY(-4px);
+      }
+
+      body.light-mode h1,
+      body.light-mode h2,
+      body.light-mode h3 {
+        color: #1e293b !important;
+      }
+
+      body.light-mode .bg-primary-blue,
+      body.light-mode .bg-blue-600 {
+        background-color: #00dbff !important;
+        color: #05080f !important;
+        border: none !important;
+        box-shadow: 0 4px 15px rgba(0, 219, 255, 0.3) !important;
+      }
+
+      body.light-mode .bg-primary-blue:hover,
+      body.light-mode .bg-blue-600:hover {
+        background-color: #00c4e0 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(0, 219, 255, 0.4) !important;
+      }
+
+      body.light-mode .text-gray-400,
+      body.light-mode .text-gray-500 {
+        color: #334155 !important;
+      }
+
+      body.light-mode #camOffState {
+        background: #f1f5f9 !important;
+        color: #475569 !important;
+      }
+
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--border-subtle);
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        flex-direction: column;
+        backdrop-filter: blur(20px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        transition:
+          transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+          background 0.3s ease;
+      }
+
+      .collapse-btn:hover {
+        transform: scale(1.1);
+      }
+
+      #restore-sidebar {
+        position: fixed;
+        top: 1.5rem;
+        left: 1rem;
+        width: 38px;
+        height: 38px;
+        background: var(--accent-cyan);
+        color: #05080f;
+        border: none;
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 55;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 20px rgba(0, 219, 255, 0.4);
+      }
+
+      body.sidebar-collapsed #restore-sidebar {
+        display: flex;
+      }
+
+      /* Video / Scanning Area */
+      .video-container {
+        position: relative;
+        background: #000;
+        border-radius: 2rem;
+        overflow: hidden;
+        border: 1px solid rgba(0, 219, 255, 0.1);
+        aspect-ratio: 16/9;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      }
+
+      .scanline {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--accent-cyan),
+          transparent
+        );
+        animation: scan 3s linear infinite;
+        z-index: 10;
+      }
+
+      @keyframes scan {
+        0% {
+          transform: translateY(-100%);
         }
-
-        body.light-mode .text-white,
-        body.light-mode .text-gray-100,
-        body.light-mode .text-gray-200,
-        body.light-mode .text-gray-300 {
-            color: #0f172a !important;
+        100% {
+          transform: translateY(400px);
         }
-
-        body.light-mode .text-gray-400,
-        body.light-mode .text-gray-500 {
-            color: #334155 !important;
-        }
-
-        body.light-mode .bg-white\/5 {
-            background-color: rgba(0, 118, 214, 0.05) !important;
-        }
-
-        body.light-mode .border-white\/10,
-        body.light-mode .border-white\/5 {
-            border-color: rgba(0, 118, 214, 0.1) !important;
-        }
-
-        body.light-mode .text-gray-400 {
-            color: #475569 !important;
-        }
-
-        body.light-mode .text-gray-500 {
-            color: #64748b !important;
-        }
-
-        body.light-mode .text-gray-600 {
-            color: #94a3b8 !important;
-        }
-
-        body.light-mode .bg-slate-800 {
-            background-color: rgba(0, 118, 214, 0.1) !important;
-        }
-
-        body.light-mode h1, 
-        body.light-mode h2, 
-        body.light-mode h3 {
-            color: #1e293b !important;
-        }
-
-        body.light-mode .text-white,
-        body.light-mode .text-gray-100,
-        body.light-mode .text-gray-200,
-        body.light-mode .text-gray-300 {
-            color: #0f172a !important;
-        }
-
-        body.light-mode .bg-primary-blue .text-white,
-        body.light-mode .bg-blue-600 .text-white,
-        body.light-mode button.bg-primary-blue,
-        body.light-mode button.bg-blue-600 {
-            color: white !important;
-        }
-
-        body.light-mode .text-gray-400,
-        body.light-mode .text-gray-500 {
-            color: #334155 !important;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: #10b981;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 0.5rem;
-            animation: pulse-glow 2s infinite;
-        }
-
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 5px #10b981; }
-            50% { box-shadow: 0 0 20px #10b981; }
-            100% { box-shadow: 0 0 5px #10b981; }
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-main);
-            color: var(--text-main);
-            margin: 0;
-            overflow: hidden;
-            width: 100vw;
-            transition: background 0.3s ease, color 0.3s ease;
-        }
-
-        body:not(.light-mode) {
-            background-image: 
-                radial-gradient(at 0% 0%, hsla(210,100%,15%,0.15) 0, transparent 50%), 
-                radial-gradient(at 50% 0%, hsla(180,100%,10%,0.1) 0, transparent 50%), 
-                radial-gradient(at 100% 0%, hsla(210,100%,15%,0.15) 0, transparent 50%),
-                radial-gradient(at 50% 100%, hsla(340,100%,10%,0.05) 0, transparent 50%);
-            background-attachment: fixed;
-        }
-
-        .heading-font { font-family: 'Orbitron', sans-serif; }
-
-        .glass {
-            background: var(--card-bg);
-            backdrop-filter: blur(25px) saturate(180%);
-            border: 1px solid var(--border-subtle);
-            border-radius: 1.5rem;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        button, a, select, input[type="checkbox"], .nav-item, .cursor-pointer {
-            cursor: pointer !important;
-        }
-
-        /* Sidebar & Layout */
-        .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border-subtle);
-            position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-            backdrop-filter: blur(30px) saturate(150%);
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .sidebar::-webkit-scrollbar { display: none; }
-
-        .config-panel {
-            width: var(--config-width);
-            height: 100vh;
-            background: var(--glass-bg);
-            border-left: 1px solid var(--glass-border);
-            position: fixed;
-            right: 0;
-            top: 0;
-            z-index: 50;
-            padding: 2rem;
-            backdrop-filter: blur(30px) saturate(150%);
-            overflow-y: auto;
-        }
-
-        .main-content {
-            margin-left: var(--sidebar-width);
-            margin-right: var(--config-width);
-            height: 100vh;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            max-width: 100%;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 0.6rem 1.5rem;
-            color: #94a3b8;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border-left: 3px solid transparent;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            color: var(--accent-cyan);
-            background: rgba(0, 219, 255, 0.05);
-            border-left-color: var(--accent-cyan);
-        }
-
-        .nav-item i { width: 24px; font-size: 1rem; margin-right: 1rem; }
-
-        /* Sidebar Transition Logic */
-        .sidebar {
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .main-content {
-            transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body.sidebar-collapsed .sidebar {
-            transform: translateX(-100%);
-        }
-
-        body.sidebar-collapsed .main-content {
-            margin-left: 0;
-            padding-left: 4.5rem;
-        }
-
-        .collapse-btn {
-            position: absolute;
-            top: 1.25rem;
-            right: 0.5rem;
-            width: 26px;
-            height: 26px;
-            background: var(--accent-cyan);
-            color: #05080f;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 100;
-            box-shadow: 0 0 15px rgba(0, 219, 255, 0.4);
-            border: none;
-            transition: all 0.3s ease;
-        }
-
-        .glass {
-            background: var(--card-bg);
-            backdrop-filter: blur(25px) saturate(180%);
-            border: 1px solid var(--border-subtle);
-            border-radius: 1.5rem;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body.light-mode .glass,
-        body.light-mode .video-container {
-            background: #ffffff !important;
-            border: 2px solid rgba(0, 219, 255, 0.5) !important;
-            box-shadow: 0 15px 35px rgba(0, 118, 214, 0.1) !important;
-            border-radius: 2.5rem !important;
-        }
-
-        body.light-mode .glass:hover,
-        body.light-mode .video-container:hover {
-            border-color: #00DBFF !important;
-            box-shadow: 0 0 30px rgba(0, 219, 255, 0.2), 0 20px 50px rgba(0, 118, 214, 0.15) !important;
-            transform: translateY(-4px);
-        }
-
-        body.light-mode h1, 
-        body.light-mode h2, 
-        body.light-mode h3 {
-            color: #1e293b !important;
-        }
-
-        body.light-mode .bg-primary-blue,
-        body.light-mode .bg-blue-600 {
-            background-color: #00DBFF !important;
-            color: #05080f !important;
-            border: none !important;
-            box-shadow: 0 4px 15px rgba(0, 219, 255, 0.3) !important;
-        }
-
-        body.light-mode .bg-primary-blue:hover,
-        body.light-mode .bg-blue-600:hover {
-            background-color: #00c4e0 !important;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(0, 219, 255, 0.4) !important;
-        }
-
-        body.light-mode .text-gray-400,
-        body.light-mode .text-gray-500 {
-            color: #334155 !important;
-        }
-
-        body.light-mode #camOffState {
-            background: #f1f5f9 !important;
-            color: #475569 !important;
-        }
-
-        .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border-subtle);
-            position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-            backdrop-filter: blur(20px);
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
-        }
-
-        .collapse-btn:hover {
-            transform: scale(1.1);
-        }
-
-        #restore-sidebar {
-            position: fixed;
-            top: 1.5rem;
-            left: 1rem;
-            width: 38px;
-            height: 38px;
-            background: var(--accent-cyan);
-            color: #05080f;
-            border: none;
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 55;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(0, 219, 255, 0.4);
-        }
-
-        body.sidebar-collapsed #restore-sidebar {
-            display: flex;
-        }
-
-        /* Video / Scanning Area */
-        .video-container {
-            position: relative;
-            background: #000;
-            border-radius: 2rem;
-            overflow: hidden;
-            border: 1px solid rgba(0, 219, 255, 0.1);
-            aspect-ratio: 16/9;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-
-        .scanline {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
-            animation: scan 3s linear infinite;
-            z-index: 10;
-        }
-
-        @keyframes scan {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(400px); }
-        }
-
-        /* Toggle Switches */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 22px;
-        }
-
-        .switch input { opacity: 0; width: 0; height: 0; }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #cbd5e1;
-            transition: .4s;
-            border-radius: 34px;
-        }
-
-        body:not(.light-mode) .slider {
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Modal Styling */
-        .modal-backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            width: 100%;
-            max-width: 600px;
-            background: #0a1120;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 2rem;
-            padding: 2rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        .vault-item {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 1.25rem;
-            padding: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .vault-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--accent-cyan);
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px; width: 16px;
-            left: 3px; bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        input:checked + .slider { background-color: var(--primary-blue); }
-        input:checked + .slider:before { transform: translateX(22px); }
-
-        /* Dropdown Styling */
-        select {
-            background-color: #161c2b !important;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-            padding: 0.75rem;
-            border-radius: 0.75rem;
-            width: 100%;
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-position: right 0.75rem center;
-            background-repeat: no-repeat;
-            background-size: 1rem;
-        }
-
-        select option {
-            background-color: #161c2b;
-            color: #ffffff;
-        }
-
-        select:focus { outline: none; border-color: var(--accent-cyan); }
-
-        /* Metric Item */
-        .metric-item {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1.25rem;
-            padding: 1rem 1.25rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.3s ease;
-        }
-
-        body.light-mode .metric-item {
-            background: #f8fafc;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .metric-item:hover { 
-            border-color: var(--accent-cyan); 
-            background: rgba(0, 219, 255, 0.05); 
-            transform: translateX(5px);
-        }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
-
-        .logo-section {
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 120px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .logo-section img {
-            width: 100%;
-            height: 100%;
-            filter: drop-shadow(0 0 10px rgba(0, 219, 255, 0.5));
-        }
-
+      }
+
+      /* Toggle Switches */
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 22px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #cbd5e1;
+        transition: 0.4s;
+        border-radius: 34px;
+      }
+
+      body:not(.light-mode) .slider {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      /* Modal Styling */
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        width: 100%;
+        max-width: 600px;
+        background: #0a1120;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 2rem;
+        padding: 2rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      }
+
+      .vault-item {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 1.25rem;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .vault-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--accent-cyan);
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      input:checked + .slider {
+        background-color: var(--primary-blue);
+      }
+      input:checked + .slider:before {
+        transform: translateX(22px);
+      }
+
+      /* Dropdown Styling */
+      select {
+        background-color: #161c2b !important;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+        width: 100%;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-position: right 0.75rem center;
+        background-repeat: no-repeat;
+        background-size: 1rem;
+      }
+
+      select option {
+        background-color: #161c2b;
+        color: #ffffff;
+      }
+
+      select:focus {
+        outline: none;
+        border-color: var(--accent-cyan);
+      }
+
+      /* Metric Item */
+      .metric-item {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1.25rem;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.3s ease;
+      }
+
+      body.light-mode .metric-item {
+        background: #f8fafc;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+      }
+
+      .metric-item:hover {
+        border-color: var(--accent-cyan);
+        background: rgba(0, 219, 255, 0.05);
+        transform: translateX(5px);
+      }
+
+      ::-webkit-scrollbar {
+        width: 4px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+      }
+
+      .logo-section {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 120px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .logo-section img {
+        width: 100%;
+        height: 100%;
+        filter: drop-shadow(0 0 10px rgba(0, 219, 255, 0.5));
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Sidebar -->
     <button id="restore-sidebar" title="Show Sidebar" onclick="toggleSidebar()">
-        <i class="fas fa-chevron-right"></i>
+      <i class="fas fa-chevron-right"></i>
     </button>
     <aside class="sidebar flex flex-col">
-        <button class="collapse-btn" onclick="toggleSidebar()" title="Hide Sidebar">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <div class="logo-section">
-            <img src="../assets/images/Logo2.png" alt="Logo">
+      <button
+        class="collapse-btn"
+        onclick="toggleSidebar()"
+        title="Hide Sidebar"
+      >
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <div class="logo-section">
+        <img src="../assets/images/Logo2.png" alt="Logo" />
+      </div>
+      <nav class="flex-1">
+        <div
+          class="nav-item cursor-pointer"
+          onclick="window.location.href = 'dashboard.html'"
+        >
+          <i class="fas fa-th-large"></i>
+          <span>Dashboard Hub</span>
         </div>
-        <nav class="flex-1">
-            <div class="nav-item cursor-pointer" onclick="window.location.href='dashboard.html'">
-                <i class="fas fa-th-large"></i>
-                <span>Dashboard Hub</span>
-            </div>
-            <div class="nav-item cursor-pointer" onclick="window.location.href='live-session.html'">
-                <i class="fas fa-video"></i>
-                <span>Live Session</span>
-            </div>
-            <div class="nav-item cursor-pointer" onclick="window.location.href='reports.html'">
-                <i class="fas fa-file-alt"></i>
-                <span>Reports</span>
-            </div>
-            <div class="nav-item cursor-pointer" onclick="window.location.href='uploads.html'">
-                <i class="fas fa-upload"></i>
-                <span>Uploads</span>
-            </div>
-
-            <div class="mt-8 px-6 mb-2 nav-category">
-                <p class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Modules</p>
-            </div>
-            <div class="nav-item active cursor-pointer" onclick="window.location.href='facial-expression.html'">
-                <i class="fas fa-user-astronaut"></i>
-                <span>Facial Micro-Exp</span>
-            </div>
-            <div class="nav-item cursor-pointer" onclick="window.location.href='voice-analysis.html'">
-                <i class="fas fa-microphone-lines"></i>
-                <span>Voice Analysis</span>
-            </div>
-        </nav>
-
-        <div class="p-4 border-t border-white/5">
-            <div class="nav-item cursor-pointer" onclick="window.location.href='profile.html'">
-                <i class="fas fa-user-circle"></i>
-                <span>Profile</span>
-            </div>
-            <div class="nav-item cursor-pointer" onclick="window.location.href='settings.html'">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-            </div>
-            <div class="nav-item text-red-400 hover:text-red-300 hover:bg-red-500/5 cursor-pointer"
-                onclick="window.location.href='login.html'">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Exit</span>
-            </div>
+        <div
+          class="nav-item cursor-pointer"
+          onclick="window.location.href = 'live-session.html'"
+        >
+          <i class="fas fa-video"></i>
+          <span>Live Session</span>
         </div>
+        <div
+          class="nav-item cursor-pointer"
+          onclick="window.location.href = 'reports.html'"
+        >
+          <i class="fas fa-file-alt"></i>
+          <span>Reports</span>
+        </div>
+        <div
+          class="nav-item cursor-pointer"
+          onclick="window.location.href = 'uploads.html'"
+        >
+          <i class="fas fa-upload"></i>
+          <span>Uploads</span>
+        </div>
+
+        <div class="mt-8 px-6 mb-2 nav-category">
+          <p
+            class="text-[10px] font-bold tracking-widest text-gray-500 uppercase"
+          >
+            Modules
+          </p>
+        </div>
+        <div
+          class="nav-item active cursor-pointer"
+          onclick="window.location.href = 'facial-expression.html'"
+        >
+          <i class="fas fa-user-astronaut"></i>
+          <span>Facial Micro-Exp</span>
+        </div>
+        <div
+          class="nav-item cursor-pointer"
+          onclick="window.location.href = 'voice-analysis.html'"
+        >
+          <i class="fas fa-microphone-lines"></i>
+          <span>Voice Analysis</span>
+        </div>
+      </nav>
+
+      <div class="p-4 border-t border-white/5">
+        <div
+          class="nav-item cursor-pointer"
+          onclick="window.location.href = 'profile.html'"
+        >
+          <i class="fas fa-user-circle"></i>
+          <span>Profile</span>
+        </div>
+        <div
+          class="nav-item cursor-pointer"
+          onclick="window.location.href = 'settings.html'"
+        >
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </div>
+        <div
+            class="nav-item text-red-400 hover:text-red-300 hover:bg-red-500/5 cursor-pointer"
+            onclick="closeApp()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </div>
+      </div>
     </aside>
 
     <!-- Evidence Vault Modal -->
     <div id="vaultModal" class="modal-backdrop">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-8">
-                <div>
-                    <h2 class="text-xl font-bold heading-font text-white uppercase tracking-wider">Recording Library</h2>
-                    <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1">Select video file for deep scan</p>
-                </div>
-                <button onclick="closeVault()" class="text-gray-500 hover:text-white transition-colors text-xl">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                <div class="vault-item group" onclick="loadMockFile('suspect_interview_01.mp4')">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20">
-                            <i class="fas fa-video text-lg"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-bold text-white">suspect_interview_01.mp4</p>
-                            <p class="text-[9px] text-gray-500 font-mono">124.5 MB • 14:20 • RAW_AV</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right text-gray-700 group-hover:text-cyan-400 transition-colors"></i>
-                </div>
-
-                <div class="vault-item group" onclick="loadMockFile('debrief_session_cam1.mp4')">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20">
-                            <i class="fas fa-video text-lg"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-bold text-white">debrief_session_cam1.mp4</p>
-                            <p class="text-[9px] text-gray-500 font-mono">110.2 MB • 08:30 • RAW_AV</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right text-gray-700 group-hover:text-cyan-400 transition-colors"></i>
-                </div>
-
-                <div class="vault-item group opacity-50 cursor-not-allowed">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
-                            <i class="fas fa-microphone text-lg"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-bold text-white">witness_call_log.wav</p>
-                            <p class="text-[9px] text-gray-500 font-mono italic">Audio-only (Switch to Voice Analysis)</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-lock text-gray-700"></i>
-                </div>
-            </div>
-
-            <div class="mt-8 pt-6 border-t border-white/5 flex justify-end">
-                <p class="text-[9px] text-gray-600 uppercase tracking-widest">Showing locally stored evidence records</p>
-            </div>
+      <div class="modal-content">
+        <div class="flex justify-between items-center mb-8">
+          <div>
+            <h2
+              class="text-xl font-bold heading-font text-white uppercase tracking-wider"
+            >
+              Recording Library
+            </h2>
+            <p
+              class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1"
+            >
+              Select video file for deep scan
+            </p>
+          </div>
+          <button
+            onclick="closeVault()"
+            class="text-gray-500 hover:text-white transition-colors text-xl"
+          >
+            <i class="fas fa-times"></i>
+          </button>
         </div>
+
+        <div
+          class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar"
+        >
+          <div
+            class="vault-item group"
+            onclick="loadMockFile('suspect_interview_01.mp4')"
+          >
+            <div class="flex items-center space-x-4">
+              <div
+                class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20"
+              >
+                <i class="fas fa-video text-lg"></i>
+              </div>
+              <div>
+                <p class="text-sm font-bold text-white">
+                  suspect_interview_01.mp4
+                </p>
+                <p class="text-[9px] text-gray-500 font-mono">
+                  124.5 MB • 14:20 • RAW_AV
+                </p>
+              </div>
+            </div>
+            <i
+              class="fas fa-chevron-right text-gray-700 group-hover:text-cyan-400 transition-colors"
+            ></i>
+          </div>
+
+          <div
+            class="vault-item group"
+            onclick="loadMockFile('debrief_session_cam1.mp4')"
+          >
+            <div class="flex items-center space-x-4">
+              <div
+                class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20"
+              >
+                <i class="fas fa-video text-lg"></i>
+              </div>
+              <div>
+                <p class="text-sm font-bold text-white">
+                  debrief_session_cam1.mp4
+                </p>
+                <p class="text-[9px] text-gray-500 font-mono">
+                  110.2 MB • 08:30 • RAW_AV
+                </p>
+              </div>
+            </div>
+            <i
+              class="fas fa-chevron-right text-gray-700 group-hover:text-cyan-400 transition-colors"
+            ></i>
+          </div>
+
+          <div class="vault-item group opacity-50 cursor-not-allowed">
+            <div class="flex items-center space-x-4">
+              <div
+                class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20"
+              >
+                <i class="fas fa-microphone text-lg"></i>
+              </div>
+              <div>
+                <p class="text-sm font-bold text-white">witness_call_log.wav</p>
+                <p class="text-[9px] text-gray-500 font-mono italic">
+                  Audio-only (Switch to Voice Analysis)
+                </p>
+              </div>
+            </div>
+            <i class="fas fa-lock text-gray-700"></i>
+          </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-white/5 flex justify-end">
+          <p class="text-[9px] text-gray-600 uppercase tracking-widest">
+            Showing locally stored evidence records
+          </p>
+        </div>
+      </div>
     </div>
 
     <!-- Configuration Panel -->
     <aside class="config-panel flex flex-col gap-6">
-        <div class="flex items-center justify-between mb-2">
-            <h3 class="text-xs font-black heading-font uppercase tracking-[0.2em] flex items-center text-gray-400">
-                <i class="fas fa-cog mr-3 text-cyan-400"></i> Configuration
-            </h3>
+      <div class="flex items-center justify-between mb-2">
+        <h3
+          class="text-xs font-black heading-font uppercase tracking-[0.2em] flex items-center text-gray-400"
+        >
+          <i class="fas fa-cog mr-3 text-cyan-400"></i> Configuration
+        </h3>
+      </div>
+
+      <div
+        class="h-[1px] bg-gradient-to-r from-cyan-500/50 to-transparent mb-4"
+      ></div>
+
+      <!-- Source Section -->
+      <div class="space-y-6">
+        <div class="space-y-2">
+          <label
+            class="text-[9px] text-gray-500 font-black uppercase tracking-widest"
+            >Video Source</label
+          >
+          <select id="videoSource" class="text-xs font-bold">
+            <option>Logitech Brio 4K</option>
+            <option>Front HD Camera</option>
+            <option>External Video Input</option>
+          </select>
         </div>
 
-        <div class="h-[1px] bg-gradient-to-r from-cyan-500/50 to-transparent mb-4"></div>
-
-        <!-- Source Section -->
-        <div class="space-y-6">
-            <div class="space-y-2">
-                <label class="text-[9px] text-gray-500 font-black uppercase tracking-widest">Video Source</label>
-                <select id="videoSource" class="text-xs font-bold">
-                    <option>Logitech Brio 4K</option>
-                    <option>Front HD Camera</option>
-                    <option>External Video Input</option>
-                </select>
-            </div>
-            
-            <div class="space-y-4">
-                <label class="text-[9px] text-gray-500 font-black uppercase tracking-widest block">Source Controls</label>
-                <div class="grid grid-cols-2 gap-3">
-                    <button id="mainCamBtn" class="py-2.5 bg-rose-500/10 border border-rose-500/30 text-rose-500 text-[9px] font-black uppercase rounded-xl hover:bg-rose-500 hover:text-white transition-all duration-300 flex items-center justify-center gap-2" onclick="toggleCamera()">
-                        <i class="fas fa-video-slash"></i> Camera Off
-                    </button>
-                    <button class="py-2.5 bg-cyan-500/10 border border-cyan-500/30 text-cyan-500 text-[9px] font-black uppercase rounded-xl hover:bg-cyan-500 hover:text-white transition-all duration-300 flex items-center justify-center gap-2" onclick="openVault()">
-                        <i class="fas fa-folder-open"></i> Load File
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="h-[1px] bg-white/5"></div>
-
-        <!-- Overlays Section -->
         <div class="space-y-4">
-            <label class="text-[9px] text-gray-500 font-black uppercase tracking-widest block">Targeted Scanning Modules</label>
-            
-            <div class="metric-item">
-                <div class="flex items-center gap-3">
-                    <i class="fas fa-eye text-[10px] text-cyan-400"></i>
-                    <span class="text-xs font-bold text-gray-300">Eye Movement</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-
-            <div class="metric-item">
-                <div class="flex items-center gap-3">
-                    <i class="fas fa-arrows-to-eye text-[10px] text-cyan-400"></i>
-                    <span class="text-xs font-bold text-gray-300">Eye Jumps</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-
-            <div class="metric-item">
-                <div class="flex items-center gap-3">
-                    <i class="fas fa-wave-square text-[10px] text-amber-500"></i>
-                    <span class="text-xs font-bold text-gray-300">Small Muscle Twitch</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-
-            <div class="metric-item">
-                <div class="flex items-center gap-3">
-                    <i class="fas fa-wind text-[10px] text-rose-500"></i>
-                    <span class="text-xs font-bold text-gray-300">Nasal Dilation</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                </label>
-            </div>
-
-            <div class="metric-item">
-                <div class="flex items-center gap-3">
-                    <i class="fas fa-grip-lines text-[10px] text-emerald-500"></i>
-                    <span class="text-xs font-bold text-gray-300">Jaw Tension Sync</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-
-        <div class="mt-auto pt-6">
-            <button class="w-full py-4 bg-cyan-400 border-b-4 border-cyan-600 text-white text-[11px] font-black uppercase rounded-xl hover:bg-cyan-500 hover:translate-y-[2px] hover:border-b-2 transition-all duration-300 tracking-[0.2em] shadow-lg shadow-cyan-200">
-                Reset to Default
+          <label
+            class="text-[9px] text-gray-500 font-black uppercase tracking-widest block"
+            >Source Controls</label
+          >
+          <div class="grid grid-cols-2 gap-3">
+            <button
+              id="mainCamBtn"
+              class="py-2.5 bg-rose-500/10 border border-rose-500/30 text-rose-500 text-[9px] font-black uppercase rounded-xl hover:bg-rose-500 hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
+              onclick="toggleCamera()"
+            >
+              <i class="fas fa-video-slash"></i> Camera Off
             </button>
+            <button
+              class="py-2.5 bg-cyan-500/10 border border-cyan-500/30 text-cyan-500 text-[9px] font-black uppercase rounded-xl hover:bg-cyan-500 hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
+              onclick="openVault()"
+            >
+              <i class="fas fa-folder-open"></i> Load File
+            </button>
+          </div>
         </div>
+      </div>
+
+      <div class="h-[1px] bg-white/5"></div>
+
+      <!-- Overlays Section -->
+      <div class="space-y-4">
+        <label
+          class="text-[9px] text-gray-500 font-black uppercase tracking-widest block"
+          >Targeted Scanning Modules</label
+        >
+
+        <div class="metric-item">
+          <div class="flex items-center gap-3">
+            <i class="fas fa-eye text-[10px] text-cyan-400"></i>
+            <span class="text-xs font-bold text-gray-300">Eye Movement</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="metric-item">
+          <div class="flex items-center gap-3">
+            <i class="fas fa-arrows-to-eye text-[10px] text-cyan-400"></i>
+            <span class="text-xs font-bold text-gray-300">Eye Jumps</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="metric-item">
+          <div class="flex items-center gap-3">
+            <i class="fas fa-wave-square text-[10px] text-amber-500"></i>
+            <span class="text-xs font-bold text-gray-300"
+              >Small Muscle Twitch</span
+            >
+          </div>
+          <label class="switch">
+            <input type="checkbox" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="metric-item">
+          <div class="flex items-center gap-3">
+            <i class="fas fa-wind text-[10px] text-rose-500"></i>
+            <span class="text-xs font-bold text-gray-300">Nasal Dilation</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="metric-item">
+          <div class="flex items-center gap-3">
+            <i class="fas fa-grip-lines text-[10px] text-emerald-500"></i>
+            <span class="text-xs font-bold text-gray-300"
+              >Jaw Tension Sync</span
+            >
+          </div>
+          <label class="switch">
+            <input type="checkbox" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="mt-auto pt-6">
+        <button
+          class="w-full py-4 bg-cyan-400 border-b-4 border-cyan-600 text-white text-[11px] font-black uppercase rounded-xl hover:bg-cyan-500 hover:translate-y-[2px] hover:border-b-2 transition-all duration-300 tracking-[0.2em] shadow-lg shadow-cyan-200"
+        >
+          Reset to Default
+        </button>
+      </div>
     </aside>
 
     <!-- Main Content -->
     <main class="main-content">
-        <header class="p-8 pb-4 flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold heading-font">Facial Analysis Unit</h1>
-                <div class="flex items-center mt-2 text-xs text-cyan-400 font-medium tracking-wide active-member-info">
-                    <span class="status-dot"></span>
-                    Active Member: <span class="ml-1 opacity-80">John Doe • Unit #DECEP-09</span>
-                </div>
-            </div>
-            <div class="flex items-center space-x-3">
-                <button id="theme-toggle" class="p-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-cyan-400 hover:bg-white/10 transition-all cursor-pointer" title="Toggle Theme">
-                    <i class="fas fa-moon"></i>
-                </button>
-                <div class="flex items-center space-x-4">
-                    <button class="bg-white/5 hover:bg-white/10 text-white text-[10px] font-bold uppercase py-2.5 px-6 rounded-xl border border-white/10 transition-all" onclick="openVault()">
-                        <i class="fas fa-folder-open mr-2 text-primary-blue"></i> Evidence Vault
-                    </button>
-                    <button class="bg-primary-blue hover:bg-blue-600 text-white text-[10px] font-bold uppercase py-2.5 px-6 rounded-xl transition-all shadow-lg shadow-blue-500/20">
-                        <i class="fas fa-video mr-2"></i> Feed Active
-                    </button>
-                </div>
-            </div>
-        </header>
+      <header class="p-8 pb-4 flex justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-bold heading-font">Facial Analysis Unit</h1>
+          <div
+            class="flex items-center mt-2 text-xs text-cyan-400 font-medium tracking-wide active-member-info"
+          >
+            <span class="status-dot"></span>
+            Active Member:
+            <span class="ml-1 opacity-80">John Doe • Unit #DECEP-09</span>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3">
+          <button
+            id="theme-toggle"
+            class="p-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-cyan-400 hover:bg-white/10 transition-all cursor-pointer"
+            title="Toggle Theme"
+          >
+            <i class="fas fa-moon"></i>
+          </button>
+          <div class="flex items-center space-x-4">
+            <button
+              class="bg-white/5 hover:bg-white/10 text-white text-[10px] font-bold uppercase py-2.5 px-6 rounded-xl border border-white/10 transition-all"
+              onclick="openVault()"
+            >
+              <i class="fas fa-folder-open mr-2 text-primary-blue"></i> Evidence
+              Vault
+            </button>
+            <button
+              class="bg-primary-blue hover:bg-blue-600 text-white text-[10px] font-bold uppercase py-2.5 px-6 rounded-xl transition-all shadow-lg shadow-blue-500/20"
+            >
+              <i class="fas fa-video mr-2"></i> Feed Active
+            </button>
+          </div>
+        </div>
+      </header>
 
-        <!-- Monitoring Section -->
-        <div class="px-4">
-            <div class="video-container group">
-                <div id="camOffState" class="absolute inset-0 bg-[#eef7f9] flex flex-col items-center justify-center text-gray-800 z-20 transition-opacity duration-500">
-                    <i class="fas fa-camera text-6xl mb-8 opacity-40 text-cyan-400"></i>
-                    <button class="px-10 py-3.5 bg-cyan-400 border-b-4 border-cyan-600 text-white text-[11px] font-black uppercase rounded-full transition-all duration-300 hover:bg-cyan-500 hover:translate-y-[2px] hover:border-b-2 hover:shadow-[0_10px_30px_rgba(0,219,255,0.4)] tracking-[0.2em] shadow-lg flex items-center gap-3" onclick="toggleCamera()">
-                        Initiate Deep Scanner
-                    </button>
-                </div>
-                
-                <div id="camOnState" class="absolute inset-0 hidden">
-                    <video id="webcam" class="absolute inset-0 w-full h-full object-cover"></video>
-                    <!-- Canvas overlay for emotion detection -->
-                    <canvas id="emotionCanvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
-                </div>
+      <!-- Monitoring Section -->
+      <div class="px-4">
+        <div class="video-container group">
+          <div
+            id="camOffState"
+            class="absolute inset-0 bg-[#eef7f9] flex flex-col items-center justify-center text-gray-800 z-20 transition-opacity duration-500"
+          >
+            <i class="fas fa-camera text-6xl mb-8 opacity-40 text-cyan-400"></i>
+            <button
+              class="px-10 py-3.5 bg-cyan-400 border-b-4 border-cyan-600 text-white text-[11px] font-black uppercase rounded-full transition-all duration-300 hover:bg-cyan-500 hover:translate-y-[2px] hover:border-b-2 hover:shadow-[0_10px_30px_rgba(0,219,255,0.4)] tracking-[0.2em] shadow-lg flex items-center gap-3"
+              onclick="toggleCamera()"
+            >
+              Initiate Deep Scanner
+            </button>
+          </div>
+
+          <div id="camOnState" class="absolute inset-0 hidden">
+            <video
+              id="webcam"
+              class="absolute inset-0 w-full h-full object-cover"
+              style="transform: scaleX(-1);"
+            ></video>
+            <!-- Canvas overlay for emotion detection -->
+            <canvas
+              id="emotionCanvas"
+              class="absolute inset-0 w-full h-full pointer-events-none"
+              style="transform: scaleX(-1);"
+            ></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analysis Grid -->
+      <div class="grid grid-cols-12 gap-6 px-4 pb-8">
+        <!-- Left: Emotion Radar -->
+        <div
+          class="col-span-12 lg:col-span-7 glass p-8 relative overflow-hidden"
+        >
+          <div class="flex justify-between items-center mb-8">
+            <h3
+              class="text-xs font-black uppercase tracking-[0.2em] text-gray-400"
+            >
+              Emotion Tracker
+            </h3>
+            <div class="flex space-x-2">
+              <span
+                class="px-2.5 py-1 bg-cyan-100/50 text-cyan-500 text-[9px] font-black rounded-lg border border-cyan-200"
+                >RADAR_ACTIVE</span
+              >
             </div>
+          </div>
+          <div class="h-64 flex items-center justify-center">
+            <canvas id="radarChart"></canvas>
+          </div>
         </div>
 
-        <!-- Analysis Grid -->
-        <div class="grid grid-cols-12 gap-6 px-4 pb-8">
-            <!-- Left: Emotion Radar -->
-            <div class="col-span-12 lg:col-span-7 glass p-8 relative overflow-hidden">
-                <div class="flex justify-between items-center mb-8">
-                    <h3 class="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Emotion Tracker</h3>
-                    <div class="flex space-x-2">
-                         <span class="px-2.5 py-1 bg-cyan-100/50 text-cyan-500 text-[9px] font-black rounded-lg border border-cyan-200">RADAR_ACTIVE</span>
-                    </div>
-                </div>
-                <div class="h-64 flex items-center justify-center">
-                    <canvas id="radarChart"></canvas>
-                </div>
+        <!-- Right: Micro-Expression List -->
+        <div class="col-span-12 lg:col-span-5 glass p-8 space-y-8">
+          <h3
+            class="text-xs font-black uppercase tracking-[0.2em] text-gray-400"
+          >
+            Live Sign Strength
+          </h3>
+
+          <div class="space-y-6">
+            <div class="space-y-2">
+              <div class="flex justify-between items-center mb-1">
+                <span
+                  class="text-[10px] font-black uppercase text-gray-500 tracking-wider"
+                  >Lip Compression</span
+                >
+                <span
+                  id="valLip"
+                  class="text-xs font-mono text-cyan-500 font-bold"
+                  >42%</span
+                >
+              </div>
+              <div
+                class="h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/50 shadow-inner"
+              >
+                <div
+                  id="barLip"
+                  class="h-full bg-cyan-400 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(0,219,255,0.4)]"
+                  style="width: 42%"
+                ></div>
+              </div>
             </div>
 
-            <!-- Right: Micro-Expression List -->
-            <div class="col-span-12 lg:col-span-5 glass p-8 space-y-8">
-                <h3 class="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Live Sign Strength</h3>
-                
-                <div class="space-y-6">
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center mb-1">
-                             <span class="text-[10px] font-black uppercase text-gray-500 tracking-wider">Lip Compression</span>
-                             <span id="valLip" class="text-xs font-mono text-cyan-500 font-bold">42%</span>
-                        </div>
-                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/50 shadow-inner">
-                            <div id="barLip" class="h-full bg-cyan-400 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(0,219,255,0.4)]" style="width: 42%"></div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center mb-1">
-                             <span class="text-[10px] font-black uppercase text-gray-500 tracking-wider">Eyebrow Twitch</span>
-                             <span id="valBrow" class="text-xs font-mono text-amber-500 font-bold">18%</span>
-                        </div>
-                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/50 shadow-inner">
-                            <div id="barBrow" class="h-full bg-amber-400 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(251,191,36,0.4)]" style="width: 18%"></div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center mb-1">
-                             <span class="text-[10px] font-black uppercase text-gray-500 tracking-wider">Pupil Dilataton</span>
-                             <span id="valPupil" class="text-xs font-mono text-rose-500 font-bold">65%</span>
-                        </div>
-                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/50 shadow-inner">
-                            <div id="barPupil" class="h-full bg-rose-400 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(244,63,94,0.4)]" style="width: 65%"></div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center mb-1">
-                             <span class="text-[10px] font-black uppercase text-gray-500 tracking-wider">Nostril Flare</span>
-                             <span id="valNose" class="text-xs font-mono text-emerald-500 font-bold">12%</span>
-                        </div>
-                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/50 shadow-inner">
-                            <div id="barNose" class="h-full bg-emerald-400 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(52,211,153,0.4)]" style="width: 12%"></div>
-                        </div>
-                    </div>
-                </div>
+            <div class="space-y-2">
+              <div class="flex justify-between items-center mb-1">
+                <span
+                  class="text-[10px] font-black uppercase text-gray-500 tracking-wider"
+                  >Eyebrow Twitch</span
+                >
+                <span
+                  id="valBrow"
+                  class="text-xs font-mono text-amber-500 font-bold"
+                  >18%</span
+                >
+              </div>
+              <div
+                class="h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/50 shadow-inner"
+              >
+                <div
+                  id="barBrow"
+                  class="h-full bg-amber-400 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(251,191,36,0.4)]"
+                  style="width: 18%"
+                ></div>
+              </div>
             </div>
+
+            <div class="space-y-2">
+              <div class="flex justify-between items-center mb-1">
+                <span
+                  class="text-[10px] font-black uppercase text-gray-500 tracking-wider"
+                  >Pupil Dilataton</span
+                >
+                <span
+                  id="valPupil"
+                  class="text-xs font-mono text-rose-500 font-bold"
+                  >65%</span
+                >
+              </div>
+              <div
+                class="h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/50 shadow-inner"
+              >
+                <div
+                  id="barPupil"
+                  class="h-full bg-rose-400 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(244,63,94,0.4)]"
+                  style="width: 65%"
+                ></div>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <div class="flex justify-between items-center mb-1">
+                <span
+                  class="text-[10px] font-black uppercase text-gray-500 tracking-wider"
+                  >Nostril Flare</span
+                >
+                <span
+                  id="valNose"
+                  class="text-xs font-mono text-emerald-500 font-bold"
+                  >12%</span
+                >
+              </div>
+              <div
+                class="h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/50 shadow-inner"
+              >
+                <div
+                  id="barNose"
+                  class="h-full bg-emerald-400 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(52,211,153,0.4)]"
+                  style="width: 12%"
+                ></div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </main>
 
     <!-- Load File Modal -->
-    <div id="vaultModal" style="display: none;" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-cyan-500/30 rounded-2xl max-w-2xl w-full p-8 shadow-2xl shadow-cyan-500/20">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black text-white uppercase tracking-wider">
-                    <i class="fas fa-folder-open text-cyan-400 mr-3"></i>Load File
-                </h2>
-                <button onclick="closeVault()" class="text-gray-400 hover:text-white transition-colors">
-                    <i class="fas fa-times text-2xl"></i>
-                </button>
-            </div>
-
-            <div class="h-[1px] bg-gradient-to-r from-cyan-500/50 to-transparent mb-6"></div>
-
-            <div class="space-y-3 max-h-96 overflow-y-auto">
-                <!-- Sample Files -->
-                <div onclick="loadMockFile('Session_2025_01_15_Interview.mp4')" class="p-4 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/50 rounded-xl cursor-pointer transition-all group">
-                    <div class="flex items-center gap-4">
-                        <i class="fas fa-video text-cyan-400 text-2xl group-hover:scale-110 transition-transform"></i>
-                        <div class="flex-1">
-                            <div class="font-bold text-white">Session_2025_01_15_Interview.mp4</div>
-                            <div class="text-xs text-gray-400">Video • 15:32 • 245 MB</div>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-600 group-hover:text-cyan-400 transition-colors"></i>
-                    </div>
-                </div>
-
-                <div onclick="loadMockFile('Audio_Recording_Suspect_A.wav')" class="p-4 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/50 rounded-xl cursor-pointer transition-all group">
-                    <div class="flex items-center gap-4">
-                        <i class="fas fa-microphone text-amber-400 text-2xl group-hover:scale-110 transition-transform"></i>
-                        <div class="flex-1">
-                            <div class="font-bold text-white">Audio_Recording_Suspect_A.wav</div>
-                            <div class="text-xs text-gray-400">Audio • 08:45 • 89 MB</div>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-600 group-hover:text-cyan-400 transition-colors"></i>
-                    </div>
-                </div>
-
-                <div onclick="loadMockFile('Interrogation_Room_2_Cam1.mp4')" class="p-4 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/50 rounded-xl cursor-pointer transition-all group">
-                    <div class="flex items-center gap-4">
-                        <i class="fas fa-video text-rose-400 text-2xl group-hover:scale-110 transition-transform"></i>
-                        <div class="flex-1">
-                            <div class="font-bold text-white">Interrogation_Room_2_Cam1.mp4</div>
-                            <div class="text-xs text-gray-400">Video • 22:18 • 512 MB</div>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-600 group-hover:text-cyan-400 transition-colors"></i>
-                    </div>
-                </div>
-
-                <div onclick="loadMockFile('Voice_Sample_Baseline.mp3')" class="p-4 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/50 rounded-xl cursor-pointer transition-all group">
-                    <div class="flex items-center gap-4">
-                        <i class="fas fa-file-audio text-emerald-400 text-2xl group-hover:scale-110 transition-transform"></i>
-                        <div class="flex-1">
-                            <div class="font-bold text-white">Voice_Sample_Baseline.mp3</div>
-                            <div class="text-xs text-gray-400">Audio • 03:12 • 12 MB</div>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-600 group-hover:text-cyan-400 transition-colors"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-6 pt-6 border-t border-white/10">
-                <button onclick="closeVault()" class="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl transition-all">
-                    Close
-                </button>
-            </div>
+    <div
+      id="vaultModal"
+      style="display: none"
+      class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-cyan-500/30 rounded-2xl max-w-2xl w-full p-8 shadow-2xl shadow-cyan-500/20"
+      >
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-black text-white uppercase tracking-wider">
+            <i class="fas fa-folder-open text-cyan-400 mr-3"></i>Load File
+          </h2>
+          <button
+            onclick="closeVault()"
+            class="text-gray-400 hover:text-white transition-colors"
+          >
+            <i class="fas fa-times text-2xl"></i>
+          </button>
         </div>
+
+        <div
+          class="h-[1px] bg-gradient-to-r from-cyan-500/50 to-transparent mb-6"
+        ></div>
+
+        <div class="space-y-3 max-h-96 overflow-y-auto">
+          <!-- Sample Files -->
+          <div
+            onclick="loadMockFile('Session_2025_01_15_Interview.mp4')"
+            class="p-4 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/50 rounded-xl cursor-pointer transition-all group"
+          >
+            <div class="flex items-center gap-4">
+              <i
+                class="fas fa-video text-cyan-400 text-2xl group-hover:scale-110 transition-transform"
+              ></i>
+              <div class="flex-1">
+                <div class="font-bold text-white">
+                  Session_2025_01_15_Interview.mp4
+                </div>
+                <div class="text-xs text-gray-400">Video • 15:32 • 245 MB</div>
+              </div>
+              <i
+                class="fas fa-chevron-right text-gray-600 group-hover:text-cyan-400 transition-colors"
+              ></i>
+            </div>
+          </div>
+
+          <div
+            onclick="loadMockFile('Audio_Recording_Suspect_A.wav')"
+            class="p-4 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/50 rounded-xl cursor-pointer transition-all group"
+          >
+            <div class="flex items-center gap-4">
+              <i
+                class="fas fa-microphone text-amber-400 text-2xl group-hover:scale-110 transition-transform"
+              ></i>
+              <div class="flex-1">
+                <div class="font-bold text-white">
+                  Audio_Recording_Suspect_A.wav
+                </div>
+                <div class="text-xs text-gray-400">Audio • 08:45 • 89 MB</div>
+              </div>
+              <i
+                class="fas fa-chevron-right text-gray-600 group-hover:text-cyan-400 transition-colors"
+              ></i>
+            </div>
+          </div>
+
+          <div
+            onclick="loadMockFile('Interrogation_Room_2_Cam1.mp4')"
+            class="p-4 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/50 rounded-xl cursor-pointer transition-all group"
+          >
+            <div class="flex items-center gap-4">
+              <i
+                class="fas fa-video text-rose-400 text-2xl group-hover:scale-110 transition-transform"
+              ></i>
+              <div class="flex-1">
+                <div class="font-bold text-white">
+                  Interrogation_Room_2_Cam1.mp4
+                </div>
+                <div class="text-xs text-gray-400">Video • 22:18 • 512 MB</div>
+              </div>
+              <i
+                class="fas fa-chevron-right text-gray-600 group-hover:text-cyan-400 transition-colors"
+              ></i>
+            </div>
+          </div>
+
+          <div
+            onclick="loadMockFile('Voice_Sample_Baseline.mp3')"
+            class="p-4 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/50 rounded-xl cursor-pointer transition-all group"
+          >
+            <div class="flex items-center gap-4">
+              <i
+                class="fas fa-file-audio text-emerald-400 text-2xl group-hover:scale-110 transition-transform"
+              ></i>
+              <div class="flex-1">
+                <div class="font-bold text-white">
+                  Voice_Sample_Baseline.mp3
+                </div>
+                <div class="text-xs text-gray-400">Audio • 03:12 • 12 MB</div>
+              </div>
+              <i
+                class="fas fa-chevron-right text-gray-600 group-hover:text-cyan-400 transition-colors"
+              ></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-6 border-t border-white/10">
+          <button
+            onclick="closeVault()"
+            class="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl transition-all"
+          >
+            Close
+          </button>
+        </div>
+      </div>
     </div>
 
     <script>
-        // Init Radar Chart
-        const ctxRadar = document.getElementById('radarChart').getContext('2d');
-        const radarChart = new Chart(ctxRadar, {
-            type: 'radar',
-            data: {
-                labels: ['Joy', 'Anger', 'Disgust', 'Fear', 'Sadness', 'Surprise', 'Neutral'],
-                datasets: [{
-                    label: 'Live Signal',
-                    data: [10, 20, 15, 82, 45, 30, 25],
-                    backgroundColor: 'rgba(0, 219, 255, 0.15)',
-                    borderColor: '#00DBFF',
-                    pointBackgroundColor: '#00DBFF',
-                    pointBorderColor: '#fff',
-                    borderWidth: 2,
-                    pointRadius: 3
-                }, {
-                    label: 'Baseline',
-                    data: [15, 10, 5, 20, 10, 15, 70],
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                    borderColor: 'rgba(255, 255, 255, 0.2)',
-                    pointRadius: 0,
-                    borderWidth: 1,
-                    borderDash: [5, 5]
-                }]
+      // Init Radar Chart
+      const ctxRadar = document.getElementById("radarChart").getContext("2d");
+      const radarChart = new Chart(ctxRadar, {
+        type: "radar",
+        data: {
+          labels: [
+            "Joy",
+            "Anger",
+            "Disgust",
+            "Fear",
+            "Sadness",
+            "Surprise",
+            "Neutral",
+          ],
+          datasets: [
+            {
+              label: "Live Signal",
+              data: [10, 20, 15, 82, 45, 30, 25],
+              backgroundColor: "rgba(0, 219, 255, 0.15)",
+              borderColor: "#00DBFF",
+              pointBackgroundColor: "#00DBFF",
+              pointBorderColor: "#fff",
+              borderWidth: 2,
+              pointRadius: 3,
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    r: {
-                        angleLines: { color: 'rgba(255, 255, 255, 0.05)' },
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                        pointLabels: { color: '#64748b', font: { size: 9, weight: 'bold' } },
-                        ticks: { display: false }
-                    }
-                },
-                plugins: {
-                    legend: { display: false }
-                }
-            }
-        });
+            {
+              label: "Baseline",
+              data: [15, 10, 5, 20, 10, 15, 70],
+              backgroundColor: "rgba(255, 255, 255, 0.05)",
+              borderColor: "rgba(255, 255, 255, 0.2)",
+              pointRadius: 0,
+              borderWidth: 1,
+              borderDash: [5, 5],
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              angleLines: { color: "rgba(255, 255, 255, 0.05)" },
+              grid: { color: "rgba(255, 255, 255, 0.05)" },
+              pointLabels: {
+                color: "#64748b",
+                font: { size: 9, weight: "bold" },
+              },
+              ticks: { display: false },
+            },
+          },
+          plugins: {
+            legend: { display: false },
+          },
+        },
+      });
 
-        // Camera and Emotion Detection Variables
-        let cameraOn = false;
-        let mediaStream = null;
-        let emotionDetectionInterval = null;
+      // Camera and Emotion Detection Variables
+      let cameraOn = false;
+      let mediaStream = null;
+      let emotionDetectionInterval = null;
 
-        function openVault() {
-            document.getElementById('vaultModal').style.display = 'flex';
-        }
+      function openVault() {
+        document.getElementById("vaultModal").style.display = "flex";
+      }
 
-        function closeVault() {
-            document.getElementById('vaultModal').style.display = 'none';
-        }
+      function closeVault() {
+        document.getElementById("vaultModal").style.display = "none";
+      }
 
-        function loadMockFile(filename) {
-            closeVault();
-            alert("Loading Evidence Body: " + filename + "\nInitializing Neural Pipeline...");
-            // Simulate loading
-            if(!cameraOn) toggleCamera();
-            document.querySelector('h1').innerHTML = filename + ' <span class="text-cyan-400 font-normal">| ANALYZING</span>';
-        }
+      function loadMockFile(filename) {
+        closeVault();
+        alert(
+          "Loading Evidence Body: " +
+            filename +
+            "\nInitializing Neural Pipeline...",
+        );
+        // Simulate loading
+        if (!cameraOn) toggleCamera();
+        document.querySelector("h1").innerHTML =
+          filename +
+          ' <span class="text-cyan-400 font-normal">| ANALYZING</span>';
+      }
 
-        async function toggleCamera() {
-            const off = document.getElementById('camOffState');
-            const on = document.getElementById('camOnState');
-            const btn = document.getElementById('mainCamBtn');
-            const video = document.getElementById('webcam');
-            
-            if (!cameraOn) {
-                try {
-                    mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
-                    video.srcObject = mediaStream;
-                    await video.play();
+      async function toggleCamera() {
+        const off = document.getElementById("camOffState");
+        const on = document.getElementById("camOnState");
+        const btn = document.getElementById("mainCamBtn");
+        const video = document.getElementById("webcam");
 
-                    cameraOn = true;
-                    off.classList.add('opacity-0');
-                    setTimeout(() => {
-                        off.classList.add('hidden');
-                        on.classList.remove('hidden');
-                        on.classList.add('flex');
-                        
-                        // Start emotion detection
-                        startEmotionDetection();
-                    }, 500);
-                    btn.innerHTML = '<i class="fas fa-video mr-2"></i> Camera On';
-                    btn.classList.remove('bg-rose-500/10', 'text-rose-500', 'border-rose-500/30');
-                    btn.classList.add('bg-cyan-500/10', 'text-cyan-500', 'border-cyan-500/30', 'hover:bg-cyan-500', 'hover:text-white');
-                } catch (err) {
-                    console.error("Error accessing camera:", err);
-                    alert("Could not access camera. Please check permissions.");
-                }
-            } else {
-                // Stop emotion detection
-                stopEmotionDetection();
-                
-                if(mediaStream) {
-                    mediaStream.getTracks().forEach(track => track.stop());
-                    mediaStream = null;
-                }
-                video.srcObject = null;
-                
-                cameraOn = false;
-                on.classList.add('hidden');
-                on.classList.remove('flex');
-                off.classList.remove('hidden');
-                setTimeout(() => off.classList.remove('opacity-0'), 10);
-                btn.innerHTML = '<i class="fas fa-video-slash"></i> Camera Off';
-                btn.classList.add('bg-rose-500/10', 'text-rose-500', 'border-rose-500/30');
-                btn.classList.remove('bg-cyan-500/10', 'text-cyan-500', 'border-cyan-500/30', 'hover:bg-cyan-500', 'hover:text-white');
-            }
-        }
-
-        // Real-time Emotion Detection Functions
-        function startEmotionDetection() {
-            const videoElement = document.getElementById("webcam");
-            const canvas = document.getElementById("emotionCanvas");
-            const ctx = canvas.getContext("2d");
-
-            console.log("🚀 Starting emotion detection...");
-
-            function resizeCanvas() {
-                canvas.width = videoElement.videoWidth;
-                canvas.height = videoElement.videoHeight;
-            }
-
-            videoElement.addEventListener('loadedmetadata', resizeCanvas);
-            resizeCanvas();
-
-            emotionDetectionInterval = setInterval(async () => {
-                if (!videoElement.videoWidth) return;
-
-                try {
-                    const tempCanvas = document.createElement('canvas');
-                    tempCanvas.width = videoElement.videoWidth;
-                    tempCanvas.height = videoElement.videoHeight;
-                    const tempCtx = tempCanvas.getContext('2d');
-                    
-                    // Flip horizontally for mirror effect
-                    tempCtx.translate(tempCanvas.width, 0);
-                    tempCtx.scale(-1, 1);
-                    tempCtx.drawImage(videoElement, 0, 0);
-                    tempCtx.setTransform(1, 0, 0, 1, 0, 0);
-
-                    const base64Image = tempCanvas.toDataURL('image/jpeg', 0.8);
-                    const result = await eel.process_frame(base64Image)();
-
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                    if (result.success && result.face_found) {
-                        const box = result.face_box;
-                        const mirroredX = canvas.width - box.x - box.w;
-                        
-                        const padding = 10;
-                        const x = Math.max(0, mirroredX - padding);
-                        const y = Math.max(0, box.y - padding);
-                        const w = Math.min(canvas.width - x, box.w + padding * 2);
-                        const h = Math.min(canvas.height - y, box.h + padding * 2);
-
-                        ctx.strokeStyle = '#00DBFF';
-                        ctx.lineWidth = 4;
-                        ctx.strokeRect(x, y, w, h);
-
-                        const emotion = result.emotion;
-                        const confidence = (result.confidence * 100).toFixed(1);
-                        const label = `${emotion} (${confidence}%)`;
-                        
-                        ctx.font = 'bold 22px Inter, sans-serif';
-                        const textWidth = ctx.measureText(label).width;
-                        
-                        const labelY = y > 40 ? y - 40 : y + h + 5;
-                        ctx.fillStyle = 'rgba(0, 219, 255, 0.95)';
-                        ctx.fillRect(x, labelY, textWidth + 20, 35);
-                        
-                        ctx.fillStyle = '#000000';
-                        ctx.fillText(label, x + 10, labelY + 24);
-
-                        console.log(`Detected: ${emotion} (${confidence}%)`);
-                    } else if (result.success && !result.face_found) {
-                        ctx.font = 'bold 24px Inter, sans-serif';
-                        ctx.fillStyle = 'rgba(244, 63, 94, 0.9)';
-                        ctx.fillText('No Face Detected', 20, 40);
-                    }
-                } catch (error) {
-                    console.error("Emotion detection error:", error);
-                }
-            }, 500);
-        }
-
-        function stopEmotionDetection() {
-            if (emotionDetectionInterval) {
-                clearInterval(emotionDetectionInterval);
-                emotionDetectionInterval = null;
-                console.log("⏹️ Stopped emotion detection");
-
-                const canvas = document.getElementById("emotionCanvas");
-                const ctx = canvas.getContext("2d");
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-            }
-        }
-
-        // Simulate Live Data
-        setInterval(() => {
-            if(!cameraOn) return;
-            
-            // Radar
-            radarChart.data.datasets[0].data = radarChart.data.datasets[0].data.map(val => {
-                const shift = (Math.random() - 0.5) * 5;
-                return Math.max(0, Math.min(100, val + shift));
+        if (!cameraOn) {
+          try {
+            // Frontend-only Camera Access
+            mediaStream = await navigator.mediaDevices.getUserMedia({
+              video: true,
             });
-            radarChart.update('none');
+            video.srcObject = mediaStream;
+            await video.play();
 
-            // Progress Bars
-            const updateBar = (id, valId) => {
-                const newVal = Math.floor(Math.random() * 80) + 10;
-                document.getElementById(id).style.width = newVal + '%';
-                document.getElementById(valId).innerText = newVal + '%';
-            };
-            
-            updateBar('barLip', 'valLip');
-            updateBar('barBrow', 'valBrow');
-            updateBar('barPupil', 'valPupil');
-            updateBar('barNose', 'valNose');
-        }, 800);
+            cameraOn = true;
+            off.classList.add("opacity-0");
+            setTimeout(() => {
+              off.classList.add("hidden");
+              on.classList.remove("hidden");
+              on.classList.add("flex");
+            }, 500);
+
+            btn.innerHTML = '<i class="fas fa-video mr-2"></i> Camera On';
+            btn.classList.remove(
+              "bg-rose-500/10",
+              "text-rose-500",
+              "border-rose-500/30",
+            );
+            btn.classList.add(
+              "bg-cyan-500/10",
+              "text-cyan-500",
+              "border-cyan-500/30",
+              "hover:bg-cyan-500",
+              "hover:text-white",
+            );
+          } catch (err) {
+            console.error("Error accessing camera:", err);
+          }
+        } else {
+          // Stop Camera
+          if (mediaStream) {
+            mediaStream.getTracks().forEach((track) => track.stop());
+            mediaStream = null;
+          }
+          video.srcObject = null;
+
+          cameraOn = false;
+          on.classList.add("hidden");
+          on.classList.remove("flex");
+          off.classList.remove("hidden");
+          setTimeout(() => off.classList.remove("opacity-0"), 10);
+
+          btn.innerHTML = '<i class="fas fa-video-slash"></i> Camera Off';
+          btn.classList.add(
+            "bg-rose-500/10",
+            "text-rose-500",
+            "border-rose-500/30",
+          );
+          btn.classList.remove(
+            "bg-cyan-500/10",
+            "text-cyan-500",
+            "border-cyan-500/30",
+            "hover:bg-cyan-500",
+            "hover:text-white",
+          );
+        }
+      }
+
+      // Real-time Emotion Detection Functions
+      function startEmotionDetection() {
+        const videoElement = document.getElementById("webcam");
+        const canvas = document.getElementById("emotionCanvas");
+        const ctx = canvas.getContext("2d");
+
+        console.log("🚀 Starting emotion detection...");
+
+        function resizeCanvas() {
+          canvas.width = videoElement.videoWidth;
+          canvas.height = videoElement.videoHeight;
+        }
+
+        videoElement.addEventListener("loadedmetadata", resizeCanvas);
+        resizeCanvas();
+
+        emotionDetectionInterval = setInterval(async () => {
+          if (!videoElement.videoWidth) return;
+
+          try {
+            const tempCanvas = document.createElement("canvas");
+            tempCanvas.width = videoElement.videoWidth;
+            tempCanvas.height = videoElement.videoHeight;
+            const tempCtx = tempCanvas.getContext("2d");
+
+            // Flip horizontally for mirror effect
+            tempCtx.translate(tempCanvas.width, 0);
+            tempCtx.scale(-1, 1);
+            tempCtx.drawImage(videoElement, 0, 0);
+            tempCtx.setTransform(1, 0, 0, 1, 0, 0);
+
+            const base64Image = tempCanvas.toDataURL("image/jpeg", 0.8);
+            const result = await eel.process_frame(base64Image)();
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (result.success && result.face_found) {
+              const box = result.face_box;
+              const mirroredX = canvas.width - box.x - box.w;
+
+              const padding = 10;
+              const x = Math.max(0, mirroredX - padding);
+              const y = Math.max(0, box.y - padding);
+              const w = Math.min(canvas.width - x, box.w + padding * 2);
+              const h = Math.min(canvas.height - y, box.h + padding * 2);
+
+              ctx.strokeStyle = "#00DBFF";
+              ctx.lineWidth = 4;
+              ctx.strokeRect(x, y, w, h);
+
+              const emotion = result.emotion;
+              const confidence = (result.confidence * 100).toFixed(1);
+              const label = `${emotion} (${confidence}%)`;
+
+              ctx.font = "bold 22px Inter, sans-serif";
+              const textWidth = ctx.measureText(label).width;
+
+              const labelY = y > 40 ? y - 40 : y + h + 5;
+              ctx.fillStyle = "rgba(0, 219, 255, 0.95)";
+              ctx.fillRect(x, labelY, textWidth + 20, 35);
+
+              ctx.fillStyle = "#000000";
+              ctx.fillText(label, x + 10, labelY + 24);
+
+              console.log(`Detected: ${emotion} (${confidence}%)`);
+            } else if (result.success && !result.face_found) {
+              ctx.font = "bold 24px Inter, sans-serif";
+              ctx.fillStyle = "rgba(244, 63, 94, 0.9)";
+              ctx.fillText("No Face Detected", 20, 40);
+            }
+          } catch (error) {
+            console.error("Emotion detection error:", error);
+          }
+        }, 500);
+      }
+
+      function stopEmotionDetection() {
+        if (emotionDetectionInterval) {
+          clearInterval(emotionDetectionInterval);
+          emotionDetectionInterval = null;
+          console.log("⏹️ Stopped emotion detection");
+
+          const canvas = document.getElementById("emotionCanvas");
+          const ctx = canvas.getContext("2d");
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+
+      // Simulate Live Data
+      setInterval(() => {
+        if (!cameraOn) return;
+
+        // Radar
+        radarChart.data.datasets[0].data = radarChart.data.datasets[0].data.map(
+          (val) => {
+            const shift = (Math.random() - 0.5) * 5;
+            return Math.max(0, Math.min(100, val + shift));
+          },
+        );
+        radarChart.update("none");
+
+        // Progress Bars
+        const updateBar = (id, valId) => {
+          const newVal = Math.floor(Math.random() * 80) + 10;
+          document.getElementById(id).style.width = newVal + "%";
+          document.getElementById(valId).innerText = newVal + "%";
+        };
+
+        updateBar("barLip", "valLip");
+        updateBar("barBrow", "valBrow");
+        updateBar("barPupil", "valPupil");
+        updateBar("barNose", "valNose");
+      }, 800);
     </script>
     <script>
-        const body = document.body;
+      const body = document.body;
 
-        function toggleSidebar() {
-            body.classList.toggle('sidebar-collapsed');
-            localStorage.setItem('sidebarCollapsed', body.classList.contains('sidebar-collapsed'));
+      function toggleSidebar() {
+        body.classList.toggle("sidebar-collapsed");
+        localStorage.setItem(
+          "sidebarCollapsed",
+          body.classList.contains("sidebar-collapsed"),
+        );
+      }
+
+      // Theme Toggle Logic
+      const themeToggle = document.getElementById("theme-toggle");
+      const themeIcon = themeToggle.querySelector("i");
+
+      function toggleTheme() {
+        const isLight = body.classList.toggle("light-mode");
+        localStorage.setItem("theme", isLight ? "light" : "dark");
+        updateThemeUI(isLight);
+        updateChartsTheme(isLight);
+      }
+
+      function updateChartsTheme(isLight) {
+        const gridColor = isLight
+          ? "rgba(0, 0, 0, 0.12)"
+          : "rgba(255, 255, 255, 0.05)";
+        const labelColor = isLight ? "#27374d" : "#64748b";
+
+        radarChart.options.scales.r.angleLines.color = gridColor;
+        radarChart.options.scales.r.grid.color = gridColor;
+        radarChart.options.scales.r.pointLabels.color = labelColor;
+
+        radarChart.data.datasets[1].borderColor = isLight
+          ? "rgba(0, 0, 0, 0.1)"
+          : "rgba(255, 255, 255, 0.2)";
+        radarChart.data.datasets[1].backgroundColor = isLight
+          ? "rgba(0, 0, 0, 0.02)"
+          : "rgba(255, 255, 255, 0.05)";
+
+        radarChart.update();
+      }
+
+      function updateThemeUI(isLight) {
+        themeIcon.className = isLight ? "fas fa-sun" : "fas fa-moon";
+        themeToggle.classList.toggle("bg-gray-200", isLight);
+        themeToggle.classList.toggle("text-gray-900", isLight);
+        themeToggle.classList.toggle("border-gray-300", isLight);
+      }
+
+      themeToggle.addEventListener("click", toggleTheme);
+
+      // Initial Load
+      document.addEventListener("DOMContentLoaded", () => {
+        if (localStorage.getItem("sidebarCollapsed") === "true") {
+          body.classList.add("sidebar-collapsed");
         }
-
-        // Theme Toggle Logic
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = themeToggle.querySelector('i');
-
-        function toggleTheme() {
-            const isLight = body.classList.toggle('light-mode');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            updateThemeUI(isLight);
-            updateChartsTheme(isLight);
+        if (
+          localStorage.getItem("theme") === "light" ||
+          (!localStorage.getItem("theme") &&
+            body.classList.contains("light-mode"))
+        ) {
+          body.classList.add("light-mode");
+          updateThemeUI(true);
+          updateChartsTheme(true);
+        } else {
+          updateThemeUI(false);
+          updateChartsTheme(false);
         }
-
-        function updateChartsTheme(isLight) {
-            const gridColor = isLight ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.05)';
-            const labelColor = isLight ? '#27374d' : '#64748b';
-            
-            radarChart.options.scales.r.angleLines.color = gridColor;
-            radarChart.options.scales.r.grid.color = gridColor;
-            radarChart.options.scales.r.pointLabels.color = labelColor;
-            
-            radarChart.data.datasets[1].borderColor = isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.2)';
-            radarChart.data.datasets[1].backgroundColor = isLight ? 'rgba(0, 0, 0, 0.02)' : 'rgba(255, 255, 255, 0.05)';
-            
-            radarChart.update();
-        }
-
-        function updateThemeUI(isLight) {
-            themeIcon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
-            themeToggle.classList.toggle('bg-gray-200', isLight);
-            themeToggle.classList.toggle('text-gray-900', isLight);
-            themeToggle.classList.toggle('border-gray-300', isLight);
-        }
-
-        themeToggle.addEventListener('click', toggleTheme);
-
-        // Initial Load
-        document.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('sidebarCollapsed') === 'true') {
-                body.classList.add('sidebar-collapsed');
+      });
+        function closeApp() {
+            if(confirm("Are you sure you want to close DECEPTRON?")) {
+                try { if(typeof eel !== 'undefined') { eel.close_python_app(); } } catch(e) {}
+                window.close();
             }
-            if (localStorage.getItem('theme') === 'light' || (!localStorage.getItem('theme') && body.classList.contains('light-mode'))) {
-                body.classList.add('light-mode');
-                updateThemeUI(true);
-                updateChartsTheme(true);
-            } else {
-                updateThemeUI(false);
-                updateChartsTheme(false);
-            }
-        });
+        }
     </script>
-</body>
+  </body>
 </html>
