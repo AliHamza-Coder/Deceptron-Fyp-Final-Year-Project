@@ -199,21 +199,43 @@
         background: var(--modal-bg);
         border: 1px solid var(--border-subtle);
         border-radius: 2.5rem;
-        padding: 2.5rem;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        transition: background 0.3s ease;
+      /* Premium Vault Styles */
+      #vaultModal .modal-content {
+          width: 90%;
+          max-width: 1000px;
+          max-height: 85vh;
+          border: 2px solid rgba(0, 219, 255, 0.3);
+          box-shadow: 0 0 50px rgba(0, 219, 255, 0.2);
+          padding: 0; /* Override previous padding */
+          border-radius: 2.5rem;
       }
-
+      .vault-search-container {
+          background: rgba(0, 0, 0, 0.4);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 1rem;
+          display: flex;
+          align-items: center;
+          padding: 0.6rem 1.2rem;
+          width: 350px;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .vault-search-container:focus-within {
+          border-color: rgba(0, 219, 255, 0.6);
+          box-shadow: 0 0 20px rgba(0, 219, 255, 0.25);
+          width: 380px;
+      }
       .vault-item {
         background: rgba(255, 255, 255, 0.02);
         border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-bottom: 1rem;
         border-radius: 1.5rem;
-        padding: 1.25rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        cursor: pointer;
-        transition: all 0.3s ease;
+      }
+      .vault-item:hover {
+        background: rgba(0, 219, 255, 0.05);
+        border-color: rgba(0, 219, 255, 0.3);
+        transform: translateY(-3px) scale(1.005);
+      }
       }
 
       .vault-item:hover {
@@ -606,215 +628,11 @@
     </style>
   </head>
   <body>
-    <!-- Sidebar -->
-    <button id="restore-sidebar" title="Show Sidebar" onclick="toggleSidebar()">
-      <i class="fas fa-chevron-right"></i>
-    </button>
-    <aside class="sidebar flex flex-col">
-      <button
-        class="collapse-btn"
-        onclick="toggleSidebar()"
-        title="Hide Sidebar"
-      >
-        <i class="fas fa-chevron-left"></i>
-      </button>
-      <div class="logo-section">
-        <img src="../assets/images/Logo2.png" alt="Logo" />
-      </div>
-      <nav class="flex-1">
-        <div
-          class="nav-item cursor-pointer"
-          onclick="window.location.href = 'dashboard.html'"
-        >
-          <i class="fas fa-th-large"></i>
-          <span>Dashboard Hub</span>
-        </div>
-        <div
-          class="nav-item active cursor-pointer"
-          onclick="window.location.href = 'live-session.html'"
-        >
-          <i class="fas fa-video"></i>
-          <span>Live Session</span>
-        </div>
-        <div
-          class="nav-item cursor-pointer"
-          onclick="window.location.href = 'reports.html'"
-        >
-          <i class="fas fa-file-alt"></i>
-          <span>Reports</span>
-        </div>
-        <div
-          class="nav-item cursor-pointer"
-          onclick="window.location.href = 'uploads.html'"
-        >
-          <i class="fas fa-upload"></i>
-          <span>Uploads</span>
-        </div>
+    <!-- Sidebar Component Container -->
+    <script src="../js/sidebar.js"></script>
+    <script src="../js/vault-component.js"></script>
+    <script>initSidebar();</script>
 
-        <div class="mt-8 px-6 mb-2 nav-category">
-          <p
-            class="text-[10px] font-bold tracking-widest text-gray-500 uppercase"
-          >
-            Modules
-          </p>
-        </div>
-        <div
-          class="nav-item cursor-pointer"
-          onclick="window.location.href = 'facial-expression.html'"
-        >
-          <i class="fas fa-user-astronaut"></i>
-          <span>Facial Micro-Exp</span>
-        </div>
-        <div
-          class="nav-item cursor-pointer"
-          onclick="window.location.href = 'voice-analysis.html'"
-        >
-          <i class="fas fa-microphone-lines"></i>
-          <span>Voice Analysis</span>
-        </div>
-      </nav>
-
-      <div class="p-4 border-t border-white/5">
-        <div
-          class="nav-item cursor-pointer"
-          onclick="window.location.href = 'profile.html'"
-        >
-          <i class="fas fa-user-circle"></i>
-          <span>Profile</span>
-        </div>
-        <div
-          class="nav-item cursor-pointer"
-          onclick="window.location.href = 'settings.html'"
-        >
-          <i class="fas fa-cog"></i>
-          <span>Settings</span>
-        </div>
-        <div
-            class="nav-item text-red-400 hover:text-red-300 hover:bg-red-500/5 cursor-pointer"
-                onclick="closeApp()">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </div>
-      </div>
-    </aside>
-
-    <!-- Evidence Vault Modal -->
-    <div id="vaultModal" class="modal-backdrop">
-      <div class="modal-content">
-        <div class="flex justify-between items-center mb-8">
-          <div>
-            <h2
-              class="text-2xl font-bold heading-font text-white uppercase tracking-wider"
-            >
-              <i class="fas fa-folder-open text-cyan-400 mr-3"></i>Load File
-            </h2>
-            <p
-              class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1"
-            >
-              Select media for detailed analysis
-            </p>
-          </div>
-          <button
-            onclick="closeVault()"
-            class="text-gray-500 hover:text-white transition-colors text-2xl"
-          >
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-
-        <div
-          class="space-y-4 max-h-[450px] overflow-y-auto pr-2 custom-scrollbar"
-        >
-          <!-- Video Item -->
-          <div
-            class="vault-item group"
-            onclick="loadFromVault('suspect_interview_2024.mp4', 'video')"
-          >
-            <div class="flex items-center space-x-5">
-              <div
-                class="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20"
-              >
-                <i class="fas fa-video text-xl"></i>
-              </div>
-              <div>
-                <p class="text-sm font-bold text-white uppercase tracking-wide">
-                  suspect_interview_2024.mp4
-                </p>
-                <p class="text-[10px] text-gray-500 font-mono mt-1">
-                  1080p • 12:45 • ANALYSIS_READY
-                </p>
-              </div>
-            </div>
-            <button
-              class="px-4 py-2 bg-cyan-500/10 text-cyan-400 text-[9px] font-bold uppercase rounded-lg border border-cyan-500/20 group-hover:bg-cyan-500 group-hover:text-[#05080f] transition-all"
-            >
-              Select
-            </button>
-          </div>
-
-          <!-- Audio Item -->
-          <div
-            class="vault-item group"
-            onclick="loadFromVault('witness_call_log_09.wav', 'audio')"
-          >
-            <div class="flex items-center space-x-5">
-              <div
-                class="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20"
-              >
-                <i class="fas fa-microphone text-xl"></i>
-              </div>
-              <div>
-                <p class="text-sm font-bold text-white uppercase tracking-wide">
-                  witness_call_log_09.wav
-                </p>
-                <p class="text-[10px] text-gray-500 font-mono mt-1">
-                  Mono • 05:20 • VOICE_STRESS_READY
-                </p>
-              </div>
-            </div>
-            <button
-              class="px-4 py-2 bg-cyan-500/10 text-cyan-400 text-[9px] font-bold uppercase rounded-lg border border-cyan-500/20 group-hover:bg-cyan-500 group-hover:text-[#05080f] transition-all"
-            >
-              Select
-            </button>
-          </div>
-
-          <!-- Video Item 2 -->
-          <div
-            class="vault-item group"
-            onclick="loadFromVault('debrief_session_cam1.mp4', 'video')"
-          >
-            <div class="flex items-center space-x-5">
-              <div
-                class="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20"
-              >
-                <i class="fas fa-video text-xl"></i>
-              </div>
-              <div>
-                <p class="text-sm font-bold text-white uppercase tracking-wide">
-                  debrief_session_cam1.mp4
-                </p>
-                <p class="text-[10px] text-gray-500 font-mono mt-1">
-                  720p • 08:30 • FACE_EMOTION_READY
-                </p>
-              </div>
-            </div>
-            <button
-              class="px-4 py-2 bg-cyan-500/10 text-cyan-400 text-[9px] font-bold uppercase rounded-lg border border-cyan-500/20 group-hover:bg-cyan-500 group-hover:text-[#05080f] transition-all"
-            >
-              Select
-            </button>
-          </div>
-        </div>
-
-        <div
-          class="mt-10 pt-6 border-t border-white/5 flex justify-between items-center text-[10px] text-gray-600 uppercase tracking-widest font-bold"
-        >
-          <span>Multi-modal Sync Ready</span>
-          <span>Active Vault Session ID: #8801</span>
-        </div>
-      </div>
-    </div>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -985,12 +803,33 @@
                   >Camera Source</label
                 >
                 <select
+                  id="cameraSelect"
                   class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-cyan-400 appearance-none transition-all cursor-pointer"
                 >
-                  <option>Logitech Brio 4K - Default</option>
-                  <option>OBS Virtual Camera</option>
-                  <option>Internal HD Device</option>
+                  <option>Loading cameras...</option>
                 </select>
+              </div>
+              
+              <div class="space-y-2">
+                <label
+                  class="text-[9px] text-gray-500 font-bold uppercase tracking-widest"
+                  >Microphone Source</label
+                >
+                <select
+                  id="microphoneSelect"
+                  class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-cyan-400 appearance-none transition-all cursor-pointer"
+                >
+                  <option>Loading microphones...</option>
+                </select>
+              </div>
+              
+              <div class="pt-4">
+                <button
+                  onclick="openVault()"
+                  class="w-full py-3 bg-purple-600/10 border border-purple-500/30 text-purple-400 text-[9px] font-bold uppercase rounded-xl hover:bg-purple-600 hover:text-white transition-all flex items-center justify-center gap-2"
+                >
+                  <i class="fas fa-folder-open"></i> Load from Vault
+                </button>
               </div>
             </div>
 
@@ -1316,7 +1155,7 @@
               <label
                 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest"
                 >Case Code</label
-              >
+            >
               <input
                 type="text"
                 value="#DEC-XQ-92"
@@ -1327,7 +1166,7 @@
               <label
                 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest"
                 >Storage Status</label
-              >
+            >
               <input
                 type="text"
                 value="Secure Cloud"
@@ -1504,12 +1343,20 @@
         const btn = document.getElementById("camBtn");
         const toast = document.getElementById("videoToast");
         const videoElement = document.getElementById("webcam");
+        const cameraSelect = document.getElementById('cameraSelect');
+        const micSelect = document.getElementById('microphoneSelect');
 
         if (on.classList.contains("hidden")) {
           // Turning ON
           try {
-            // Frontend-only Camera Access
-            mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            // Get selected devices
+            const cameraId = cameraSelect.value;
+            const micId = micSelect.value;
+            const constraints = {
+              video: cameraId ? { deviceId: { exact: cameraId } } : true,
+              audio: micId ? { deviceId: { exact: micId } } : true,
+            };
+            mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
             videoElement.srcObject = mediaStream;
             videoElement.play();
 
@@ -1781,8 +1628,65 @@
 
       themeToggle.addEventListener("click", toggleTheme);
 
+      // Populate Camera and Microphone Sources
+      async function populateCameras() {
+        const select = document.getElementById('cameraSelect');
+        select.innerHTML = '';
+        try {
+          const devices = await navigator.mediaDevices.enumerateDevices();
+          const videoDevices = devices.filter(d => d.kind === 'videoinput');
+          videoDevices.forEach((device, index) => {
+            const option = document.createElement('option');
+            option.value = device.deviceId;
+            option.text = device.label || `Camera ${index + 1}`;
+            select.appendChild(option);
+          });
+        } catch (err) {
+          console.error("Error enumerating cameras:", err);
+          const option = document.createElement('option');
+          option.text = "No cameras found";
+          select.appendChild(option);
+        }
+      }
+
+      async function populateMicrophones() {
+        const select = document.getElementById('microphoneSelect');
+        select.innerHTML = '';
+        try {
+          const devices = await navigator.mediaDevices.enumerateDevices();
+          const audioDevices = devices.filter(d => d.kind === 'audioinput');
+          audioDevices.forEach((device, index) => {
+            const option = document.createElement('option');
+            option.value = device.deviceId;
+            option.text = device.label || `Microphone ${index + 1}`;
+            select.appendChild(option);
+          });
+        } catch (err) {
+          console.error("Error enumerating microphones:", err);
+          const option = document.createElement('option');
+          option.text = "No microphones found";
+          select.appendChild(option);
+        }
+      }
+
+      function openVault() {
+          VaultComponent.open((item) => {
+              // Load the selected item into the view or player
+              // For Live Session, we might just want to show the filename in the header as 'analyzing'
+              document.querySelector('h1').innerHTML = item.filename + ' <span class="text-cyan-400 font-normal">| PIPELINE LOADED</span>';
+              
+              // If it's a video/audio, we could potentially load it into a secondary preview if needed, 
+              // but the primary use here is likely for context or future analysis.
+              console.log("Selected from Vault:", item);
+          });
+      }
+
       // Initial Load
       document.addEventListener("DOMContentLoaded", () => {
+        // Populate device sources
+        populateCameras();
+        populateMicrophones();
+
         if (localStorage.getItem("sidebarCollapsed") === "true") {
           body.classList.add("sidebar-collapsed");
         }
@@ -1794,9 +1698,8 @@
         }
       });
         function closeApp() {
-            if(confirm("Are you sure you want to close DECEPTRON?")) {
-                try { if(typeof eel !== 'undefined') { eel.close_python_app(); } } catch(e) {}
-                window.close();
+            if(confirm("Are you sure you want to logout?")) {
+                window.location.href = 'login.html';
             }
         }
     </script>

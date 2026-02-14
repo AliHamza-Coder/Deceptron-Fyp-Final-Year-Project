@@ -214,10 +214,31 @@
         </div>
     </div>
     <script>
-        document.getElementById('signupForm').addEventListener('submit', (e) => {
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            // Simulate account creation success
-            window.location.href = 'dashboard.html';
+            
+            const formData = new FormData(e.target);
+            const user_data = {
+                firstName: e.target.querySelector('input[placeholder="First Name"]').value,
+                lastName: e.target.querySelector('input[placeholder="Last Name"]').value,
+                username: e.target.querySelector('input[placeholder="Username"]').value,
+                email: e.target.querySelector('input[placeholder="Email Address"]').value,
+                password: e.target.querySelector('input[placeholder="Create Password"]').value,
+                created_at: new Date().toISOString()
+            };
+
+            try {
+                const result = await eel.signup(user_data)();
+                if (result.success) {
+                    alert("Account created successfully! Please sign in.");
+                    window.location.href = 'login.html';
+                } else {
+                    alert("Error: " + result.message);
+                }
+            } catch (err) {
+                console.error("Signup error:", err);
+                alert("An error occurred during signup.");
+            }
         });
     </script>
 

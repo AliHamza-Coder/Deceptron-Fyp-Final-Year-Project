@@ -165,7 +165,7 @@
                     
                     <form id="loginForm" class="space-y-6">
                         <div>
-                            <input type="email" placeholder="Email Address" required 
+                            <input type="text" placeholder="Email or Username" required 
                                 class="input-field w-full px-6 py-4 rounded-2xl text-white placeholder-gray-500 text-sm font-light">
                         </div>
                         
@@ -198,10 +198,23 @@
         </div>
     </div>
     <script>
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            // Simulate authentication success
-            window.location.href = 'dashboard.html';
+            
+            const identity = e.target.querySelector('input[type="text"]').value;
+            const password = e.target.querySelector('input[type="password"]').value;
+
+            try {
+                const result = await eel.login(identity, password)();
+                if (result.success) {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert("Login failed: " + result.message);
+                }
+            } catch (err) {
+                console.error("Login error:", err);
+                alert("An error occurred during login.");
+            }
         });
     </script>
 

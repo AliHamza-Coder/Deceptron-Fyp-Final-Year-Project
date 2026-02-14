@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="../styles/output.css" />
     <script src="../scripts/chart.min.js"></script>
     <link rel="stylesheet" href="../vendor/font-awesome/css/all.min.css" />
+    <script src="../js/sidebar.js"></script>
+    <script src="../js/vault-component.js"></script>
+    <script type="text/javascript" src="/eel.js"></script>
     <style>
       :root {
         --primary-blue: #0076d6;
@@ -114,6 +117,40 @@
       body.light-mode .text-gray-500 {
         color: #334155 !important;
       }
+
+        /* Premium Vault Styles */
+        #vaultModal .modal-card {
+            width: 90%;
+            max-width: 900px;
+            max-height: 85vh;
+            border: 2px solid rgba(0, 219, 255, 0.3);
+            box-shadow: 0 0 40px rgba(0, 219, 255, 0.15);
+        }
+        .vault-search-container {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            width: 300px;
+            transition: all 0.3s ease;
+        }
+        .vault-search-container:focus-within {
+            border-color: rgba(0, 219, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 219, 255, 0.2);
+        }
+        .vault-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .vault-item:hover {
+            background: rgba(0, 219, 255, 0.08);
+            border-color: rgba(0, 219, 255, 0.4);
+            transform: scale(1.01) translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
 
       .status-dot {
         width: 8px;
@@ -421,30 +458,7 @@
         box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
       }
 
-      .scanline {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          var(--accent-cyan),
-          transparent
-        );
-        animation: scan 3s linear infinite;
-        z-index: 10;
-      }
-
-      @keyframes scan {
-        0% {
-          transform: translateY(-100%);
-        }
-        100% {
-          transform: translateY(400px);
-        }
-      }
+      /* Removed scanline animation */
 
       /* Toggle Switches */
       .switch {
@@ -612,97 +626,10 @@
     </style>
   </head>
   <body>
-    <!-- Sidebar -->
-    <button id="restore-sidebar" title="Show Sidebar" onclick="toggleSidebar()">
-      <i class="fas fa-chevron-right"></i>
-    </button>
-    <aside class="sidebar flex flex-col">
-      <button
-        class="collapse-btn"
-        onclick="toggleSidebar()"
-        title="Hide Sidebar"
-      >
-        <i class="fas fa-chevron-left"></i>
-      </button>
-      <div class="logo-section">
-        <img src="../assets/images/Logo2.png" alt="Logo" />
-      </div>
-      <nav class="flex-1">
-        <div
-          class="nav-item cursor-pointer"
-          onclick="window.location.href = 'dashboard.html'"
-        >
-          <i class="fas fa-th-large"></i>
-          <span>Dashboard Hub</span>
-        </div>
-        <div
-          class="nav-item cursor-pointer"
-          onclick="window.location.href = 'live-session.html'"
-        >
-          <i class="fas fa-video"></i>
-          <span>Live Session</span>
-        </div>
-        <div
-          class="nav-item cursor-pointer"
-          onclick="window.location.href = 'reports.html'"
-        >
-          <i class="fas fa-file-alt"></i>
-          <span>Reports</span>
-        </div>
-        <div
-          class="nav-item cursor-pointer"
-          onclick="window.location.href = 'uploads.html'"
-        >
-          <i class="fas fa-upload"></i>
-          <span>Uploads</span>
-        </div>
-
-        <div class="mt-8 px-6 mb-2 nav-category">
-          <p
-            class="text-[10px] font-bold tracking-widest text-gray-500 uppercase"
-          >
-            Modules
-          </p>
-        </div>
-        <div
-          class="nav-item active cursor-pointer"
-          onclick="window.location.href = 'facial-expression.html'"
-        >
-          <i class="fas fa-user-astronaut"></i>
-          <span>Facial Micro-Exp</span>
-        </div>
-        <div
-          class="nav-item cursor-pointer"
-          onclick="window.location.href = 'voice-analysis.html'"
-        >
-          <i class="fas fa-microphone-lines"></i>
-          <span>Voice Analysis</span>
-        </div>
-      </nav>
-
-      <div class="p-4 border-t border-white/5">
-        <div
-          class="nav-item cursor-pointer"
-          onclick="window.location.href = 'profile.html'"
-        >
-          <i class="fas fa-user-circle"></i>
-          <span>Profile</span>
-        </div>
-        <div
-          class="nav-item cursor-pointer"
-          onclick="window.location.href = 'settings.html'"
-        >
-          <i class="fas fa-cog"></i>
-          <span>Settings</span>
-        </div>
-        <div
-            class="nav-item text-red-400 hover:text-red-300 hover:bg-red-500/5 cursor-pointer"
-            onclick="closeApp()">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
-        </div>
-      </div>
-    </aside>
+    <!-- Sidebar Component Container -->
+    <script src="../js/sidebar.js"></script>
+    <script src="../js/vault-component.js"></script>
+    <script>initSidebar();</script>
 
     <!-- Evidence Vault Modal -->
     <div id="vaultModal" class="modal-backdrop">
@@ -848,7 +775,7 @@
             </button>
             <button
               class="py-2.5 bg-cyan-500/10 border border-cyan-500/30 text-cyan-500 text-[9px] font-black uppercase rounded-xl hover:bg-cyan-500 hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
-              onclick="openVault()"
+              onclick="openVaultSelection()"
             >
               <i class="fas fa-folder-open"></i> Load File
             </button>
@@ -958,7 +885,7 @@
           <div class="flex items-center space-x-4">
             <button
               class="bg-white/5 hover:bg-white/10 text-white text-[10px] font-bold uppercase py-2.5 px-6 rounded-xl border border-white/10 transition-all"
-              onclick="openVault()"
+              onclick="openVaultSelection()"
             >
               <i class="fas fa-folder-open mr-2 text-primary-blue"></i> Evidence
               Vault
@@ -992,14 +919,8 @@
             <video
               id="webcam"
               class="absolute inset-0 w-full h-full object-cover"
-              style="transform: scaleX(-1);"
+              controls
             ></video>
-            <!-- Canvas overlay for emotion detection -->
-            <canvas
-              id="emotionCanvas"
-              class="absolute inset-0 w-full h-full pointer-events-none"
-              style="transform: scaleX(-1);"
-            ></canvas>
           </div>
         </div>
       </div>
@@ -1133,123 +1054,25 @@
       </div>
     </main>
 
-    <!-- Load File Modal -->
-    <div
-      id="vaultModal"
-      style="display: none"
-      class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-    >
-      <div
-        class="bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-cyan-500/30 rounded-2xl max-w-2xl w-full p-8 shadow-2xl shadow-cyan-500/20"
-      >
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-black text-white uppercase tracking-wider">
-            <i class="fas fa-folder-open text-cyan-400 mr-3"></i>Load File
-          </h2>
-          <button
-            onclick="closeVault()"
-            class="text-gray-400 hover:text-white transition-colors"
-          >
-            <i class="fas fa-times text-2xl"></i>
-          </button>
+
+    <!-- Media Player Modal -->
+    <div id="playerModal" class="fixed inset-0 z-[110] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closePlayer()"></div>
+        <div class="player-modal relative w-full max-w-4xl p-4 rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+            <div class="flex justify-between items-center mb-4 px-2">
+                <h3 id="playerTitle" class="text-sm font-bold text-white uppercase tracking-wider">File Player</h3>
+                <button onclick="closePlayer()" class="text-gray-400 hover:text-white transition-colors"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="media-container mx-auto bg-black flex items-center justify-center">
+                <video id="vaultVideo" class="w-full h-full hidden" controls></video>
+                <div id="audioPlayerUI" class="hidden flex-col items-center justify-center w-full h-full space-y-6">
+                    <div class="w-24 h-24 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-400 border-2 border-cyan-500/20 animate-pulse">
+                        <i class="fas fa-microphone text-4xl"></i>
+                    </div>
+                    <audio id="vaultAudio" class="w-3/4" controls></audio>
+                </div>
+            </div>
         </div>
-
-        <div
-          class="h-[1px] bg-gradient-to-r from-cyan-500/50 to-transparent mb-6"
-        ></div>
-
-        <div class="space-y-3 max-h-96 overflow-y-auto">
-          <!-- Sample Files -->
-          <div
-            onclick="loadMockFile('Session_2025_01_15_Interview.mp4')"
-            class="p-4 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/50 rounded-xl cursor-pointer transition-all group"
-          >
-            <div class="flex items-center gap-4">
-              <i
-                class="fas fa-video text-cyan-400 text-2xl group-hover:scale-110 transition-transform"
-              ></i>
-              <div class="flex-1">
-                <div class="font-bold text-white">
-                  Session_2025_01_15_Interview.mp4
-                </div>
-                <div class="text-xs text-gray-400">Video • 15:32 • 245 MB</div>
-              </div>
-              <i
-                class="fas fa-chevron-right text-gray-600 group-hover:text-cyan-400 transition-colors"
-              ></i>
-            </div>
-          </div>
-
-          <div
-            onclick="loadMockFile('Audio_Recording_Suspect_A.wav')"
-            class="p-4 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/50 rounded-xl cursor-pointer transition-all group"
-          >
-            <div class="flex items-center gap-4">
-              <i
-                class="fas fa-microphone text-amber-400 text-2xl group-hover:scale-110 transition-transform"
-              ></i>
-              <div class="flex-1">
-                <div class="font-bold text-white">
-                  Audio_Recording_Suspect_A.wav
-                </div>
-                <div class="text-xs text-gray-400">Audio • 08:45 • 89 MB</div>
-              </div>
-              <i
-                class="fas fa-chevron-right text-gray-600 group-hover:text-cyan-400 transition-colors"
-              ></i>
-            </div>
-          </div>
-
-          <div
-            onclick="loadMockFile('Interrogation_Room_2_Cam1.mp4')"
-            class="p-4 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/50 rounded-xl cursor-pointer transition-all group"
-          >
-            <div class="flex items-center gap-4">
-              <i
-                class="fas fa-video text-rose-400 text-2xl group-hover:scale-110 transition-transform"
-              ></i>
-              <div class="flex-1">
-                <div class="font-bold text-white">
-                  Interrogation_Room_2_Cam1.mp4
-                </div>
-                <div class="text-xs text-gray-400">Video • 22:18 • 512 MB</div>
-              </div>
-              <i
-                class="fas fa-chevron-right text-gray-600 group-hover:text-cyan-400 transition-colors"
-              ></i>
-            </div>
-          </div>
-
-          <div
-            onclick="loadMockFile('Voice_Sample_Baseline.mp3')"
-            class="p-4 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/50 rounded-xl cursor-pointer transition-all group"
-          >
-            <div class="flex items-center gap-4">
-              <i
-                class="fas fa-file-audio text-emerald-400 text-2xl group-hover:scale-110 transition-transform"
-              ></i>
-              <div class="flex-1">
-                <div class="font-bold text-white">
-                  Voice_Sample_Baseline.mp3
-                </div>
-                <div class="text-xs text-gray-400">Audio • 03:12 • 12 MB</div>
-              </div>
-              <i
-                class="fas fa-chevron-right text-gray-600 group-hover:text-cyan-400 transition-colors"
-              ></i>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-6 pt-6 border-t border-white/10">
-          <button
-            onclick="closeVault()"
-            class="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl transition-all"
-          >
-            Close
-          </button>
-        </div>
-      </div>
     </div>
 
     <script>
@@ -1309,31 +1132,62 @@
         },
       });
 
-      // Camera and Emotion Detection Variables
       let cameraOn = false;
       let mediaStream = null;
-      let emotionDetectionInterval = null;
 
-      function openVault() {
-        document.getElementById("vaultModal").style.display = "flex";
+      // Populate Camera Sources
+      async function populateCameras() {
+        const select = document.getElementById('videoSource');
+        select.innerHTML = '';
+        try {
+          const devices = await navigator.mediaDevices.enumerateDevices();
+          const videoDevices = devices.filter(d => d.kind === 'videoinput');
+          videoDevices.forEach((device, index) => {
+            const option = document.createElement('option');
+            option.value = device.deviceId;
+            option.text = device.label || `Camera ${index + 1}`;
+            select.appendChild(option);
+          });
+        } catch (err) {
+          console.error("Error enumerating cameras:", err);
+          const option = document.createElement('option');
+          option.text = "No cameras found";
+          select.appendChild(option);
+        }
       }
 
-      function closeVault() {
-        document.getElementById("vaultModal").style.display = "none";
-      }
+      let vaultData = [];
 
-      function loadMockFile(filename) {
-        closeVault();
-        alert(
-          "Loading Evidence Body: " +
-            filename +
-            "\nInitializing Neural Pipeline...",
-        );
-        // Simulate loading
-        if (!cameraOn) toggleCamera();
-        document.querySelector("h1").innerHTML =
-          filename +
-          ' <span class="text-cyan-400 font-normal">| ANALYZING</span>';
+      function openVaultSelection() {
+          VaultComponent.open((item) => {
+              if (item.type !== 'video') {
+                  alert("Please select a video file for Facial micro-expression analysis.");
+                  return;
+              }
+              
+              // Load file into video player
+              const video = document.getElementById("webcam");
+              // Clear stream if any
+              if (mediaStream) {
+                  mediaStream.getTracks().forEach(track => track.stop());
+                  mediaStream = null;
+              }
+              video.srcObject = null;
+              video.src = item.filepath;
+              
+              // Reset transform for vault video (usually shouldn't be mirrored)
+              video.style.transform = "none";
+              
+              document.querySelector("h1").innerHTML = item.filename + ' <span class="text-cyan-400 font-normal">| ANALYZING</span>';
+              
+              // Set camera state to ON for UI logic
+              cameraOn = true;
+              document.getElementById("camOffState").classList.add("hidden");
+              document.getElementById("camOnState").classList.remove("hidden");
+              document.getElementById("camOnState").classList.add("flex");
+              
+              video.play();
+          });
       }
 
       async function toggleCamera() {
@@ -1341,13 +1195,16 @@
         const on = document.getElementById("camOnState");
         const btn = document.getElementById("mainCamBtn");
         const video = document.getElementById("webcam");
+        const select = document.getElementById('videoSource');
 
         if (!cameraOn) {
           try {
-            // Frontend-only Camera Access
-            mediaStream = await navigator.mediaDevices.getUserMedia({
-              video: true,
-            });
+            // Get selected camera device
+            const deviceId = select.value;
+            const constraints = {
+              video: deviceId ? { deviceId: { exact: deviceId } } : true,
+            };
+            mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
             video.srcObject = mediaStream;
             await video.play();
 
@@ -1372,6 +1229,9 @@
               "hover:bg-cyan-500",
               "hover:text-white",
             );
+            video.style.transform = "scaleX(-1)";
+            
+            cameraOn = true;
           } catch (err) {
             console.error("Error accessing camera:", err);
           }
@@ -1395,103 +1255,19 @@
             "text-rose-500",
             "border-rose-500/30",
           );
-          btn.classList.remove(
-            "bg-cyan-500/10",
-            "text-cyan-500",
-            "border-cyan-500/30",
-            "hover:bg-cyan-500",
-            "hover:text-white",
-          );
-        }
-      }
+            btn.classList.remove(
+              "bg-cyan-500/10",
+              "text-cyan-500",
+              "border-cyan-500/30",
+              "hover:bg-cyan-500",
+              "hover:text-white",
+            );
+            // Reset transform
+            video.style.transform = "none";
 
-      // Real-time Emotion Detection Functions
-      function startEmotionDetection() {
-        const videoElement = document.getElementById("webcam");
-        const canvas = document.getElementById("emotionCanvas");
-        const ctx = canvas.getContext("2d");
-
-        console.log("🚀 Starting emotion detection...");
-
-        function resizeCanvas() {
-          canvas.width = videoElement.videoWidth;
-          canvas.height = videoElement.videoHeight;
-        }
-
-        videoElement.addEventListener("loadedmetadata", resizeCanvas);
-        resizeCanvas();
-
-        emotionDetectionInterval = setInterval(async () => {
-          if (!videoElement.videoWidth) return;
-
-          try {
-            const tempCanvas = document.createElement("canvas");
-            tempCanvas.width = videoElement.videoWidth;
-            tempCanvas.height = videoElement.videoHeight;
-            const tempCtx = tempCanvas.getContext("2d");
-
-            // Flip horizontally for mirror effect
-            tempCtx.translate(tempCanvas.width, 0);
-            tempCtx.scale(-1, 1);
-            tempCtx.drawImage(videoElement, 0, 0);
-            tempCtx.setTransform(1, 0, 0, 1, 0, 0);
-
-            const base64Image = tempCanvas.toDataURL("image/jpeg", 0.8);
-            const result = await eel.process_frame(base64Image)();
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            if (result.success && result.face_found) {
-              const box = result.face_box;
-              const mirroredX = canvas.width - box.x - box.w;
-
-              const padding = 10;
-              const x = Math.max(0, mirroredX - padding);
-              const y = Math.max(0, box.y - padding);
-              const w = Math.min(canvas.width - x, box.w + padding * 2);
-              const h = Math.min(canvas.height - y, box.h + padding * 2);
-
-              ctx.strokeStyle = "#00DBFF";
-              ctx.lineWidth = 4;
-              ctx.strokeRect(x, y, w, h);
-
-              const emotion = result.emotion;
-              const confidence = (result.confidence * 100).toFixed(1);
-              const label = `${emotion} (${confidence}%)`;
-
-              ctx.font = "bold 22px Inter, sans-serif";
-              const textWidth = ctx.measureText(label).width;
-
-              const labelY = y > 40 ? y - 40 : y + h + 5;
-              ctx.fillStyle = "rgba(0, 219, 255, 0.95)";
-              ctx.fillRect(x, labelY, textWidth + 20, 35);
-
-              ctx.fillStyle = "#000000";
-              ctx.fillText(label, x + 10, labelY + 24);
-
-              console.log(`Detected: ${emotion} (${confidence}%)`);
-            } else if (result.success && !result.face_found) {
-              ctx.font = "bold 24px Inter, sans-serif";
-              ctx.fillStyle = "rgba(244, 63, 94, 0.9)";
-              ctx.fillText("No Face Detected", 20, 40);
-            }
-          } catch (error) {
-            console.error("Emotion detection error:", error);
           }
-        }, 500);
-      }
-
-      function stopEmotionDetection() {
-        if (emotionDetectionInterval) {
-          clearInterval(emotionDetectionInterval);
-          emotionDetectionInterval = null;
-          console.log("⏹️ Stopped emotion detection");
-
-          const canvas = document.getElementById("emotionCanvas");
-          const ctx = canvas.getContext("2d");
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
-      }
+
 
       // Simulate Live Data
       setInterval(() => {
@@ -1571,7 +1347,23 @@
       themeToggle.addEventListener("click", toggleTheme);
 
       // Initial Load
-      document.addEventListener("DOMContentLoaded", () => {
+      document.addEventListener("DOMContentLoaded", async () => {
+        // Check session
+        const user = await eel.get_current_user()();
+        if (!user) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        // Update Member Name
+        const activeMember = document.querySelector('.active-member-info span.ml-1');
+        if (activeMember) {
+          activeMember.textContent = `${user.firstName} ${user.lastName} • Unit #${user.username.toUpperCase()}`;
+        }
+
+        // Populate camera sources
+        populateCameras();
+
         if (localStorage.getItem("sidebarCollapsed") === "true") {
           body.classList.add("sidebar-collapsed");
         }
@@ -1588,12 +1380,14 @@
           updateChartsTheme(false);
         }
       });
-        function closeApp() {
-            if(confirm("Are you sure you want to close DECEPTRON?")) {
-                try { if(typeof eel !== 'undefined') { eel.close_python_app(); } } catch(e) {}
-                window.close();
-            }
-        }
+
+      async function logout() {
+          if(confirm("Are you sure you want to logout?")) {
+              await eel.logout()();
+              window.location.href = 'login.html';
+          }
+      }
+      window.closeApp = logout;
     </script>
   </body>
 </html>

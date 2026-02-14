@@ -593,121 +593,28 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <button id="restore-sidebar" title="Show Sidebar" onclick="toggleSidebar()">
-        <i class="fas fa-chevron-right"></i>
-    </button>
-    <aside class="sidebar flex flex-col transition-all duration-300">
-        <button class="collapse-btn" onclick="toggleSidebar()" title="Hide Sidebar">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <div class="logo-section">
-            <img src="../assets/images/Logo2.png" alt="Logo">
-        </div>
-        <nav class="flex-1">
-            <div class="nav-item cursor-pointer" onclick="window.location.href='dashboard.html'">
-                <i class="fas fa-th-large"></i>
-                <span>Dashboard Hub</span>
-            </div>
-            <div class="nav-item cursor-pointer" onclick="window.location.href='live-session.html'">
-                <i class="fas fa-video"></i>
-                <span>Live Session</span>
-            </div>
-            <div class="nav-item cursor-pointer" onclick="window.location.href='reports.html'">
-                <i class="fas fa-file-alt"></i>
-                <span>Reports</span>
-            </div>
-            <div class="nav-item cursor-pointer" onclick="window.location.href='uploads.html'">
-                <i class="fas fa-upload"></i>
-                <span>Uploads</span>
-            </div>
+    <!-- Sidebar Component Container -->
+    <script src="../js/sidebar.js"></script>
+    <script src="../js/vault-component.js"></script>
+    <script>initSidebar();</script>
 
-            <div class="mt-8 px-6 mb-2 nav-category">
-                <p class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Modules</p>
-            </div>
-            <div class="nav-item cursor-pointer" onclick="window.location.href='facial-expression.html'">
-                <i class="fas fa-user-astronaut"></i>
-                <span>Facial Micro-Exp</span>
-            </div>
-            <div class="nav-item active cursor-pointer" onclick="window.location.href='voice-analysis.html'">
-                <i class="fas fa-microphone-lines"></i>
-                <span>Voice Analysis</span>
-            </div>
-        </nav>
 
-        <div class="p-4 border-t border-white/5">
-            <div class="nav-item cursor-pointer" onclick="window.location.href='profile.html'">
-                <i class="fas fa-user-circle"></i>
-                <span>Profile</span>
+    <!-- Media Player Modal -->
+    <div id="playerModal" class="fixed inset-0 z-[110] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closePlayer()"></div>
+        <div class="player-modal relative w-full max-w-4xl p-6 rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+            <div class="flex justify-between items-center mb-6 px-2">
+                <h3 id="playerTitle" class="text-sm font-bold text-white uppercase tracking-wider">Acoustic Player</h3>
+                <button onclick="closePlayer()" class="text-gray-400 hover:text-white transition-colors"><i class="fas fa-times"></i></button>
             </div>
-            <div class="nav-item cursor-pointer" onclick="window.location.href='settings.html'">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-            </div>
-            <div class="nav-item text-red-400 hover:text-red-300 hover:bg-red-500/5 cursor-pointer"
-                onclick="closeApp()">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </div>
-        </div>
-    </aside>
-
-    <!-- Evidence Vault Modal -->
-    <div id="vaultModal" class="modal-backdrop">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-8">
-                <div>
-                    <h2 class="text-xl font-bold heading-font text-white uppercase tracking-wider">Voice Record Library</h2>
-                    <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1">Select voice record for analysis</p>
-                </div>
-                <button onclick="closeVault()" class="text-gray-500 hover:text-white transition-colors text-xl">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                <div class="vault-item group" onclick="loadMockAudio('witness_statement_audio.wav')">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
-                            <i class="fas fa-microphone text-lg"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-bold text-white">witness_statement_audio.wav</p>
-                            <p class="text-[9px] text-gray-500 font-mono">12.8 MB • 05:44 • LOSSLESS</p>
-                        </div>
+            <div class="media-container mx-auto bg-black flex items-center justify-center">
+                <video id="vaultVideo" class="w-full h-full hidden" controls></video>
+                <div id="audioPlayerUI" class="hidden flex-col items-center justify-center w-full h-full space-y-8">
+                    <div class="w-32 h-32 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-400 border-2 border-cyan-500/20 shadow-[0_0_30px_rgba(0,219,255,0.1)]">
+                        <i class="fas fa-microphone text-5xl"></i>
                     </div>
-                    <i class="fas fa-chevron-right text-gray-700 group-hover:text-cyan-400 transition-colors"></i>
+                    <audio id="vaultAudio" class="w-3/4 accent-cyan-500" controls></audio>
                 </div>
-
-                <div class="vault-item group" onclick="loadMockAudio('anon_hotline_tip.mp3')">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
-                            <i class="fas fa-microphone text-lg"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-bold text-white">anon_hotline_tip.mp3</p>
-                            <p class="text-[9px] text-gray-500 font-mono">3.2 MB • 01:15 • MP3_ENCODE</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right text-gray-700 group-hover:text-cyan-400 transition-colors"></i>
-                </div>
-
-                <div class="vault-item group opacity-50 cursor-not-allowed">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20">
-                            <i class="fas fa-video text-lg"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-bold text-white">suspect_interview_01.mp4</p>
-                            <p class="text-[9px] text-gray-500 font-mono italic">Video-only (Switch to Facial Analysis)</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-lock text-gray-700"></i>
-                </div>
-            </div>
-
-            <div class="mt-8 pt-6 border-t border-white/5 flex justify-end">
-                <p class="text-[9px] text-gray-600 uppercase tracking-widest">Acoustic Logic Repository Access Granted</p>
             </div>
         </div>
     </div>
@@ -726,15 +633,13 @@
                     <i class="fas fa-moon"></i>
                 </button>
                 <div class="flex items-center space-x-4">
-                    <button class="btn-outline px-6 py-2.5 group" onclick="openVault()">
+                    <button class="btn-outline px-6 py-2.5 group" onclick="openVaultSelection()">
                         <i class="fas fa-folder-open mr-2 group-hover:text-cyan-400 transition-colors"></i> Evidence Vault
                     </button>
                     <input type="file" id="audioInput" class="hidden" accept="audio/*">
                     <div class="relative">
                         <select id="micSelect">
-                            <option>Built-in Microphone</option>
-                            <option>External XLR Device</option>
-                            <option>Spatial Array Mic</option>
+                            <option>Loading microphones...</option>
                         </select>
                     </div>
                 </div>
@@ -1099,6 +1004,63 @@
             document.getElementById('playBtn').disabled = false;
         }
 
+        function openVaultSelection() {
+            VaultComponent.open((item) => {
+                if (item.type !== 'audio') {
+                    alert("Please select an audio file for Voice Analysis.");
+                    return;
+                }
+                
+                document.getElementById('statusLabel').innerText = `Loaded from Vault: ${item.filename}`;
+                document.getElementById('statusLabel').classList.className = "text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400";
+                
+                // Load physical file into WaveSurfer
+                // Note: items in DB have filepath starting with ../uploads/
+                wavesurfer.load(item.filepath);
+                
+                // Simulate analysis flow
+                setTimeout(finalizeAnalysis, 1500);
+            });
+        }
+
+        function selectFile(filename, type) {
+            closeVault();
+            openPlayer(filename, type);
+            // Simulate loading into wavesurfer in future task
+            document.getElementById('statusLabel').innerText = "Analyzing: " + filename;
+        }
+
+        function openPlayer(filename, type) {
+            const modal = document.getElementById('playerModal');
+            const video = document.getElementById('vaultVideo');
+            const audioUI = document.getElementById('audioPlayerUI');
+            const audio = document.getElementById('vaultAudio');
+            document.getElementById('playerTitle').textContent = `Now Playing: ${filename}`;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            if (type === 'video') {
+                video.classList.remove('hidden');
+                audioUI.classList.add('hidden');
+                video.play();
+            } else {
+                audioUI.classList.remove('hidden');
+                video.classList.add('hidden');
+                audio.play();
+            }
+        }
+
+        function closePlayer() {
+            const modal = document.getElementById('playerModal');
+            const video = document.getElementById('vaultVideo');
+            const audio = document.getElementById('vaultAudio');
+            video.pause();
+            audio.pause();
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
         // Load Audio Event
         document.getElementById('audioInput').onchange = e => {
             const file = e.target.files[0];
@@ -1153,8 +1115,45 @@
 
         themeToggle.addEventListener('click', toggleTheme);
 
+        // Populate Microphone Sources
+        async function populateMicrophones() {
+            const select = document.getElementById('micSelect');
+            select.innerHTML = '';
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const audioDevices = devices.filter(d => d.kind === 'audioinput');
+                audioDevices.forEach((device, index) => {
+                    const option = document.createElement('option');
+                    option.value = device.deviceId;
+                    option.text = device.label || `Microphone ${index + 1}`;
+                    select.appendChild(option);
+                });
+            } catch (err) {
+                console.error("Error enumerating microphones:", err);
+                const option = document.createElement('option');
+                option.text = "No microphones found";
+                select.appendChild(option);
+            }
+        }
+
         // Initial Load
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check session
+            const user = await eel.get_current_user()();
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Update Member Name
+            const activeMember = document.querySelector('.active-member-info span.ml-1');
+            if (activeMember) {
+                activeMember.textContent = `${user.firstName} ${user.lastName} • Unit #${user.username.toUpperCase()}`;
+            }
+
+            // Populate microphone sources
+            populateMicrophones();
+
             if (localStorage.getItem('sidebarCollapsed') === 'true') {
                 document.body.classList.add('sidebar-collapsed');
             }
@@ -1166,12 +1165,14 @@
                 updateThemeUI(false);
             }
         });
-        function closeApp() {
-            if(confirm("Are you sure you want to close DECEPTRON?")) {
-                try { if(typeof eel !== 'undefined') { eel.close_python_app(); } } catch(e) {}
-                window.close();
+
+        async function logout() {
+            if(confirm("Are you sure you want to logout?")) {
+                await eel.logout()();
+                window.location.href = 'login.html';
             }
         }
+        window.closeApp = logout;
     </script>
 </body>
 

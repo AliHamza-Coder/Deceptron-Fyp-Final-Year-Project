@@ -3,26 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deceptron - User Profile</title>
+    <title>Deceptron - Profile Management</title>
     <link rel="stylesheet" href="../styles/output.css">
     <link rel="stylesheet" href="../vendor/font-awesome/css/all.min.css">
+    <script type="text/javascript" src="/eel.js"></script>
     <style>
         :root {
             --primary-blue: #0076D6;
             --accent-cyan: #00DBFF;
             --accent-cyan-glow: rgba(0, 219, 255, 0.4);
-            --bg-dark: #070B14;
             --sidebar-width: 260px;
-            --glass-bg: rgba(10, 17, 32, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.08);
-        }
-
-        :root {
-            --primary-blue: #0076D6;
-            --accent-cyan: #00DBFF;
-            --bg-dark: #070B14;
-            --sidebar-width: 260px;
-
+            
             /* Theme Tokens */
             --bg-main: #05080f;
             --text-main: #e2e8f0;
@@ -31,98 +22,36 @@
             --sidebar-bg: rgba(10, 17, 32, 0.98);
             --card-bg: rgba(16, 28, 45, 0.4);
             --border-subtle: rgba(255, 255, 255, 0.05);
+            --neon-blue: #0076D6;
+            --neon-cyan: #00DBFF;
         }
 
         body.light-mode {
-            --bg-main: #f0f9ff;
-            --text-main: #1e293b;
-            --text-dim: #64748b;
-            --glass-bg: rgba(255, 255, 255, 0.7);
-            --sidebar-bg: rgba(255, 255, 255, 0.9);
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --border-subtle: rgba(0, 219, 255, 0.5);
+            --bg-main: #f8fafc;
+            --text-main: #0f172a;
+            --text-dim: #475569;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --sidebar-bg: rgba(255, 255, 255, 0.98);
+            --card-bg: rgba(255, 255, 255, 1);
+            --border-subtle: rgba(0, 118, 214, 0.1);
         }
 
-        body.light-mode .active-member-info {
-            color: #22d3ee !important; /* cyan-400 */
-            font-weight: 500;
-        }
-
-        /* Light Mode Utility Overrides */
-        body.light-mode .bg-white\/5 {
-            background-color: rgba(0, 118, 214, 0.05) !important;
-        }
-
-        body.light-mode .border-white\/10,
-        body.light-mode .border-white\/5 {
-            border-color: rgba(0, 118, 214, 0.1) !important;
-        }
-
-        body.light-mode .text-gray-400 {
-            color: #475569 !important;
-        }
-
-        body.light-mode .text-gray-500 {
-            color: #64748b !important;
-        }
-
-        body.light-mode .text-gray-600 {
-            color: #94a3b8 !important;
-        }
-
-        body.light-mode .bg-slate-800 {
-            background-color: rgba(0, 118, 214, 0.1) !important;
-        }
-
+        /* Light Mode Header Fix */
         body.light-mode h1, 
         body.light-mode h2, 
-        body.light-mode h3 {
-            color: #1e293b !important;
-        }
-
-        body.light-mode .text-white,
-        body.light-mode .text-gray-100,
-        body.light-mode .text-gray-200,
-        body.light-mode .text-gray-300 {
+        body.light-mode h3,
+        body.light-mode h4,
+        body.light-mode .heading-font {
             color: #0f172a !important;
         }
 
-        body.light-mode .bg-primary-blue .text-white,
-        body.light-mode .bg-blue-600 .text-white,
-        body.light-mode button.bg-primary-blue,
-        body.light-mode button.bg-blue-600 {
-            background-color: #00DBFF !important;
-            color: #05080f !important;
-            border: none !important;
-            box-shadow: 0 4px 15px rgba(0, 219, 255, 0.3) !important;
+        body.light-mode .text-white {
+            color: #0f172a !important;
         }
 
-        body.light-mode button.bg-primary-blue:hover,
-        body.light-mode button.bg-blue-600:hover {
-            background-color: #00c4e0 !important;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(0, 219, 255, 0.4) !important;
-        }
-
-        body.light-mode .text-gray-400,
-        body.light-mode .text-gray-500 {
-            color: #334155 !important;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: #10b981;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 0.5rem;
-            animation: pulse-glow 2s infinite;
-        }
-
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 5px #10b981; }
-            50% { box-shadow: 0 0 20px #10b981; }
-            100% { box-shadow: 0 0 5px #10b981; }
+        body.light-mode .verified-badge {
+            background: rgba(16, 185, 129, 0.05);
+            border-color: rgba(16, 185, 129, 0.1);
         }
 
         body {
@@ -130,15 +59,15 @@
             background: var(--bg-main);
             color: var(--text-main);
             margin: 0;
-            overflow: hidden;
-            width: 100vw;
-            transition: background 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+            overflow-x: hidden;
         }
 
         body:not(.light-mode) {
             background-image: 
                 radial-gradient(at 0% 0%, hsla(210,100%,15%,0.15) 0, transparent 50%), 
-                radial-gradient(at 50% 0%, hsla(180,100%,10%,0.1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(180,100%,10%,0.1) 0, transparent 50%),
                 radial-gradient(at 100% 0%, hsla(210,100%,15%,0.15) 0, transparent 50%),
                 radial-gradient(at 50% 100%, hsla(340,100%,10%,0.05) 0, transparent 50%);
             background-attachment: fixed;
@@ -146,68 +75,23 @@
 
         .heading-font { font-family: 'Orbitron', sans-serif; }
 
-        button, a, select, input, .nav-item, .cursor-pointer, .avatar-hover {
-            cursor: pointer !important;
-        }
-
-        .glass {
-            background: rgba(16, 28, 45, 0.6);
-            backdrop-filter: blur(25px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 2rem;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body.light-mode .glass {
-            background: rgba(255, 255, 255, 0.95) !important;
-            border: 2px solid rgba(0, 219, 255, 0.4) !important;
-            box-shadow: 0 10px 40px rgba(0, 118, 214, 0.08) !important;
-            border-radius: 2.5rem !important;
-        }
-
-        body.light-mode .glass:hover {
-            border-color: rgba(0, 219, 255, 0.8) !important;
-            box-shadow: 0 0 40px rgba(0, 219, 255, 0.25), 0 15px 45px rgba(0, 118, 214, 0.15) !important;
-        }
-
+        /* Sidebar Styles (Synced with Dashboard) */
         .sidebar {
             width: var(--sidebar-width);
             height: 100vh;
-            background: var(--glass-bg);
-            border-right: 1px solid var(--glass-border);
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-subtle);
             position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-            backdrop-filter: blur(30px) saturate(150%);
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .sidebar::-webkit-scrollbar { display: none; }
-
-        .main-content {
-            margin-left: var(--sidebar-width);
-            height: 100vh;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: 100%;
+            left: 0; top: 0; z-index: 50;
+            display: flex; flex-direction: column;
+            backdrop-filter: blur(20px);
+            transition: transform 0.4s ease;
         }
 
         .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 0.6rem 1.5rem;
-            color: #94a3b8;
+            display: flex; align-items: center;
+            padding: 0.8rem 1.5rem;
+            color: var(--text-dim);
             transition: all 0.3s ease;
             cursor: pointer;
             border-left: 3px solid transparent;
@@ -219,299 +103,506 @@
             border-left-color: var(--accent-cyan);
         }
 
-        .nav-item i { width: 24px; font-size: 1rem; margin-right: 1rem; }
-
-        /* Sidebar Transition Logic */
-        .sidebar {
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .main-content {
-            transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body.sidebar-collapsed .sidebar {
-            transform: translateX(-100%);
-        }
-
-        body.sidebar-collapsed .main-content {
-            margin-left: 0;
-            padding-left: 4.5rem;
-        }
-
-        .collapse-btn {
-            position: absolute;
-            top: 1.25rem;
-            right: 0.5rem;
-            width: 26px;
-            height: 26px;
-            background: var(--accent-cyan);
-            color: #05080f;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 100;
-            box-shadow: 0 0 15px rgba(0, 219, 255, 0.4);
-            border: none;
-            transition: all 0.3s ease;
-        }
-
-        .glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-subtle);
-        }
-
-        .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border-subtle);
-            position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-            backdrop-filter: blur(20px);
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
-        }
-
-        .collapse-btn:hover {
-            transform: scale(1.1);
-        }
-
-        #restore-sidebar {
-            position: fixed;
-            top: 1.5rem;
-            left: 1rem;
-            width: 38px;
-            height: 38px;
-            background: var(--accent-cyan);
-            color: #05080f;
-            border: none;
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 55;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(0, 219, 255, 0.4);
-        }
-
-        body.sidebar-collapsed #restore-sidebar {
-            display: flex;
-        }
-
-        .profile-container {
-            width: 100%;
-            max-width: 800px;
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .input-field {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 1rem 1.25rem;
-            border-radius: 1rem;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-
-        body.light-mode .avatar-main-bg {
-            background: #ffffff !important;
-        }
-
-        body.light-mode .avatar-text {
-            color: #1e293b !important;
-        }
-
-        body.light-mode .input-field {
-            background: #ffffff !important;
-            border: 1px solid rgba(0, 219, 255, 0.3) !important;
-            color: #1e293b !important;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: var(--accent-cyan);
-            background: rgba(255, 255, 255, 0.05);
-            box-shadow: 0 0 15px rgba(0, 219, 255, 0.1);
-        }
-
-        body.light-mode .input-field:focus {
-            border-color: #00DBFF !important;
-            background: #ffffff !important;
-            box-shadow: 0 0 15px rgba(0, 219, 255, 0.2) !important;
-        }
-
-        .avatar-hover:hover .avatar-overlay { opacity: 1; }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        .nav-item i { width: 24px; margin-right: 1rem; text-align: center; }
 
         .logo-section {
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 120px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            height: 120px; display: flex; align-items: center; justify-content: center;
+            padding: 1.5rem; border-bottom: 1px solid var(--border-subtle);
         }
 
-        .logo-section img {
-            width: 100%;
-            height: 100%;
-            filter: drop-shadow(0 0 10px rgba(0, 219, 255, 0.5));
+        .logo-section img { max-width: 100%; height: auto; filter: drop-shadow(0 0 10px rgba(0, 219, 255, 0.5)); }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2.5rem;
+            transition: margin-left 0.4s ease;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            display: flex; align-items: center; gap: 2.5rem;
+            padding: 2rem; margin-bottom: 3rem;
+            background: var(--glass-bg);
+            border-radius: 2.5rem;
+            border: 1px solid var(--border-subtle);
+            backdrop-filter: blur(20px);
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            width: 170px; height: 170px;
+            border-radius: 50%;
+            padding: 8px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            box-shadow: 0 0 40px rgba(0, 219, 255, 0.25);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .avatar-inner {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            background: #05080f;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #05080f;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .avatar-inner img { 
+            width: 100%; height: 100%; 
+            object-fit: cover; 
+            transition: all 0.5s ease;
+        }
+
+        /* Hover Overlay */
+        .avatar-wrapper:hover .avatar-inner img { transform: scale(1.1); filter: blur(3px) brightness(0.6); }
+        
+        .avatar-edit-overlay {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(0, 0, 0, 0.4);
+            opacity: 0; transition: all 0.3s ease;
+            cursor: pointer; z-index: 5;
+        }
+
+        .avatar-wrapper:hover .avatar-edit-overlay { opacity: 1; }
+        
+        .avatar-edit-overlay i { font-size: 1.5rem; color: #fff; margin-bottom: 0.5rem; transform: translateY(10px); transition: 0.3s; }
+        .avatar-edit-overlay span { font-size: 0.6rem; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 1px; transform: translateY(10px); transition: 0.3s 0.05s; }
+        .avatar-wrapper:hover .avatar-edit-overlay i, 
+        .avatar-wrapper:hover .avatar-edit-overlay span { transform: translateY(0); }
+
+        /* Delete Button - Sleek Corner Placement */
+        .delete-avatar-btn {
+            position: absolute; top: 5px; right: 5px;
+            width: 34px; height: 34px;
+            background: #ff4757; color: #fff;
+            border-radius: 50%; display: none;
+            align-items: center; justify-content: center;
+            font-size: 0.8rem; border: 3px solid #05080f;
+            cursor: pointer; z-index: 15; transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
+        }
+        .delete-avatar-btn:hover { background: #ff6b81; transform: scale(1.1) rotate(90deg); }
+
+        /* Pending Confirmation Overlay */
+        .avatar-confirm-overlay {
+            position: absolute; inset: 0;
+            background: rgba(0, 219, 255, 0.15);
+            backdrop-filter: blur(8px);
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            gap: 1rem; z-index: 20; border-radius: 50%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .avatar-wrapper.pending-save .avatar-confirm-overlay { display: flex; }
+        
+        .confirm-actions { display: flex; gap: 0.75rem; }
+        
+        .btn-action {
+            width: 44px; height: 44px;
+            border-radius: 50%; border: none;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; cursor: pointer; transition: all 0.3s ease;
+        }
+
+        .btn-confirm { background: var(--neon-cyan); color: #05080f; box-shadow: 0 0 20px rgba(0, 219, 255, 0.4); }
+        .btn-confirm:hover { transform: scale(1.1); background: #fff; }
+        
+        .btn-cancel { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .btn-cancel:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.1); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .verified-badge {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.4rem 0.8rem;
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 2rem;
+            font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
+        }
+
+        /* Modal Avatar Styles */
+        .modal-avatar-section {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 1rem; border-radius: 2rem;
+        }
+
+        .modal-avatar-wrapper {
+            position: relative;
+            width: 140px; height: 140px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-avatar-preview {
+            width: 140px; height: 140px;
+            border-radius: 50%;
+            border: 4px solid var(--neon-cyan);
+            overflow: hidden;
+            background: #05080f;
+            box-shadow: 0 0 30px rgba(0, 219, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .modal-avatar-wrapper:hover .modal-avatar-preview {
+            transform: scale(1.02);
+            box-shadow: 0 0 40px rgba(0, 219, 255, 0.4);
+        }
+
+        .modal-avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+        .modal-pencil-icon {
+            position: absolute; bottom: 5px; right: 5px;
+            width: 38px; height: 38px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #05080f; border: 4px solid #05080f;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .modal-avatar-wrapper:hover .modal-pencil-icon {
+            transform: scale(1.1) rotate(15deg);
+        }
+
+        .modal-remove-link {
+            margin-top: 1rem;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-remove-link:hover { color: #ef4444; text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            .modal-avatar-wrapper {
+                width: 110px; height: 110px;
+            }
+            .modal-avatar-preview {
+                width: 110px; height: 110px;
+            }
+            .modal-pencil-icon {
+                width: 32px; height: 32px;
+                border: 3px solid #05080f;
+            }
+        }
+
+        /* Info Cards */
+        .info-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            display: flex; align-items: center; gap: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .info-card:hover { transform: translateY(-5px); border-color: var(--neon-cyan); }
+
+        .icon-box {
+            width: 50px; height: 50px;
+            background: rgba(0, 219, 255, 0.1);
+            border: 1px solid rgba(0, 219, 255, 0.2);
+            border-radius: 1rem;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--neon-cyan); font-size: 1.25rem;
+        }
+
+        /* Password Section */
+        .password-section {
+            margin-top: 3rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 2rem;
+            padding: 2rem;
+        }
+
+        .input-group { margin-bottom: 1.5rem; }
+        .input-group label {
+            display: block; margin-bottom: 0.5rem;
+            font-size: 0.7rem; font-weight: 700; color: var(--text-dim);
+            text-transform: uppercase; letter-spacing: 0.1em;
+        }
+
+        .cyber-input {
+            width: 100%; padding: 0.85rem 1.25rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            border-radius: 0.75rem;
+            color: var(--text-main); transition: all 0.3s ease;
+        }
+
+        body.light-mode .cyber-input {
+            background: rgba(0, 0, 0, 0.03);
+            border-color: rgba(0, 0, 0, 0.1);
+            color: #1e293b;
+        }
+
+        .cyber-input:focus {
+            outline: none; border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 219, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        body.light-mode .cyber-input:focus {
+            background: #fff;
+        }
+
+        .update-btn {
+            background: var(--neon-cyan);
+            color: #05080f;
+            padding: 1rem 2.5rem;
+            border-radius: 1rem;
+            font-weight: 800; text-transform: uppercase;
+            border: none; cursor: pointer; transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 219, 255, 0.3);
+        }
+
+        .update-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 219, 255, 0.5);
+            background: #fff;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px); z-index: 1000;
+            display: none; align-items: center; justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--sidebar-bg);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 2.5rem;
+            width: 90%; max-width: 850px;
+            padding: 2rem;
+            box-shadow: 0 0 60px rgba(0, 219, 255, 0.3);
+            color: var(--text-main);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+                border-radius: 1.5rem;
+            }
+        }
+
+        body.light-mode .modal-content {
+            background: #fff;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            color: #1e293b;
+        }
+        
+        .modal-header h2 { color: var(--text-main); }
+        .modal-header p { color: var(--text-dim); }
+        body.light-mode .modal-header h2 { color: #1e293b; }
+
+        /* Theme Toggle */
+        .theme-btn {
+            width: 45px; height: 45px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-main); cursor: pointer; transition: all 0.3s ease;
+        }
+
+        .theme-btn:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); }
+
+        /* Sidebar collapsed responsiveness */
+        body.sidebar-collapsed .sidebar { transform: translateX(-100%); }
+        body.sidebar-collapsed .main-content { margin-left: 0; }
+
+        #restore-sidebar {
+            position: fixed; top: 1.5rem; left: 1rem;
+            width: 38px; height: 38px;
+            background: var(--neon-cyan); color: #05080f;
+            border-radius: 50%; display: none;
+            align-items: center; justify-content: center;
+            z-index: 55; box-shadow: 0 0 20px rgba(0, 219, 255, 0.4);
+        }
+
+        body.sidebar-collapsed #restore-sidebar { display: flex; }
+
+        .collapse-btn {
+            position: absolute; top: 1.25rem; right: 0.5rem;
+            width: 26px; height: 26px;
+            background: var(--neon-cyan);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 100; box-shadow: 0 0 15px rgba(0, 219, 255, 0.4);
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <button id="restore-sidebar" title="Show Sidebar" onclick="toggleSidebar()">
-        <i class="fas fa-chevron-right"></i>
-    </button>
-    <aside class="sidebar flex flex-col">
-        <button class="collapse-btn" onclick="toggleSidebar()" title="Hide Sidebar">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <div class="logo-section">
-            <img src="../assets/images/Logo2.png" alt="Logo">
-        </div>
-        <nav class="flex-1">
-            <div class="nav-item cursor-pointer" onclick="window.location.href='dashboard.html'">
-                <i class="fas fa-th-large"></i>
-                <span>Dashboard Hub</span>
-            </div>
-            <div class="nav-item cursor-pointer" onclick="window.location.href='live-session.html'">
-                <i class="fas fa-video"></i>
-                <span>Live Session</span>
-            </div>
-            <div class="nav-item cursor-pointer" onclick="window.location.href='reports.html'">
-                <i class="fas fa-file-alt"></i>
-                <span>Reports</span>
-            </div>
-            <div class="nav-item cursor-pointer" onclick="window.location.href='uploads.html'">
-                <i class="fas fa-upload"></i>
-                <span>Uploads</span>
-            </div>
-
-            <div class="mt-8 px-6 mb-2 nav-category">
-                <p class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Modules</p>
-            </div>
-            <div class="nav-item cursor-pointer" onclick="window.location.href='facial-expression.html'">
-                <i class="fas fa-user-astronaut"></i>
-                <span>Facial Micro-Exp</span>
-            </div>
-            <div class="nav-item cursor-pointer" onclick="window.location.href='voice-analysis.html'">
-                <i class="fas fa-microphone-lines"></i>
-                <span>Voice Analysis</span>
-            </div>
-        </nav>
-
-        <div class="p-4 border-t border-white/5">
-            <div class="nav-item active cursor-pointer" onclick="window.location.href='profile.html'">
-                <i class="fas fa-user-circle"></i>
-                <span>Profile</span>
-            </div>
-            <div class="nav-item cursor-pointer" onclick="window.location.href='settings.html'">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-            </div>
-            <div class="nav-item text-red-400 hover:text-red-300 hover:bg-red-500/5 cursor-pointer"
-                onclick="closeApp()">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </div>
-        </div>
-    </aside>
+    <!-- Sidebar Component Container -->
+    <script src="../js/sidebar.js"></script>
+    <script>initSidebar();</script>
 
     <main class="main-content">
-        <div class="profile-container space-y-8">
-            <header class="p-8 pb-4 flex justify-between items-center w-full">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-black heading-font text-white">Profile</h1>
+                <p class="text-sm text-dim">Manage your account information</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="update-btn flex items-center gap-2" onclick="openModal()" style="padding: 0.7rem 1.5rem; font-size: 0.8rem;">
+                    <i class="fas fa-pencil-alt"></i> Edit Profile
+                </button>
+                <button class="theme-btn" onclick="toggleTheme()" id="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="avatar-wrapper" id="avatar-container">
+                <div class="avatar-inner">
+                    <img src="" alt="Avatar" id="display-avatar" onerror="this.src='https://ui-avatars.com/api/?name=User&background=0a1120&color=00dbff'">
+                </div>
+            </div>
+            <div class="flex-1">
+                <div class="flex items-center gap-4 mb-2">
+                    <h2 class="text-4xl font-black heading-font text-white" id="display-name">...</h2>
+                    <span class="verified-badge"><i class="fas fa-check-circle"></i> Verified</span>
+                </div>
+                <p class="text-cyan-400 text-sm font-bold tracking-[0.2em] uppercase" id="display-title">...</p>
+            </div>
+        </section>
+
+        <!-- Info Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="info-card">
+                <div class="icon-box"><i class="fas fa-envelope"></i></div>
                 <div>
-                    <h1 class="text-2xl font-bold heading-font">Account Settings</h1>
-                    <div class="flex items-center mt-2 text-xs text-cyan-400 font-medium tracking-wide active-member-info">
-                        <span class="status-dot"></span>
-                        Active Member: <span class="ml-1 opacity-80">John Doe • Unit #DECEP-09</span>
+                    <label class="text-[10px] uppercase tracking-widest font-bold text-dim">Email Address</label>
+                    <p class="text-lg font-bold" id="display-email">-</p>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="icon-box"><i class="fas fa-user-tag"></i></div>
+                <div>
+                    <label class="text-[10px] uppercase tracking-widest font-bold text-dim">Full Name</label>
+                    <p class="text-lg font-bold" id="display-fullname">-</p>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="icon-box"><i class="fas fa-clock"></i></div>
+                <div>
+                    <label class="text-[10px] uppercase tracking-widest font-bold text-dim">Last Login</label>
+                    <p class="text-lg font-bold">Today, 09:15 AM</p>
+                </div>
+            </div>
+                <div class="info-card">
+                    <div class="icon-box"><i class="fas fa-fingerprint"></i></div>
+                    <div>
+                        <label class="text-[10px] uppercase tracking-widest font-bold text-dim">User ID</label>
+                        <p class="text-lg font-bold heading-font text-cyan-400">USR-00147</p>
                     </div>
                 </div>
-                <div class="flex items-center space-x-3">
-                    <button id="theme-toggle" class="p-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-cyan-400 hover:bg-white/10 transition-all cursor-pointer" title="Toggle Theme">
-                        <i class="fas fa-moon"></i>
-                    </button>
+            </div>
+        </main>
+    
+        <!-- Edit Profile Modal -->
+        <div class="modal-overlay" id="edit-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="text-2xl font-black heading-font mb-2">Edit Account</h2>
+                    <p class="text-xs text-dim uppercase tracking-widest">Update your profile and security</p>
                 </div>
-            </header>
-
-            <div class="glass p-10">
-                <div class="flex flex-col md:flex-row items-center gap-10 mb-12">
-                    <div class="relative avatar-hover cursor-pointer group">
-                        <div class="w-32 h-32 rounded-3xl bg-gradient-to-br from-blue-600 to-cyan-400 p-0.5">
-                            <div class="w-full h-full bg-[#05080f] dark:bg-[#05080f] body.light-mode:bg-white rounded-3xl flex items-center justify-center overflow-hidden avatar-main-bg">
-                                <span class="text-4xl font-black heading-font text-white avatar-text">JD</span>
+                
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <!-- Avatar Management Column -->
+                        <div class="md:col-span-1 border-r border-white/5 pr-4">
+                            <div class="modal-avatar-section">
+                                <div class="modal-avatar-wrapper" onclick="document.getElementById('modal-avatar-upload').click()">
+                                    <div class="modal-avatar-preview">
+                                        <img src="" id="modal-avatar-display" onerror="this.src='https://ui-avatars.com/api/?name=User&background=0a1120&color=00dbff'">
+                                    </div>
+                                    <div class="modal-pencil-icon">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </div>
+                                </div>
+                                <div class="modal-remove-link" onclick="modalRemoveAvatar()">
+                                    <i class="fas fa-trash-alt mr-1"></i> Remove Photo
+                                </div>
+                                <input type="file" id="modal-avatar-upload" class="hidden" accept="image/*" onchange="modalPreviewAvatar(event)">
                             </div>
                         </div>
-                        <div class="avatar-overlay absolute inset-0 bg-black/60 rounded-3xl opacity-0 transition-opacity flex flex-col items-center justify-center text-white">
-                            <i class="fas fa-camera mb-1"></i>
-                            <span class="text-[9px] font-bold uppercase tracking-tighter">Change</span>
+
+                        <!-- Data Column -->
+                        <div class="md:col-span-2 space-y-6">
+                            <div class="grid grid-cols-1 gap-6">
+                                <div class="space-y-4">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <i class="fas fa-id-card text-cyan-400"></i>
+                                        <h4 class="text-xs font-black uppercase tracking-wider">General Information</h4>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Full Name</label>
+                                        <input type="text" class="cyber-input" id="edit-name" placeholder="Full Name">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Designation</label>
+                                        <input type="text" class="cyber-input" id="edit-title" placeholder="Designation">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="text-center md:text-left">
-                        <h2 class="text-2xl font-bold text-white mb-1">John Doe</h2>
-                        <p class="text-cyan-400 text-xs font-bold uppercase tracking-widest">General Member</p>
-                        <div class="flex space-x-2 mt-4">
-                            <span class="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold rounded-full border border-emerald-500/20">Verified Identity</span>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-3 mb-2">
+                                <i class="fas fa-lock text-cyan-400"></i>
+                                <h4 class="text-xs font-black uppercase tracking-wider">Account Security</h4>
+                            </div>
+                            <div class="input-group">
+                                <label>Current Password</label>
+                                <input type="password" class="cyber-input" id="edit-current-pwd" placeholder="••••••••">
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-3 mb-2 invisible">
+                                <h4 class="text-xs font-black uppercase tracking-wider">Hidden</h4>
+                            </div>
+                            <div class="input-group">
+                                <label>New Password</label>
+                                <input type="password" class="cyber-input" id="edit-new-pwd" placeholder="••••••••">
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="space-y-2">
-                        <label class="text-[10px] text-gray-500 font-bold uppercase tracking-widest ml-1">Full Name</label>
-                        <input type="text" value="John Doe" class="input-field" placeholder="Enter your full name">
+                    <div class="input-group">
+                        <label>Email Address (Primary)</label>
+                        <input type="text" class="cyber-input opacity-50" id="edit-email" disabled>
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] text-gray-500 font-bold uppercase tracking-widest ml-1">Email Address</label>
-                        <input type="email" value="john.doe@example.com" class="input-field" placeholder="your.name@company.com">
-                    </div>
-                    <div class="space-y-2 md:col-span-2">
-                        <label class="text-[10px] text-gray-500 font-bold uppercase tracking-widest ml-1">Update Password</label>
-                        <input type="password" class="input-field" placeholder="••••••••••••">
-                        <p class="text-[9px] text-gray-600 mt-2 uppercase tracking-widest italic leading-relaxed">Leave blank to maintain current secure credentials.</p>
+
+                    <div class="flex gap-4 pt-4">
+                        <button class="update-btn flex-1" style="background: rgba(128,128,128,0.1); color: var(--text-main); border: 1px solid var(--border-subtle); box-shadow: none;" onclick="closeModal()">Cancel</button>
+                        <button class="update-btn flex-1" onclick="saveProfile()">Save Changes</button>
                     </div>
                 </div>
-
-                <div class="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div>
-                        <p class="text-sm font-bold text-white mb-1">Danger Zone</p>
-                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">Permanently delete your account</p>
-                    </div>
-                    <button class="px-6 py-3 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase rounded-xl hover:bg-red-500 hover:text-white transition-all">Delete Account</button>
-                </div>
-            </div>
-
-            <div class="flex justify-end space-x-4">
-                <button class="px-8 py-4 bg-white/5 border border-white/10 text-white text-[10px] font-bold uppercase rounded-xl hover:bg-white/10 transition-all">Discard</button>
-                <button class="px-8 py-4 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold uppercase rounded-xl shadow-[0_4px_15px_rgba(0,219,255,0.1)] hover:bg-cyan-500/20 hover:border-cyan-400 hover:shadow-[0_0_20px_rgba(0,219,255,0.3)] transition-all duration-300">Save Profile</button>
             </div>
         </div>
-    </main>
+
     <script>
         const body = document.body;
 
@@ -520,45 +611,149 @@
             localStorage.setItem('sidebarCollapsed', body.classList.contains('sidebar-collapsed'));
         }
 
-        // Theme Toggle Logic
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = themeToggle.querySelector('i');
-
         function toggleTheme() {
             const isLight = body.classList.toggle('light-mode');
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            updateThemeUI(isLight);
+            const icon = document.querySelector('#theme-toggle i');
+            icon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
         }
 
-        function updateThemeUI(isLight) {
-            themeIcon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
-            themeToggle.classList.toggle('bg-gray-200', isLight);
-            themeToggle.classList.toggle('text-gray-900', isLight);
-            themeToggle.classList.toggle('border-gray-300', isLight);
+        function openModal() { document.getElementById('edit-modal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('edit-modal').style.display = 'none'; }
+
+        async function saveProfile() {
+            console.log("Save Profile clicked");
+            try {
+                const name = document.getElementById('edit-name').value;
+                const title = document.getElementById('edit-title').value;
+                const currentPwd = document.getElementById('edit-current-pwd').value;
+                const newPwd = document.getElementById('edit-new-pwd').value;
+
+                console.log("Profile data:", { name, title });
+
+                // Handle Avatar Update
+                if (pendingAvatarBase64 !== null) {
+                    console.log("Updating avatar...");
+                    const avatarResult = await eel.update_avatar(pendingAvatarBase64)();
+                    console.log("Avatar result:", avatarResult);
+                    if (!avatarResult.success) {
+                        alert("Avatar update failed: " + avatarResult.message);
+                        return;
+                    }
+                    pendingAvatarBase64 = null;
+                }
+
+                // Update Profile Info
+                console.log("Updating profile...");
+                const result = await eel.update_profile(name, title)();
+                console.log("Profile result:", result);
+                if (result.success) {
+                    updateProfileUI(result.user);
+                    alert("Profile updated successfully!");
+                } else {
+                    alert("Profile update failed: " + (result.message || "Unknown error"));
+                    return;
+                }
+
+                // Update Password if fields are filled
+                if (currentPwd && newPwd) {
+                    console.log("Updating password...");
+                    const pwdResult = await eel.update_password(currentPwd, newPwd)();
+                    console.log("Password result:", pwdResult);
+                    if (pwdResult.success) {
+                        alert("Password updated successfully!");
+                        document.getElementById('edit-current-pwd').value = '';
+                        document.getElementById('edit-new-pwd').value = '';
+                    } else {
+                        alert("Password update failed: " + pwdResult.message);
+                    }
+                }
+                
+                closeModal();
+            } catch (error) {
+                console.error("Save profile error:", error);
+                alert("An error occurred while saving: " + error.message);
+            }
         }
 
-        themeToggle.addEventListener('click', toggleTheme);
+        function updateProfileUI(user) {
+            if (!user) return;
+            const name = user.fullname || user.username || 'User';
+            const title = user.title || 'Senior Analyst • Deceptron Unit';
+            const email = user.email || 'N/A';
+            const avatar = user.avatar || '';
+            
+            document.getElementById('display-name').innerText = name;
+            document.getElementById('display-fullname').innerText = name;
+            document.getElementById('display-title').innerText = title;
+            document.getElementById('display-email').innerText = email;
+
+            const avatarImg = document.getElementById('display-avatar');
+            const modalAvatarImg = document.getElementById('modal-avatar-display');
+
+            const avatarUrl = avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0a1120&color=00dbff`;
+            avatarImg.src = avatarUrl;
+            modalAvatarImg.src = avatarUrl;
+            
+            // Update input fields
+            document.getElementById('edit-name').value = name;
+            document.getElementById('edit-title').value = title;
+            document.getElementById('edit-email').value = email;
+            
+            window.currentUserAvatar = avatar;
+        }
+
+        let pendingAvatarBase64 = null;
+
+        function modalPreviewAvatar(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    pendingAvatarBase64 = event.target.result;
+                    document.getElementById('modal-avatar-display').src = pendingAvatarBase64;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function modalRemoveAvatar() {
+            if (confirm("Remove profile photo?")) {
+                pendingAvatarBase64 = ""; // Empty string tells backend to clear avatar
+                document.getElementById('modal-avatar-display').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(document.getElementById('edit-name').value || 'User')}&background=0a1120&color=00dbff`;
+            }
+        }
+
+        function logout() {
+            if(confirm("Confirm system termination?")) {
+                eel.logout()(() => {
+                    window.location.href = 'login.html';
+                });
+            }
+        }
 
         // Initial Load
-        document.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('sidebarCollapsed') === 'true') {
-                body.classList.add('sidebar-collapsed');
-            }
-            if (localStorage.getItem('theme') === 'light' || (!localStorage.getItem('theme') && body.classList.contains('light-mode'))) {
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (localStorage.getItem('sidebarCollapsed') === 'true') body.classList.add('sidebar-collapsed');
+            if (localStorage.getItem('theme') === 'light') {
                 body.classList.add('light-mode');
-                updateThemeUI(true);
-            } else {
-                updateThemeUI(false);
+                document.querySelector('#theme-toggle i').className = 'fas fa-sun';
+            }
+
+            // Fetch real user data immediately and update UI
+            try {
+                const user = await eel.get_current_user()();
+                if (user) {
+                    updateProfileUI(user);
+                } else {
+                    // Redirect if no session
+                    window.location.href = 'login.html';
+                }
+            } catch (err) {
+                console.error("Failed to fetch user data:", err);
             }
         });
-        function closeApp() {
-            if(confirm("Are you sure you want to close DECEPTRON?")) {
-                try { if(typeof eel !== 'undefined') { eel.close_python_app(); } } catch(e) {}
-                window.close();
-            }
-        }
     </script>
 </body>
-
 </html>
 ```
