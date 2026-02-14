@@ -1686,6 +1686,64 @@
             option.text = device.label || `Camera ${index + 1}`;
             select.appendChild(option);
           });
+          
+          if (videoDevices.length > 0) {
+             // Load preference
+             try {
+                const result = await eel.load_preferences()();
+                if (result.success && result.preferences) {
+                    // 1. Camera Selection
+                    if (result.preferences.default_camera) {
+                        const exists = videoDevices.some(d => d.deviceId === result.preferences.default_camera);
+                        if (exists) select.value = result.preferences.default_camera;
+                    }
+
+                    // 2. Visual Settings
+                    const v = document.getElementById('webcam');
+                    if (v) {
+                        const b = result.preferences.brightness || 50;
+                        const c = result.preferences.contrast || 50;
+                        const s = result.preferences.saturation || 50;
+                        const mirror = result.preferences.mirror_camera || false;
+                        
+                        const bVal = 0.5 + (b / 100);
+                        const cVal = 0.5 + (c / 100);
+                        const sVal = 0.5 + (s / 100);
+                        
+                        v.style.filter = `brightness(${bVal}) contrast(${cVal}) saturate(${sVal})`;
+                        v.style.transform = mirror ? 'scaleX(-1)' : 'scaleX(1)';
+                        
+                        // Grid Overlay
+                        let gridOverlay = document.getElementById('liveGridOverlay');
+                        if (result.preferences.grid_overlay) {
+                            if (!gridOverlay) {
+                                const parent = v.parentElement;
+                                gridOverlay = document.createElement('div');
+                                gridOverlay.id = 'liveGridOverlay';
+                                gridOverlay.className = "absolute inset-0 pointer-events-none z-10";
+                                gridOverlay.innerHTML = `
+                                    <div class="w-full h-full grid grid-cols-3 grid-rows-3">
+                                        <div class="border-r border-b border-white/20"></div>
+                                        <div class="border-r border-b border-white/20"></div>
+                                        <div class="border-b border-white/20"></div>
+                                        <div class="border-r border-b border-white/20"></div>
+                                        <div class="border-r border-b border-white/20"></div>
+                                        <div class="border-b border-white/20"></div>
+                                        <div class="border-r border-white/20"></div>
+                                        <div class="border-r border-white/20"></div>
+                                        <div></div>
+                                    </div>
+                                `;
+                                parent.appendChild(gridOverlay);
+                            }
+                            gridOverlay.classList.remove('hidden');
+                        } else {
+                            if (gridOverlay) gridOverlay.classList.add('hidden');
+                        }
+                    }
+                }
+             } catch (e) { console.error("Pref load error:", e); }
+          }
           if (videoDevices.length === 0) select.innerHTML = '<option value="">No Camera Detected</option>';
         } catch (err) {
           console.error("Error enumerating cameras:", err);
@@ -1708,6 +1766,17 @@
             option.text = device.label || `Microphone ${index + 1}`;
             select.appendChild(option);
           });
+          
+          if (audioDevices.length > 0) {
+             // Load preference
+             try {
+                const result = await eel.load_preferences()();
+                if (result.success && result.preferences && result.preferences.default_mic) {
+                     const exists = audioDevices.some(d => d.deviceId === result.preferences.default_mic);
+                     if (exists) select.value = result.preferences.default_mic;
+                }
+             } catch (e) { }
+          }
           if (audioDevices.length === 0) select.innerHTML = '<option value="">No Mic Detected</option>';
         } catch (err) {
           console.error("Error enumerating microphones:", err);
@@ -1734,6 +1803,7 @@
               video.srcObject = null;
               video.src = item.filepath;
               video.setAttribute('controls', 'true');
+              video.style.transform = "none";
               
               document.querySelector('h1').innerHTML = item.filename + ' <span class="text-cyan-400 font-normal">| PIPELINE LOADED</span>';
               updateStatusUI('vault', 'Vault Analysis');

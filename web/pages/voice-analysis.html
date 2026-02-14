@@ -1128,6 +1128,19 @@
                     option.text = device.label || `Microphone ${index + 1}`;
                     select.appendChild(option);
                 });
+
+                if (audioDevices.length > 0) {
+                   // Load preference
+                   try {
+                      const result = await eel.load_preferences()();
+                      if (result.success && result.preferences && result.preferences.default_mic) {
+                           const exists = audioDevices.some(d => d.deviceId === result.preferences.default_mic);
+                           if (exists) select.value = result.preferences.default_mic;
+                      }
+                   } catch (e) {
+                      console.error("Pref load error:", e);
+                   }
+                }
             } catch (err) {
                 console.error("Error enumerating microphones:", err);
                 const option = document.createElement('option');

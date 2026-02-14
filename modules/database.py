@@ -93,3 +93,42 @@ def change_password(username, current_pwd, new_pwd):
         users_table.update({'password': new_pwd}, User.username == username)
         return {'success': True}
     return {'success': False, 'message': 'Current password incorrect'}
+
+def update_user_preferences(username, preferences):
+    """
+    Update a user's preferences (e.g., default camera/mic).
+    """
+    User = Query()
+    # upsert=True is not available in basic update, so we use a search-then-update approach or set
+    # TinyDB 'update' merges dictionaries, which is what we want for nested 'preferences'
+    
+    # First, ensure the 'preferences' field exists
+    user = users_table.get(User.username == username)
+    if not user:
+         return {'success': False, 'message': 'User not found'}
+    
+    current_prefs = user.get('preferences', {})
+    # Merge new prefs with existing ones
+    updated_prefs = {**current_prefs, **preferences}
+    
+    users_table.update({'preferences': updated_prefs}, User.username == username)
+    return {'success': True, 'preferences': updated_prefs}
+
+def get_user_preferences(username):
+    """
+    Get a user's preferences.
+    """
+    User = Query()
+    user = users_table.get(User.username == username)
+    if user:
+        return {'success': True, 'preferences': user.get('preferences', {})}
+    return {'success': False, 'message': 'User not found'}
+
+def update_last_login(username):
+    """
+    Update the last_login timestamp for a user.
+    """
+    User = Query()
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    users_table.update({'last_login': timestamp}, User.username == username)
+    return {'success': True, 'timestamp': timestamp}

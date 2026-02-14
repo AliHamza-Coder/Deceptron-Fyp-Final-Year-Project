@@ -184,6 +184,8 @@ def login(identity, password):
     result = database.login_user(identity, password)
     if result['success']:
         current_user = result['user']
+        # Update last login timestamp
+        database.update_last_login(current_user['username'])
         print(f"✅ Login successful: {current_user['username']}")
     return result
 
@@ -415,6 +417,34 @@ def update_password(current_pwd, new_pwd):
     if not current_user:
         return {'success': False, 'message': 'Not logged in'}
     return database.change_password(current_user['username'], current_pwd, new_pwd)
+
+@eel.expose
+def save_preferences(preferences):
+    """
+    Save current user's preferences (e.g. camera/mic settings).
+    """
+    global current_user
+    if not current_user:
+        return {'success': False, 'message': 'Not logged in'}
+    
+    result = database.update_user_preferences(current_user['username'], preferences)
+    if result['success']:
+        # Update local session cache
+        if 'preferences' not in current_user:
+            current_user['preferences'] = {}
+        current_user['preferences'].update(preferences)
+    return result
+
+@eel.expose
+def load_preferences():
+    """
+    Load current user's preferences.
+    """
+    global current_user
+    if not current_user:
+        return {'success': False, 'message': 'Not logged in'}
+    
+    return database.get_user_preferences(current_user['username'])
 
 
 # ========================================

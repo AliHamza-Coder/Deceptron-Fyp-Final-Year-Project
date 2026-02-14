@@ -441,6 +441,7 @@
 </head>
 <body>
     <!-- Sidebar Component Container -->
+    <script type="text/javascript" src="/eel.js"></script>
     <script src="../js/sidebar.js"></script>
     <script>initSidebar();</script>
 
@@ -499,19 +500,30 @@
 
                 <div class="setting-card">
                     <h3 class="text-xs font-bold uppercase tracking-widest text-purple-400 mb-6 flex items-center">
-                        <i class="fas fa-bullseye mr-3"></i> Optical Focus
+                        <i class="fas fa-tools mr-3"></i> Advanced Tools
                     </h3>
-                    <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
-                        <div>
-                            <p class="text-xs font-bold text-gray-300 uppercase">AI Auto-Calibration</p>
-                            <p class="text-[9px] text-gray-500">Enable neural tracking for focal adjustment.</p>
+                    <div class="space-y-4">
+                        <!-- Mirror Toggle -->
+                        <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
+                            <div>
+                                <p class="text-xs font-bold text-gray-300 uppercase">Mirror Camera</p>
+                                <p class="text-[9px] text-gray-500">Flip the video feed horizontally.</p>
+                            </div>
+                            <input type="checkbox" id="mirrorToggle" class="w-4 h-4 accent-purple-500" onchange="applySettings()">
                         </div>
-                        <input type="checkbox" checked class="w-4 h-4 accent-purple-500">
+                        <!-- Grid Toggle -->
+                        <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
+                            <div>
+                                <p class="text-xs font-bold text-gray-300 uppercase">Grid Overlay</p>
+                                <p class="text-[9px] text-gray-500">Show 3x3 rule of thirds grid.</p>
+                            </div>
+                            <input type="checkbox" id="gridToggle" class="w-4 h-4 accent-purple-500" onchange="applySettings()">
+                        </div>
                     </div>
                 </div>
 
                 <div class="flex space-x-4">
-                    <button class="flex-1 py-4 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold uppercase rounded-xl shadow-[0_4px_15px_rgba(0,219,255,0.1)] hover:bg-cyan-500 hover:text-black transition-all duration-300">Apply Configuration</button>
+                    <button onclick="saveCameraConfiguration(this)" class="flex-1 py-4 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold uppercase rounded-xl shadow-[0_4px_15px_rgba(0,219,255,0.1)] hover:bg-cyan-500 hover:text-black transition-all duration-300">Apply Configuration</button>
                     <button onclick="resetSettings()" class="flex-1 py-4 bg-white/5 border border-white/10 text-white text-[10px] font-bold uppercase rounded-xl hover:bg-white/10 transition-all cursor-pointer">Reset Default</button>
                 </div>
             </div>
@@ -522,11 +534,11 @@
                     <div class="space-y-2">
                         <label class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Select Camera Source</label>
                         <select id="camSelect">
-                            <option>Logitech Brio 4K (Primary)</option>
-                            <option>Integrated HD Webcam</option>
-                            <option>External HDMI Input</option>
+                            <option value="">Loading devices...</option>
                         </select>
                     </div>
+                    
+
                 </div>
 
                 <!-- Enlarged Preview -->
@@ -599,8 +611,7 @@
                 updateThemeUI(false);
             }
 
-            // Populate Camera Dropdown
-            await populateCameras();
+
 
             // Initialize Sliders
             setupSliders();
@@ -610,30 +621,131 @@
 
             // Attach Logout Handler
             setupLogoutHandler();
-        });
+        
+            // --- Camera & Settings Logic ---
+            const camSelect = document.getElementById('camSelect');
 
-        // --- Camera & Settings Logic ---
-        async function populateCameras() {
-            const select = document.getElementById('camSelect');
-            select.innerHTML = ''; // Clear existing
-            
+            // Populate Devices (Camera & Mic)
             try {
-                // Don't request permission here - just enumerate without labels
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+                    camSelect.innerHTML = '<option value="">Searching...</option>';
+                    return;
+                }
 
-                videoDevices.forEach((device, index) => {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                
+                // Clear existing
+                camSelect.innerHTML = '';
+                
+                const videoDevices = devices.filter(d => d.kind === 'videoinput');
+
+                // Populate Cameras
+                if (videoDevices.length > 0) {
+                    videoDevices.forEach((device, index) => {
+                        const option = document.createElement('option');
+                        option.value = device.deviceId;
+                        option.text = device.label || `Camera ${index + 1}`;
+                        camSelect.appendChild(option);
+                    });
+                } else {
                     const option = document.createElement('option');
-                    option.value = device.deviceId;
-                    option.text = device.label || `Camera ${index + 1}`;
-                    select.appendChild(option);
-                });
+                    option.text = "No Camera Detected";
+                    camSelect.appendChild(option);
+                }
+
+                // Load saved preferences
+                await loadSavedPreferences();
             } catch (err) {
                 console.error("Error enumerating devices:", err);
-                const option = document.createElement('option');
-                option.text = "Camera Access Denied";
-                select.appendChild(option);
+                camSelect.innerHTML = '<option>Access Denied</option>';
             }
+        });
+
+        async function loadSavedPreferences() {
+            try {
+                const result = await eel.load_preferences()();
+                if (result.success && result.preferences) {
+                    const prefs = result.preferences;
+                    
+                    // Load Camera
+                    if (prefs.default_camera) {
+                        document.getElementById('camSelect').value = prefs.default_camera;
+                    }
+
+                    
+                    // Load Sliders
+                    if (prefs.brightness) document.getElementById('brightnessSlider').value = prefs.brightness;
+                    if (prefs.contrast) document.getElementById('contrastSlider').value = prefs.contrast;
+                    if (prefs.saturation) document.getElementById('saturationSlider').value = prefs.saturation;
+
+                    // Load Toggles
+                    if (prefs.mirror_camera !== undefined) document.getElementById('mirrorToggle').checked = prefs.mirror_camera;
+                    if (prefs.grid_overlay !== undefined) document.getElementById('gridToggle').checked = prefs.grid_overlay;
+                    
+                    // Update Text Labels
+                    document.querySelectorAll('.range-slider').forEach(s => {
+                        const display = s.previousElementSibling.querySelector('.text-cyan-400');
+                        if(display) display.innerText = s.value + '%';
+                    });
+                    
+                    // Apply visual filter
+                    applySettings();
+                }
+            } catch (e) {
+                console.error("Failed to load preferences:", e);
+            }
+        }
+
+        async function saveCameraConfiguration(btn) {
+             const camId = document.getElementById('camSelect').value;
+
+             
+             // Get visual settings
+             const brightness = document.getElementById('brightnessSlider').value;
+             const contrast = document.getElementById('contrastSlider').value;
+             const saturation = document.getElementById('saturationSlider').value;
+             const mirror = document.getElementById('mirrorToggle').checked;
+             const grid = document.getElementById('gridToggle').checked;
+             
+             // Visual feedback
+             const originalText = btn.innerText;
+             btn.innerText = "SAVING...";
+             btn.disabled = true;
+             
+             try {
+                 const prefs = {
+                     'default_camera': camId,
+                     'brightness': brightness,
+                     'contrast': contrast,
+                     'saturation': saturation,
+                     'mirror_camera': mirror,
+                     'grid_overlay': grid
+                 };
+                 const result = await eel.save_preferences(prefs)();
+                 
+                 if (result && result.success) {
+                     btn.innerText = "SAVED!";
+                     btn.classList.add('bg-emerald-500', 'text-black', 'border-emerald-500');
+                     btn.classList.remove('bg-cyan-500/10', 'text-cyan-400');
+                     
+                     setTimeout(() => {
+                         btn.innerText = originalText;
+                         btn.classList.remove('bg-emerald-500', 'text-black', 'border-emerald-500');
+                         btn.classList.add('bg-cyan-500/10', 'text-cyan-400');
+                         btn.disabled = false;
+                     }, 2000);
+                 } else {
+                     throw new Error(result ? result.message : "Unknown backend error");
+                 }
+             } catch (e) {
+                 console.error("Failed to save preferences:", e);
+                 btn.innerText = "ERROR";
+                 alert("Failed to save: " + e.message); // Show error to user
+                 setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                 }, 2000);
+             }
         }
 
         async function toggleCam() {
@@ -724,7 +836,42 @@
             
             // Apply scaleX(-1) if you want mirroring in details, but user asked for "transformer scale issue" fix in other pages. 
             // In settings, mirroring is usually standard for self-view.
+            // Mirror logic
+            const mirror = document.getElementById('mirrorToggle').checked;
+            const transform = mirror ? 'scaleX(-1)' : 'scaleX(1)';
+
             video.style.filter = `brightness(${bVal}) contrast(${cVal}) saturate(${sVal})`;
+            video.style.transform = transform;
+            
+            // Grid Logic
+            // Check if grid exists
+            let gridOverlay = document.getElementById('settingsGridOverlay');
+            if(document.getElementById('gridToggle').checked) {
+                if(!gridOverlay) {
+                    // Create Grid
+                    const parent = video.parentElement;
+                    gridOverlay = document.createElement('div');
+                    gridOverlay.id = 'settingsGridOverlay';
+                    gridOverlay.className = "absolute inset-0 pointer-events-none z-10";
+                    gridOverlay.innerHTML = `
+                        <div class="w-full h-full grid grid-cols-3 grid-rows-3">
+                            <div class="border-r border-b border-white/20"></div>
+                            <div class="border-r border-b border-white/20"></div>
+                            <div class="border-b border-white/20"></div>
+                            <div class="border-r border-b border-white/20"></div>
+                            <div class="border-r border-b border-white/20"></div>
+                            <div class="border-b border-white/20"></div>
+                            <div class="border-r border-white/20"></div>
+                            <div class="border-r border-white/20"></div>
+                            <div></div>
+                        </div>
+                    `;
+                    parent.appendChild(gridOverlay);
+                }
+                gridOverlay.classList.remove('hidden');
+            } else {
+                if(gridOverlay) gridOverlay.classList.add('hidden');
+            }
 
             // 2. Try Hardware Constraints (if stream exists)
             if (videoTrack) {
@@ -770,7 +917,19 @@
             // Clear localStorage
             localStorage.removeItem('brightnessSlider');
             localStorage.removeItem('contrastSlider');
+            document.getElementById('saturationSlider').value = 50;
+            document.getElementById('mirrorToggle').checked = false;
+            document.getElementById('gridToggle').checked = false;
+            
+            // Clear localStorage
+            localStorage.removeItem('brightnessSlider');
+            localStorage.removeItem('contrastSlider');
             localStorage.removeItem('saturationSlider');
+            // We removed other localStorage usages for sliders in setupSliders but good to keep clean
+            // Actually setupSliders still uses it. Correct.
+            
+            localStorage.removeItem('mirrorToggle');
+            localStorage.removeItem('gridToggle');
             
             // Update UI text
             document.querySelectorAll('.range-slider').forEach(s => {
@@ -779,6 +938,9 @@
             });
 
             applySettings();
+
+            // Clear backend preferences
+            eel.save_preferences(null)();
         }
 
         // --- Logout App Logic ---

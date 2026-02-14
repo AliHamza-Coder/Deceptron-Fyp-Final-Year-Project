@@ -506,16 +506,16 @@
                 <div class="icon-box"><i class="fas fa-clock"></i></div>
                 <div>
                     <label class="text-[10px] uppercase tracking-widest font-bold text-dim">Last Login</label>
-                    <p class="text-lg font-bold">Today, 09:15 AM</p>
+                    <p class="text-lg font-bold" id="display-last-login">Just now</p>
                 </div>
             </div>
-                <div class="info-card">
-                    <div class="icon-box"><i class="fas fa-fingerprint"></i></div>
-                    <div>
-                        <label class="text-[10px] uppercase tracking-widest font-bold text-dim">User ID</label>
-                        <p class="text-lg font-bold heading-font text-cyan-400">USR-00147</p>
-                    </div>
+            <div class="info-card">
+                <div class="icon-box"><i class="fas fa-calendar-alt"></i></div>
+                <div>
+                    <label class="text-[10px] uppercase tracking-widest font-bold text-dim">Member Since</label>
+                    <p class="text-lg font-bold heading-font text-cyan-400" id="display-member-since">-</p>
                 </div>
+            </div>
             </div>
         </main>
     
@@ -687,6 +687,13 @@
             document.getElementById('display-fullname').innerText = name;
             document.getElementById('display-title').innerText = title;
             document.getElementById('display-email').innerText = email;
+
+            // Updated Realtime Data
+            const lastLogin = user.last_login ? new Date(user.last_login).toLocaleString() : 'Just now';
+            const memberSince = user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A';
+            
+            document.getElementById('display-last-login').innerText = lastLogin;
+            document.getElementById('display-member-since').innerText = memberSince;
 
             const avatarImg = document.getElementById('display-avatar');
             const modalAvatarImg = document.getElementById('modal-avatar-display');

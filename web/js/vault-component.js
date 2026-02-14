@@ -14,8 +14,7 @@ const VaultComponent = (function() {
 
         const modalHTML = `
             <div id="deceptronVaultModal" class="fixed inset-0 hidden items-center justify-center p-4 bg-black/90 backdrop-blur-3xl transition-all duration-300" style="z-index: 100000 !important;">
-                <div class="vault-container relative w-full max-w-5xl bg-neutral-900 border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden glass transition-all duration-300 scale-95 opacity-0">
-                    <!-- Header -->
+                <div class="vault-container relative w-full max-w-3xl bg-neutral-900 border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden glass transition-all duration-300 scale-95 opacity-0">
                     <div class="flex items-center justify-between p-6 border-b border-white/5">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
@@ -31,19 +30,16 @@ const VaultComponent = (function() {
                         </button>
                     </div>
 
-                    <!-- Search Bar -->
-                    <div class="p-6 pb-0">
+                    <div class="p-6 pb-2">
                         <div class="relative group">
-                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-cyan-400 transition-colors"></i>
                             <input type="text" id="vaultSearch" placeholder="Search evidence vault..." 
-                                   class="w-full bg-black/40 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all">
+                                   class="w-full bg-black/20 border border-white/5 rounded-2xl py-4 px-6 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/10 focus:ring-1 focus:ring-white/5 transition-all">
+                            <i class="fas fa-search absolute right-6 top-1/2 translate-y-1/2 text-gray-600 group-focus-within:text-white transition-colors pointer-events-none"></i>
                         </div>
                     </div>
 
-                    <!-- List Area -->
                     <div class="p-6 h-[450px] overflow-y-auto custom-scrollbar" id="vaultList">
-                        <!-- Items injected here -->
-                    </div>
+                        </div>
                 </div>
             </div>
 
@@ -192,23 +188,26 @@ const VaultComponent = (function() {
             const icon = isVideo ? 'fa-video' : 'fa-microphone';
             
             return `
-                <div class="vault-item p-4 bg-white/5 border border-white/5 rounded-2xl flex items-center justify-between group"
+                <div class="vault-item group p-4 bg-white/5 border border-white/5 rounded-2xl flex items-center justify-between transition-all hover:bg-white/10 hover:border-cyan-500/30"
                      onclick="VaultComponent.select('${item.id}')">
                     <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20 group-hover:bg-cyan-500 group-hover:text-black transition-all">
-                            <i class="fas ${icon} text-lg text-cyan-400 group-hover:text-black"></i>
+                        <div class="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20 group-hover:bg-cyan-500/20 group-hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all duration-300">
+                            <i class="fas ${icon} text-lg text-cyan-400 group-hover:text-cyan-300"></i>
                         </div>
                         <div>
-                            <h4 class="text-sm font-bold text-white group-hover:text-cyan-400 transition-colors">${item.filename}</h4>
-                            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-tighter mt-1">${item.size} • ${item.timestamp}</p>
+                            <h4 class="text-sm font-bold text-white group-hover:text-cyan-400 transition-colors w-64 truncate" title="${item.filename}">${item.filename}</h4>
+                            <div class="flex items-center space-x-2 mt-1">
+                                <span class="bg-white/10 px-1.5 py-0.5 rounded text-[9px] font-mono text-gray-400">${item.type.toUpperCase()}</span>
+                                <span class="text-[10px] text-gray-500 uppercase font-bold tracking-tighter">${item.timestamp}</span>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="flex items-center space-x-3">
-                        <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[8px] font-black uppercase tracking-tighter border border-emerald-500/20">
-                            Clearance: Level 4
-                        </span>
-                        <i class="fas fa-chevron-right text-[10px] text-white/20 group-hover:text-cyan-400 transition-colors"></i>
+                    <div class="flex items-center pl-4 bg-black/40 rounded-lg py-1.5 px-3 border border-white/5 group-hover:border-cyan-500/30 transition-colors">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-cyan-500/80 mr-3 group-hover:text-cyan-400">Select</span>
+                        <div class="w-6 h-6 rounded-full bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20 group-hover:bg-cyan-500 group-hover:text-black transition-all">
+                             <i class="fas fa-arrow-right text-[8px] text-cyan-400 group-hover:text-black"></i>
+                        </div>
                     </div>
                 </div>
             `;
