@@ -561,6 +561,16 @@
         const activeMemberName = document.querySelector('.active-member-info span.ml-1');
         let newlyUploadedFiles = {}; // Store File objects for new uploads
 
+        function downloadFile(url, filename) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename || 'download';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Download Initialized", 'success');
+        }
+
         async function loadUploads() {
             const result = await eel.get_uploads()();
             mediaList.innerHTML = '';
@@ -601,9 +611,9 @@
                         </div>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <!-- 1. Analyze Button -->
-                        <button class="px-5 py-2.5 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold uppercase rounded-xl hover:bg-cyan-500 hover:text-black transition-all duration-300 shadow-[0_4px_12px_rgba(0,219,255,0.1)] hover:shadow-[0_0_20px_rgba(0,219,255,0.4)]" onclick="window.location.href='${analyzeLoc}'">
-                            ${analyzeBtn}
+                        <!-- 1. Download Button -->
+                        <button class="px-5 py-2.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold uppercase rounded-xl hover:bg-emerald-500 hover:text-white transition-all duration-300 shadow-[0_4px_12px_rgba(16,185,129,0.1)] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)]" onclick="downloadFile('${mediaSource}', '${item.filename}')">
+                            <i class="fas fa-download mr-2"></i> Download Evidence
                         </button>
 
                         <!-- 2. Eye Icon (Preview) -->

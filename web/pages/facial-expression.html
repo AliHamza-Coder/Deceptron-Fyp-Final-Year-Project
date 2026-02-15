@@ -511,6 +511,10 @@
         background-repeat: no-repeat;
         background-size: 1rem;
       }
+      /* Fix for mirrored video controls */
+      video[style*="scaleX(-1)"]::-webkit-media-controls {
+        transform: scaleX(-1);
+      }
     </style>
   </head>
   <body>
@@ -846,12 +850,62 @@
 
       <!-- Monitoring Section -->
       <div class="px-4">
-        </div>
+          <div class="video-container group">
+              <div
+                id="camOffState"
+                class="absolute inset-0 bg-[#020408] flex flex-col items-center justify-center text-gray-800 transition-opacity duration-500 z-10"
+              >
+                <i class="fas fa-video-slash text-7xl mb-6 opacity-20"></i>
+                <p
+                  class="text-sm font-mono tracking-[0.3em] uppercase opacity-30"
+                >
+                  Camera Interface: Offline
+                </p>
+                <button
+                  class="mt-6 px-6 py-2 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase rounded-full hover:bg-cyan-500 hover:text-white transition-all"
+                  onclick="toggleCamera()"
+                >
+                  Turn on Camera
+                </button>
+              </div>
+
+              <div id="camOnState" class="absolute inset-0 bg-black hidden">
+                <div
+                  class="absolute inset-0 bg-cyan-900/10 flex items-center justify-center text-gray-600"
+                >
+                  <i class="fas fa-spinner fa-spin text-4xl text-cyan-500"></i>
+                </div>
+                <video
+                  id="webcam"
+                  class="absolute inset-0 w-full h-full object-cover"
+                  style="transform: scaleX(-1);"
+                  muted
+                ></video>
+                <!-- Hidden canvas for recording capture -->
+                <canvas id="recordCanvas" class="hidden"></canvas>
+              </div>
+
+              <!-- Notification Toast inside Video -->
+              <div
+                id="videoToast"
+                class="absolute top-20 left-1/2 -translate-x-1/2 z-30 transition-all duration-500 opacity-0 translate-y-4"
+              >
+                <div
+                  class="px-6 py-2 bg-cyan-500 text-white text-[10px] font-bold uppercase rounded-full shadow-lg shadow-cyan-500/40"
+                >
+                  Scanner & Interface Online
+                </div>
+              </div>
+          </div>
         <!-- Recording Controls Bar -->
         <div class="glass mt-4 p-4 flex justify-between items-center px-6">
             <div class="flex items-center space-x-4">
                 <button id="camBtn" class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center hover:bg-cyan-500 hover:text-white transition-all duration-300" onclick="toggleCamera()">
                     <i class="fas fa-camera"></i>
+                </button>
+                <!-- Pause Button -->
+                <button id="pauseBtn" class="w-10 h-10 rounded-xl flex items-center justify-center text-amber-500 hover:text-white hover:bg-amber-500 transition-all border border-amber-500/20 hidden" onclick="togglePause()">
+                  <i class="fas fa-pause"></i>
                 </button>
                 <div class="h-8 w-[1px] bg-white/10 mx-2"></div>
                 <!-- REC Indicator -->
@@ -872,7 +926,7 @@
                 </button>
                 <button
                     id="analyseBtn"
-                    class="px-8 py-3 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase rounded-xl transition-all shadow-lg shadow-purple-500/20 hidden"
+                    class="px-8 py-3 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold uppercase rounded-xl transition-all shadow-lg shadow-cyan-500/20 hidden"
                     onclick="finalizeAnalysis()"
                 >
                     <i class="fas fa-brain mr-2"></i> Analyse
@@ -1210,7 +1264,9 @@
       async function toggleCamera() {
         const off = document.getElementById("camOffState");
         const on = document.getElementById("camOnState");
-        const btn = document.getElementById("mainCamBtn");
+        const mainBtn = document.getElementById("mainCamBtn");
+        const camBtn = document.getElementById("camBtn");
+        const toast = document.getElementById("videoToast");
         const video = document.getElementById("webcam");
         const vSelect = document.getElementById('videoSource');
 
@@ -1223,13 +1279,28 @@
             video.src = "";
             await video.play();
             cameraOn = true;
-            off.classList.add("opacity-0");
-            setTimeout(() => { off.classList.add("hidden"); on.classList.remove("hidden"); on.classList.add("flex"); }, 500);
-            if (btn) {
-                btn.innerHTML = '<i class="fas fa-video mr-2"></i> Camera On';
-                btn.classList.remove("bg-rose-500/10", "text-rose-500", "border-rose-500/30");
-                btn.classList.add("bg-cyan-500/10", "text-cyan-500", "border-cyan-500/30", "hover:bg-cyan-500", "hover:text-white");
-            }
+            
+            off.style.opacity = "0";
+            setTimeout(() => {
+              off.classList.add("hidden");
+              on.classList.remove("hidden");
+              on.classList.add("flex");
+              
+              if (mainBtn) {
+                  mainBtn.innerHTML = '<i class="fas fa-video mr-2"></i> Camera On';
+                  mainBtn.classList.remove("bg-rose-500/10", "text-rose-500", "border-rose-500/30");
+                  mainBtn.classList.add("bg-cyan-500/10", "text-cyan-500", "border-cyan-500/30", "hover:bg-cyan-500", "hover:text-white");
+              }
+              if (camBtn) camBtn.classList.add("active");
+
+              // Show Toast
+              toast.classList.remove("opacity-0", "translate-y-4");
+              toast.classList.add("opacity-1", "translate-y-0");
+              setTimeout(() => {
+                toast.classList.add("opacity-0", "translate-y-4");
+              }, 2000);
+            }, 300);
+            
             video.style.transform = "scaleX(-1)";
             updateStatusUI('live', 'Live Feed');
             populateDevices();
@@ -1243,12 +1314,15 @@
           on.classList.add("hidden");
           on.classList.remove("flex");
           off.classList.remove("hidden");
-          setTimeout(() => off.classList.remove("opacity-0"), 10);
-          if (btn) {
-              btn.innerHTML = '<i class="fas fa-video-slash"></i> Camera Off';
-              btn.classList.add("bg-rose-500/10", "text-rose-500", "border-rose-500/30");
-              btn.classList.remove("bg-cyan-500/10", "text-cyan-500", "border-cyan-500/30", "hover:bg-cyan-500", "hover:text-white");
+          setTimeout(() => off.style.opacity = "1", 10);
+          
+          if (mainBtn) {
+              mainBtn.innerHTML = '<i class="fas fa-video-slash"></i> Camera Off';
+              mainBtn.classList.add("bg-rose-500/10", "text-rose-500", "border-rose-500/30");
+              mainBtn.classList.remove("bg-cyan-500/10", "text-cyan-500", "border-cyan-500/30", "hover:bg-cyan-500", "hover:text-white");
           }
+          if (camBtn) camBtn.classList.remove("active");
+          
           video.style.transform = "none";
           updateStatusUI('ready', 'System Ready');
           
@@ -1274,12 +1348,16 @@
 
       function handleSessionToggle() {
         const btn = document.getElementById("sessionBtn");
+        const pauseBtn = document.getElementById("pauseBtn");
         const recIndicator = document.getElementById("recIndicator");
+        const toast = document.getElementById("videoToast");
+        
         if (!isRecording) {
           if (!mediaStream) {
             alert("Please turn on the camera first.");
             return;
           }
+          
           recordedChunks = [];
           // Video-only recording
           const options = MediaRecorder.isTypeSupported('video/webm;codecs=vp8') 
@@ -1293,20 +1371,48 @@
           mediaRecorder.start(1000);
           isRecording = true;
           btn.innerHTML = '<i class="fas fa-stop-circle mr-2"></i> End Session';
-          btn.classList.remove("bg-cyan-600");
-          btn.classList.add("bg-red-600");
+          btn.classList.remove("bg-cyan-600", "shadow-cyan-500/20");
+          btn.classList.add("bg-red-600", "shadow-red-500/20");
+          
+          if (pauseBtn) pauseBtn.classList.remove("hidden");
           if (recIndicator) recIndicator.classList.remove("hidden");
+          
           startTime = new Date();
           timerInterval = setInterval(updateTimer, 1000);
           updateStatusUI('live', 'Recording Active');
+
+          // Show Toast
+          toast.querySelector("div").innerText = "Recording Started";
+          toast.classList.remove("opacity-0", "translate-y-4");
+          toast.classList.add("opacity-1", "translate-y-0");
+          setTimeout(() => {
+            toast.classList.add("opacity-0", "translate-y-4");
+          }, 1500);
         } else {
           mediaRecorder.stop();
           if (mediaStream) {
             mediaStream.getTracks().forEach(track => track.stop());
             mediaStream = null;
           }
+          if (pauseBtn) pauseBtn.classList.add("hidden");
+          if (recIndicator) recIndicator.classList.add("hidden");
           clearInterval(timerInterval);
           openSaveModal();
+        }
+      }
+
+      function togglePause() {
+        const pauseBtn = document.getElementById('pauseBtn');
+        if (mediaRecorder.state === "recording") {
+          mediaRecorder.pause();
+          pauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+          pauseBtn.classList.remove("text-amber-500", "border-amber-500/20");
+          pauseBtn.classList.add("bg-amber-500", "text-white");
+        } else if (mediaRecorder.state === "paused") {
+          mediaRecorder.resume();
+          pauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+          pauseBtn.classList.add("text-amber-500", "border-amber-500/20");
+          pauseBtn.classList.remove("bg-amber-500", "text-white");
         }
       }
 
@@ -1341,9 +1447,10 @@
                 // Visualization
                 const video = document.getElementById("webcam");
                 video.srcObject = null;
-                video.src = result.filepath || `../uploads/${filename}`;
+                // Fix: Access result.data.filepath and use correct fallback path
+                video.src = (result.data && result.data.filepath) ? result.data.filepath : `../recordings/${filename}`;
                 video.setAttribute('controls', 'true');
-                video.style.transform = "none";
+                video.style.transform = "scaleX(-1)";
                 const off = document.getElementById("camOffState");
                 const on = document.getElementById("camOnState");
                 off.classList.add("hidden");
@@ -1428,6 +1535,11 @@
               document.getElementById("camOffState").classList.add("hidden");
               document.getElementById("camOnState").classList.remove("hidden");
               document.getElementById("camOnState").classList.add("flex");
+              
+              // Show Analyse button when loading from vault
+              const analyseBtn = document.getElementById("analyseBtn");
+              if (analyseBtn) analyseBtn.classList.remove("hidden");
+              
               video.play();
           });
       }

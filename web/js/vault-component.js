@@ -14,7 +14,7 @@ const VaultComponent = (function() {
 
         const modalHTML = `
             <div id="deceptronVaultModal" class="fixed inset-0 hidden items-center justify-center p-4 bg-black/90 backdrop-blur-3xl transition-all duration-300" style="z-index: 100000 !important;">
-                <div class="vault-container relative w-full max-w-3xl bg-neutral-900 border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden glass transition-all duration-300 scale-95 opacity-0">
+                <div class="vault-container relative w-full max-w-3xl bg-neutral-900 border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden glass transition-all duration-300 scale-95 opacity-0" style="height: 500px;">
                     <div class="flex items-center justify-between p-6 border-b border-white/5">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
@@ -30,7 +30,7 @@ const VaultComponent = (function() {
                         </button>
                     </div>
 
-                    <div class="p-6 pb-2">
+                    <div class="p-6 pb-4">
                         <div class="relative group">
                             <input type="text" id="vaultSearch" placeholder="Search evidence vault..." 
                                    class="w-full bg-black/20 border border-white/5 rounded-2xl py-4 px-6 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/10 focus:ring-1 focus:ring-white/5 transition-all">
@@ -38,13 +38,17 @@ const VaultComponent = (function() {
                         </div>
                     </div>
 
-                    <div class="p-6 h-[450px] overflow-y-auto custom-scrollbar" id="vaultList">
-                        </div>
+                    <div class="px-6 pb-6 flex-1 overflow-y-auto custom-scrollbar" id="vaultList" style="height: calc(500px - 180px);">
+                    </div>
                 </div>
             </div>
 
             <style>
-                #deceptronVaultModal .vault-container { background: rgba(17, 17, 17, 0.95); }
+                #deceptronVaultModal .vault-container { 
+                    background: rgba(17, 17, 17, 0.95);
+                    display: flex;
+                    flex-direction: column;
+                }
                 #deceptronVaultModal .glass { backdrop-filter: blur(40px); }
                 
                 body.light-mode #deceptronVaultModal .vault-container { 
@@ -89,6 +93,12 @@ const VaultComponent = (function() {
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
                 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 219, 255, 0.2); border-radius: 10px; }
                 body.light-mode .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 118, 214, 0.15); }
+                
+                /* Ensure smooth scrolling */
+                .custom-scrollbar {
+                    scroll-behavior: smooth;
+                    -webkit-overflow-scrolling: touch;
+                }
             </style>
         `;
 

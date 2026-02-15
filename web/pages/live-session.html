@@ -506,6 +506,10 @@
         color: #1e293b !important;
       }
 
+      /* Fix for mirrored video controls */
+      video[style*="scaleX(-1)"]::-webkit-media-controls {
+        transform: scaleX(-1);
+      }
     </style>
   </head>
   <body>
@@ -677,7 +681,7 @@
               </button>
               <button
                 id="analyseBtn"
-                class="px-8 py-3 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase rounded-xl transition-all shadow-lg shadow-purple-500/20 hidden"
+                class="px-8 py-3 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold uppercase rounded-xl transition-all shadow-lg shadow-cyan-500/20 hidden"
                 onclick="finalizeAnalysis()"
               >
                 <i class="fas fa-brain mr-2"></i> Analyse
@@ -1644,10 +1648,12 @@
               // Load saved file into player
               const video = document.getElementById("webcam");
               video.srcObject = null;
-              video.src = result.filepath || `../uploads/${filename}`;
+              video.src = (result.data && result.data.filepath) ? result.data.filepath : `../recordings/${filename}`;
               video.setAttribute('controls', 'true');
               video.muted = false; // Unmute for playback
-              video.style.transform = "none";
+              video.style.transform = "scaleX(-1)";
+              video.load();
+              video.play();
               
               const off = document.getElementById("camOffState");
               const on = document.getElementById("camOnState");
@@ -1898,6 +1904,10 @@
               on.classList.remove("hidden");
               btn.classList.add("active");
               on.style.opacity = "1";
+
+              // Show Analyse button when loading from vault
+              const analyseBtn = document.getElementById("analyseBtn");
+              if (analyseBtn) analyseBtn.classList.remove("hidden");
 
               video.play();
           });
