@@ -124,8 +124,14 @@ const VaultComponent = (function() {
         // Fetch data
         renderLoader();
         try {
-            currentUploads = await eel.get_uploads()();
-            renderItems();
+            const result = await eel.get_uploads()();
+            if (result.success) {
+                currentUploads = result.data || [];
+                renderItems();
+            } else {
+                console.error("Vault pull failed:", result.message);
+                renderError();
+            }
         } catch (err) {
             console.error("Vault pull failed:", err);
             renderError();

@@ -9,9 +9,10 @@
     <link rel="stylesheet" href="../styles/output.css" />
     <script src="../scripts/chart.min.js"></script>
     <link rel="stylesheet" href="../vendor/font-awesome/css/all.min.css" />
+    <link rel="stylesheet" href="../styles/sidebar.css" />
+    <script src="../scripts/wavesurfer.js"></script>
     <script src="../js/sidebar.js"></script>
     <script src="../js/vault-component.js"></script>
-    <script type="text/javascript" src="/eel.js"></script>
     <style>
       :root {
         --primary-blue: #0076d6;
@@ -42,6 +43,11 @@
         --sidebar-bg: rgba(255, 255, 255, 0.9);
         --card-bg: rgba(255, 255, 255, 0.85);
         --border-subtle: rgba(0, 219, 255, 0.5);
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(224, 242, 254, 0.8) 0, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(207, 250, 254, 0.8) 0, transparent 50%),
+            radial-gradient(at 50% 100%, rgba(240, 249, 255, 1) 0, transparent 50%);
+        background-attachment: fixed;
       }
 
       body.light-mode .active-member-info {
@@ -227,33 +233,11 @@
       a,
       select,
       input[type="checkbox"],
-      .nav-item,
-      .cursor-pointer {
+      input[type="checkbox"] {
         cursor: pointer !important;
       }
 
       /* Sidebar & Layout */
-      .sidebar {
-        width: var(--sidebar-width);
-        height: 100vh;
-        background: var(--sidebar-bg);
-        border-right: 1px solid var(--border-subtle);
-        position: fixed;
-        left: 0;
-        top: 0;
-        z-index: 50;
-        display: flex;
-        flex-direction: column;
-        backdrop-filter: blur(30px) saturate(150%);
-        overflow-y: auto;
-        overflow-x: hidden;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-      }
-
-      .sidebar::-webkit-scrollbar {
-        display: none;
-      }
 
       .config-panel {
         width: var(--config-width);
@@ -270,76 +254,11 @@
       }
 
       .main-content {
-        margin-left: var(--sidebar-width);
         margin-right: var(--config-width);
-        height: 100vh;
-        overflow-y: auto;
-        overflow-x: hidden;
         padding: 1.5rem;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
-        max-width: 100%;
-      }
-
-      .nav-item {
-        display: flex;
-        align-items: center;
-        padding: 0.6rem 1.5rem;
-        color: #94a3b8;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        border-left: 3px solid transparent;
-      }
-
-      .nav-item:hover,
-      .nav-item.active {
-        color: var(--accent-cyan);
-        background: rgba(0, 219, 255, 0.05);
-        border-left-color: var(--accent-cyan);
-      }
-
-      .nav-item i {
-        width: 24px;
-        font-size: 1rem;
-        margin-right: 1rem;
-      }
-
-      /* Sidebar Transition Logic */
-      .sidebar {
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .main-content {
-        transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      body.sidebar-collapsed .sidebar {
-        transform: translateX(-100%);
-      }
-
-      body.sidebar-collapsed .main-content {
-        margin-left: 0;
-        padding-left: 4.5rem;
-      }
-
-      .collapse-btn {
-        position: absolute;
-        top: 1.25rem;
-        right: 0.5rem;
-        width: 26px;
-        height: 26px;
-        background: var(--accent-cyan);
-        color: #05080f;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 100;
-        box-shadow: 0 0 15px rgba(0, 219, 255, 0.4);
-        border: none;
-        transition: all 0.3s ease;
       }
 
       .glass {
@@ -397,54 +316,6 @@
       body.light-mode #camOffState {
         background: #f1f5f9 !important;
         color: #475569 !important;
-      }
-
-      .sidebar {
-        width: var(--sidebar-width);
-        height: 100vh;
-        background: var(--sidebar-bg);
-        border-right: 1px solid var(--border-subtle);
-        position: fixed;
-        left: 0;
-        top: 0;
-        z-index: 50;
-        display: flex;
-        flex-direction: column;
-        backdrop-filter: blur(20px);
-        overflow-y: auto;
-        overflow-x: hidden;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-        transition:
-          transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-          background 0.3s ease;
-      }
-
-      .collapse-btn:hover {
-        transform: scale(1.1);
-      }
-
-      #restore-sidebar {
-        position: fixed;
-        top: 1.5rem;
-        left: 1rem;
-        width: 38px;
-        height: 38px;
-        background: var(--accent-cyan);
-        color: #05080f;
-        border: none;
-        border-radius: 50%;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 55;
-        transition: all 0.3s ease;
-        box-shadow: 0 0 20px rgba(0, 219, 255, 0.4);
-      }
-
-      body.sidebar-collapsed #restore-sidebar {
-        display: flex;
       }
 
       /* Video / Scanning Area */
@@ -644,9 +515,20 @@
   </head>
   <body>
     <!-- Sidebar Component Container -->
-    <script src="../js/sidebar.js"></script>
-    <script src="../js/vault-component.js"></script>
-    <script>initSidebar();</script>
+    <script>
+      // Anti-Flash Theme Optimization
+      (function() {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        if (savedTheme === 'light' || (!savedTheme && prefersLight)) {
+          document.body.classList.add('light-mode');
+        }
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+          document.body.classList.add('sidebar-collapsed');
+        }
+      })();
+      initSidebar();
+    </script>
 
     <!-- Evidence Vault Modal -->
     <div id="vaultModal" class="modal-backdrop">
@@ -964,36 +846,38 @@
 
       <!-- Monitoring Section -->
       <div class="px-4">
-        <div class="video-container group">
-          <div
-            id="camOffState"
-            class="absolute inset-0 bg-[#eef7f9] flex flex-col items-center justify-center text-gray-800 z-20 transition-opacity duration-500"
-          >
-            <i class="fas fa-camera text-6xl mb-8 opacity-40 text-cyan-400"></i>
-            <button
-              class="px-10 py-3.5 bg-cyan-400 border-b-4 border-cyan-600 text-white text-[11px] font-black uppercase rounded-full transition-all duration-300 hover:bg-cyan-500 hover:translate-y-[2px] hover:border-b-2 hover:shadow-[0_10px_30px_rgba(0,219,255,0.4)] tracking-[0.2em] shadow-lg flex items-center gap-3"
-              onclick="toggleCamera()"
-            >
-              Initiate Deep Scanner
-            </button>
-          </div>
-
-          <div id="camOnState" class="absolute inset-0 bg-black hidden">
-            <video
-              id="webcam"
-              class="absolute inset-0 w-full h-full object-cover"
-            ></video>
-
-            <div class="absolute top-6 right-6 z-20">
-              <button
-                class="w-8 h-8 flex items-center justify-center bg-black/60 backdrop-blur-md rounded-lg border border-white/10 hover:bg-white/20 transition-all text-white"
-                title="Enlarge Screen"
-                onclick="toggleFullScreen()"
-              >
-                <i class="fas fa-expand"></i>
-              </button>
+        </div>
+        <!-- Recording Controls Bar -->
+        <div class="glass mt-4 p-4 flex justify-between items-center px-6">
+            <div class="flex items-center space-x-4">
+                <button id="camBtn" class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center hover:bg-cyan-500 hover:text-white transition-all duration-300" onclick="toggleCamera()">
+                    <i class="fas fa-camera"></i>
+                </button>
+                <div class="h-8 w-[1px] bg-white/10 mx-2"></div>
+                <!-- REC Indicator -->
+                <div id="recIndicator" class="flex items-center bg-rose-500/10 border border-rose-500/20 px-2 py-1 rounded-md hidden">
+                    <span class="w-2 h-2 bg-rose-600 rounded-full animate-pulse mr-1.5"></span>
+                    <span class="text-[9px] font-bold text-rose-500 uppercase tracking-tighter">REC</span>
+                </div>
+                <!-- Timer -->
+                <div id="recordingTimer" class="text-xl font-mono text-white/80 tabular-nums">00:00:00</div>
             </div>
-          </div>
+            <div class="flex items-center space-x-3">
+                <button
+                    id="sessionBtn"
+                    class="px-8 py-3 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold uppercase rounded-xl transition-all shadow-lg shadow-cyan-500/20"
+                    onclick="handleSessionToggle()"
+                >
+                    <i class="fas fa-play mr-2"></i> Start Recording
+                </button>
+                <button
+                    id="analyseBtn"
+                    class="px-8 py-3 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase rounded-xl transition-all shadow-lg shadow-purple-500/20 hidden"
+                    onclick="finalizeAnalysis()"
+                >
+                    <i class="fas fa-brain mr-2"></i> Analyse
+                </button>
+            </div>
         </div>
       </div>
 
@@ -1130,38 +1014,98 @@
     <!-- Media Player Modal -->
     <div id="playerModal" class="fixed inset-0 z-[110] hidden items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closePlayer()"></div>
-        <div class="player-modal relative w-full max-w-4xl p-4 rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
-            <div class="flex justify-between items-center mb-4 px-2">
-                <h3 id="playerTitle" class="text-sm font-bold text-white uppercase tracking-wider">File Player</h3>
-                <button onclick="closePlayer()" class="text-gray-400 hover:text-white transition-colors"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="media-container mx-auto bg-black flex items-center justify-center">
-                <video id="vaultVideo" class="w-full h-full hidden" controls></video>
-                <div id="audioPlayerUI" class="hidden flex-col items-center justify-center w-full h-full space-y-6">
-                    <div class="w-24 h-24 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-400 border-2 border-cyan-500/20 animate-pulse">
-                        <i class="fas fa-microphone text-4xl"></i>
-                    </div>
-                    <audio id="vaultAudio" class="w-3/4" controls></audio>
-                </div>
-            </div>
         </div>
     </div>
 
+    <!-- Modal for Saving Session -->
+    <div
+      id="saveModal"
+      class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[999] hidden flex items-center justify-center opacity-0 transition-all duration-300"
+    >
+      <div
+        class="bg-[#0b121f] border border-white/10 p-10 rounded-3xl w-full max-w-lg transform scale-95 transition-all duration-300 shadow-2xl"
+      >
+        <h2 class="text-2xl font-bold heading-font text-white mb-2">
+          Save Recording
+        </h2>
+        <p class="text-xs text-gray-400 mb-8">
+          Finalize and encrypt the facial analysis for permanent storage.
+        </p>
+
+        <div class="space-y-5">
+          <div class="space-y-2">
+            <label
+              class="text-[10px] font-bold text-gray-500 uppercase tracking-widest"
+              >Subject Identifier</label
+            >
+            <input
+              id="subjectIdInput"
+              type="text"
+              placeholder="Enter name or ID..."
+              class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-cyan-400 focus:outline-none transition-all"
+            />
+          </div>
+        </div>
+
+        <div class="mt-10 flex flex-col space-y-3">
+          <button
+            class="w-full py-4 bg-cyan-500 text-[#05080f] text-xs font-bold uppercase rounded-xl shadow-lg shadow-cyan-500/30 transition-all font-bold"
+            onclick="saveData()"
+          >
+            Save Record
+          </button>
+          <div class="flex space-x-3">
+            <button
+              class="flex-1 py-3 bg-white/5 hover:bg-white/10 text-[10px] font-bold uppercase rounded-xl transition-all text-gray-400"
+              onclick="closeSaveModal()"
+            >
+              Continue Recording
+            </button>
+            <button
+              class="flex-1 py-3 bg-red-500/10 hover:bg-red-500/20 text-[10px] font-bold uppercase rounded-xl transition-all text-red-500 border border-red-500/20"
+              onclick="discardSession()"
+            >
+              Discard & Reset
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
-      // Init Radar Chart
+      // Global State
+      const body = document.body;
+      let cameraOn = false;
+      let mediaStream = null;
+      let vaultData = [];
+
+      // --- Theme Toggle Logic ---
+      const themeToggle = document.getElementById("theme-toggle");
+      const themeIcon = themeToggle ? themeToggle.querySelector("i") : null;
+
+      function toggleTheme() {
+        const isLight = body.classList.toggle("light-mode");
+        localStorage.setItem("theme", isLight ? "light" : "dark");
+        updateThemeUI(isLight);
+        if (typeof updateChartsTheme === 'function') updateChartsTheme(isLight);
+      }
+
+      function updateThemeUI(isLight) {
+        if (!themeIcon || !themeToggle) return;
+        themeIcon.className = isLight ? "fas fa-sun" : "fas fa-moon";
+        themeToggle.classList.toggle("bg-gray-200", isLight);
+        themeToggle.classList.toggle("text-gray-900", isLight);
+        themeToggle.classList.toggle("border-gray-300", isLight);
+      }
+
+      if (themeToggle) themeToggle.addEventListener("click", toggleTheme);
+
+      // --- Radar Chart Initialization ---
       const ctxRadar = document.getElementById("radarChart").getContext("2d");
       const radarChart = new Chart(ctxRadar, {
         type: "radar",
         data: {
-          labels: [
-            "Joy",
-            "Anger",
-            "Disgust",
-            "Fear",
-            "Sadness",
-            "Surprise",
-            "Neutral",
-          ],
+          labels: ["Joy", "Anger", "Disgust", "Fear", "Sadness", "Surprise", "Neutral"],
           datasets: [
             {
               label: "Live Signal",
@@ -1198,28 +1142,41 @@
               ticks: { display: false },
             },
           },
-          plugins: {
-            legend: { display: false },
-          },
+          plugins: { legend: { display: false } },
         },
       });
 
-      let cameraOn = false;
-      let mediaStream = null;
+      function updateChartsTheme(isLight) {
+        if (!radarChart) return;
+        const gridColor = isLight ? "rgba(0, 0, 0, 0.12)" : "rgba(255, 255, 255, 0.05)";
+        const labelColor = isLight ? "#27374d" : "#64748b";
 
-      // Populate Camera Sources
+        radarChart.options.scales.r.angleLines.color = gridColor;
+        radarChart.options.scales.r.grid.color = gridColor;
+        radarChart.options.scales.r.pointLabels.color = labelColor;
+
+        radarChart.data.datasets[1].borderColor = isLight ? "rgba(0, 0, 0, 0.1)" : "rgba(255, 255, 255, 0.2)";
+        radarChart.data.datasets[1].backgroundColor = isLight ? "rgba(0, 0, 0, 0.02)" : "rgba(255, 255, 255, 0.05)";
+        radarChart.update();
+      }
+
+      // --- Sidebar Logic ---
+      function toggleSidebar() {
+        body.classList.toggle("sidebar-collapsed");
+        localStorage.setItem("sidebarCollapsed", body.classList.contains("sidebar-collapsed"));
+      }
+
+      // --- Camera & Devices Logic ---
       async function populateDevices() {
         const vSelect = document.getElementById('videoSource');
-        
+        if (!vSelect) return;
         try {
           if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
             vSelect.innerHTML = '<option value="">Searching...</option>';
             return;
           }
-
           const devices = await navigator.mediaDevices.enumerateDevices();
           vSelect.innerHTML = '';
-          
           const videoDevices = devices.filter(d => d.kind === 'videoinput');
           videoDevices.forEach((device, index) => {
             const option = document.createElement('option');
@@ -1229,174 +1186,25 @@
           });
           
           if (videoDevices.length > 0) {
-             // Load preference
-             try {
-                const result = await eel.load_preferences()();
-                if (result.success && result.preferences) {
-                     // 1. Camera Selection
-                     if (result.preferences.default_camera) {
-                          const exists = videoDevices.some(d => d.deviceId === result.preferences.default_camera);
-                          if (exists) vSelect.value = result.preferences.default_camera;
-                     }
-
-                     // 2. Visual Settings
-                     const v = document.getElementById('webcam');
-                     if (v) {
-                        const b = result.preferences.brightness || 50;
-                        const c = result.preferences.contrast || 50;
-                        const s = result.preferences.saturation || 50;
-                        const mirror = result.preferences.mirror_camera || false;
-                        
-                        const bVal = 0.5 + (b / 100);
-                        const cVal = 0.5 + (c / 100);
-                        const sVal = 0.5 + (s / 100);
-                        
-                        v.style.filter = `brightness(${bVal}) contrast(${cVal}) saturate(${sVal})`;
-                        v.style.transform = mirror ? 'scaleX(-1)' : 'scaleX(1)';
-                        
-                        // Grid Overlay
-                        let gridOverlay = document.getElementById('facialGridOverlay');
-                        if (result.preferences.grid_overlay) {
-                            if (!gridOverlay) {
-                                const parent = v.parentElement;
-                                gridOverlay = document.createElement('div');
-                                gridOverlay.id = 'facialGridOverlay';
-                                gridOverlay.className = "absolute inset-0 pointer-events-none z-10";
-                                gridOverlay.innerHTML = `
-                                    <div class="w-full h-full grid grid-cols-3 grid-rows-3">
-                                        <div class="border-r border-b border-white/20"></div>
-                                        <div class="border-r border-b border-white/20"></div>
-                                        <div class="border-b border-white/20"></div>
-                                        <div class="border-r border-b border-white/20"></div>
-                                        <div class="border-r border-b border-white/20"></div>
-                                        <div class="border-b border-white/20"></div>
-                                        <div class="border-r border-white/20"></div>
-                                        <div class="border-r border-white/20"></div>
-                                        <div></div>
-                                    </div>
-                                `;
-                                parent.appendChild(gridOverlay);
-                            }
-                            gridOverlay.classList.remove('hidden');
-                        } else {
-                            if (gridOverlay) gridOverlay.classList.add('hidden');
-                        }
-                     }
+             const result = await eel.load_preferences()();
+             if (result.success && result.preferences) {
+                if (result.preferences.default_camera) {
+                   const exists = videoDevices.some(d => d.deviceId === result.preferences.default_camera);
+                   if (exists) vSelect.value = result.preferences.default_camera;
                 }
-             } catch (e) {
-                console.error("Pref load error:", e);
+                const v = document.getElementById('webcam');
+                if (v) {
+                   const b = result.preferences.brightness || 50;
+                   const c = result.preferences.contrast || 50;
+                   const s = result.preferences.saturation || 50;
+                   const mirror = result.preferences.mirror_camera || false;
+                   v.style.filter = `brightness(${0.5 + b/100}) contrast(${0.5 + c/100}) saturate(${0.5 + s/100})`;
+                   v.style.transform = mirror ? 'scaleX(-1)' : 'scaleX(1)';
+                }
              }
           }
-
           if (videoDevices.length === 0) vSelect.innerHTML = '<option value="">No Camera Detected</option>';
-
-        } catch (err) {
-          console.error("Error enumerating devices:", err);
-        }
-      }
-
-      function updateStatusUI(status, label) {
-          const tag = document.getElementById('statusTag');
-          const dot = document.getElementById('statusDot');
-          if (!tag || !dot) return;
-          
-          tag.innerText = label;
-          
-          if (status === 'live') {
-              dot.className = "w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]";
-          } else if (status === 'vault') {
-              dot.className = "w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_10px_rgba(0,219,255,0.5)]";
-          } else {
-              dot.className = "w-2 h-2 bg-gray-500 rounded-full";
-          }
-      }
-
-      function toggleFullScreen() {
-        const container = document.querySelector(".video-container");
-        if (!document.fullscreenElement) {
-          container.requestFullscreen();
-        } else {
-          document.exitFullscreen();
-        }
-      }
-
-      function resetConfigurations() {
-        const modules = [
-          "toggleFace", "toggleEmotion", "toggleEyeMove", "toggleEyeJumps",
-          "toggleMuscleTwitch", "toggleNasal", "toggleCheeks", "toggleJaw", "toggleMesh"
-        ];
-
-        modules.forEach(id => {
-          const el = document.getElementById(id);
-          if (el) {
-            // Set all to OFF except Emotion and Face Detection
-            el.checked = (id === "toggleEmotion" || id === "toggleFace");
-          }
-        });
-
-        console.log("Configurations Reset: Emotion Detection active, others secured.");
-      }
-
-      function clearVault() {
-          const video = document.getElementById("webcam");
-          const off = document.getElementById("camOffState");
-          const on = document.getElementById("camOnState");
-          const btn = document.getElementById("mainCamBtn");
-
-          if (mediaStream) {
-              mediaStream.getTracks().forEach(track => track.stop());
-              mediaStream = null;
-          }
-
-          video.srcObject = null;
-          video.src = "";
-          video.removeAttribute('controls');
-          video.style.transform = "none";
-
-          cameraOn = false;
-          on.classList.add("hidden");
-          on.classList.remove("flex");
-          off.classList.remove("hidden");
-          off.classList.remove("opacity-0");
-
-          btn.innerHTML = '<i class="fas fa-video-slash"></i> Camera Off';
-          btn.classList.add("bg-rose-500/10", "text-rose-500", "border-rose-500/30");
-          btn.classList.remove("bg-cyan-500/10", "text-cyan-500", "border-cyan-500/30", "hover:bg-cyan-500", "hover:text-white");
-
-          document.querySelector("h1").innerText = "Facial Analysis Unit";
-          updateStatusUI('ready', 'System Ready');
-      }
-
-      let vaultData = [];
-
-      function openVaultSelection() {
-          VaultComponent.open((item) => {
-              if (item.type !== 'video') {
-                  alert("Please select a video file for Facial micro-expression analysis.");
-                  return;
-              }
-              
-              const video = document.getElementById("webcam");
-              if (mediaStream) {
-                  mediaStream.getTracks().forEach(track => track.stop());
-                  mediaStream = null;
-              }
-              video.srcObject = null;
-              video.src = item.filepath;
-              
-              video.setAttribute('controls', 'true');
-              video.style.transform = "none";
-              
-              document.querySelector("h1").innerHTML = item.filename + ' <span class="text-cyan-400 font-normal">| VAULT SCAN</span>';
-              updateStatusUI('vault', 'Vault Analysis');
-              
-              cameraOn = true;
-              document.getElementById("camOffState").classList.add("hidden");
-              document.getElementById("camOnState").classList.remove("hidden");
-              document.getElementById("camOnState").classList.add("flex");
-              
-              video.play();
-          });
+        } catch (err) { console.error("Error enumerating devices:", err); }
       }
 
       async function toggleCamera() {
@@ -1408,192 +1216,271 @@
 
         if (!cameraOn) {
           try {
-            video.removeAttribute('controls');
-            
             const cameraId = vSelect.value;
-            
-            // Build constraints dynamically to avoid failure if no ID is selected
-            const constraints = {
-              video: cameraId ? { deviceId: { ideal: cameraId } } : true,
-              audio: false // Only video for facial analysis
-            };
-            
+            const constraints = { video: cameraId ? { deviceId: { ideal: cameraId } } : true, audio: false };
             mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
             video.srcObject = mediaStream;
             video.src = "";
             await video.play();
-
             cameraOn = true;
             off.classList.add("opacity-0");
-            setTimeout(() => {
-              off.classList.add("hidden");
-              on.classList.remove("hidden");
-              on.classList.add("flex");
-            }, 500);
-
-            btn.innerHTML = '<i class="fas fa-video mr-2"></i> Camera On';
-            btn.classList.remove("bg-rose-500/10", "text-rose-500", "border-rose-500/30");
-            btn.classList.add("bg-cyan-500/10", "text-cyan-500", "border-cyan-500/30", "hover:bg-cyan-500", "hover:text-white");
-            
+            setTimeout(() => { off.classList.add("hidden"); on.classList.remove("hidden"); on.classList.add("flex"); }, 500);
+            if (btn) {
+                btn.innerHTML = '<i class="fas fa-video mr-2"></i> Camera On';
+                btn.classList.remove("bg-rose-500/10", "text-rose-500", "border-rose-500/30");
+                btn.classList.add("bg-cyan-500/10", "text-cyan-500", "border-cyan-500/30", "hover:bg-cyan-500", "hover:text-white");
+            }
             video.style.transform = "scaleX(-1)";
-            
             updateStatusUI('live', 'Live Feed');
-            document.querySelector("h1").innerText = "Facial Analysis Unit";
-            
-            // Refresh device list to get labels (now that permission is granted)
             populateDevices();
-            
-          } catch (err) {
-            console.error("Error accessing camera:", err);
-            cameraOn = false;
-            alert("Could not access camera. Please check if it is being used by another app or check permissions.");
-          }
+          } catch (err) { console.error("Error accessing camera:", err); cameraOn = false; }
         } else {
-          // Stop Camera
-          if (mediaStream) {
-            mediaStream.getTracks().forEach((track) => track.stop());
-            mediaStream = null;
-          }
+          if (mediaStream) { mediaStream.getTracks().forEach(track => track.stop()); mediaStream = null; }
           video.srcObject = null;
-          video.src = "";
-
+          video.src = ""; // Clear vault
+          video.removeAttribute('controls');
           cameraOn = false;
           on.classList.add("hidden");
           on.classList.remove("flex");
           off.classList.remove("hidden");
           setTimeout(() => off.classList.remove("opacity-0"), 10);
-
-          btn.innerHTML = '<i class="fas fa-video-slash"></i> Camera Off';
-          btn.classList.add("bg-rose-500/10", "text-rose-500", "border-rose-500/30");
-          btn.classList.remove("bg-cyan-500/10", "text-cyan-500", "border-cyan-500/30", "hover:bg-cyan-500", "hover:text-white");
-          
+          if (btn) {
+              btn.innerHTML = '<i class="fas fa-video-slash"></i> Camera Off';
+              btn.classList.add("bg-rose-500/10", "text-rose-500", "border-rose-500/30");
+              btn.classList.remove("bg-cyan-500/10", "text-cyan-500", "border-cyan-500/30", "hover:bg-cyan-500", "hover:text-white");
+          }
           video.style.transform = "none";
           updateStatusUI('ready', 'System Ready');
-          }
+          
+          if (isRecording) handleSessionToggle(); // End session if camera turned off
         }
+      }
 
+      let isRecording = false;
+      let mediaRecorder;
+      let recordedChunks = [];
+      let startTime;
+      let timerInterval;
 
-      // Simulate Live Data
+      function updateTimer() {
+        if (!startTime) return;
+        const now = new Date();
+        const diff = new Date(now - startTime);
+        const h = String(diff.getUTCHours()).padStart(2, '0');
+        const m = String(diff.getUTCMinutes()).padStart(2, '0');
+        const s = String(diff.getUTCSeconds()).padStart(2, '0');
+        document.getElementById("recordingTimer").innerText = `${h}:${m}:${s}`;
+      }
+
+      function handleSessionToggle() {
+        const btn = document.getElementById("sessionBtn");
+        const recIndicator = document.getElementById("recIndicator");
+        if (!isRecording) {
+          if (!mediaStream) {
+            alert("Please turn on the camera first.");
+            return;
+          }
+          recordedChunks = [];
+          // Video-only recording
+          const options = MediaRecorder.isTypeSupported('video/webm;codecs=vp8') 
+              ? { mimeType: 'video/webm;codecs=vp8' } 
+              : {};
+          
+          mediaRecorder = new MediaRecorder(mediaStream, options);
+          mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) recordedChunks.push(event.data);
+          };
+          mediaRecorder.start(1000);
+          isRecording = true;
+          btn.innerHTML = '<i class="fas fa-stop-circle mr-2"></i> End Session';
+          btn.classList.remove("bg-cyan-600");
+          btn.classList.add("bg-red-600");
+          if (recIndicator) recIndicator.classList.remove("hidden");
+          startTime = new Date();
+          timerInterval = setInterval(updateTimer, 1000);
+          updateStatusUI('live', 'Recording Active');
+        } else {
+          mediaRecorder.stop();
+          if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream = null;
+          }
+          clearInterval(timerInterval);
+          openSaveModal();
+        }
+      }
+
+      function openSaveModal() {
+        const m = document.getElementById("saveModal");
+        m.classList.remove("hidden");
+        setTimeout(() => {
+          m.classList.remove("opacity-0");
+          m.querySelector("div").classList.remove("scale-95");
+          m.querySelector("div").classList.add("scale-100");
+        }, 10);
+      }
+
+      function closeSaveModal() {
+        const m = document.getElementById("saveModal");
+        m.classList.add("opacity-0");
+        m.querySelector("div").classList.add("scale-95");
+        setTimeout(() => m.classList.add("hidden"), 300);
+      }
+
+      async function saveData() {
+        const subjectId = document.getElementById('subjectIdInput').value || "Unknown_Subject";
+        const filename = `facial_${subjectId}_${new Date().getTime()}.webm`;
+        closeSaveModal();
+        try {
+          const blob = new Blob(recordedChunks, { type: 'video/webm' });
+          const reader = new FileReader();
+          reader.readAsDataURL(blob);
+          reader.onloadend = async () => {
+            const result = await eel.save_recording(filename, reader.result, 'facial')();
+            if (result.success) {
+                // Visualization
+                const video = document.getElementById("webcam");
+                video.srcObject = null;
+                video.src = result.filepath || `../uploads/${filename}`;
+                video.setAttribute('controls', 'true');
+                video.style.transform = "none";
+                const off = document.getElementById("camOffState");
+                const on = document.getElementById("camOnState");
+                off.classList.add("hidden");
+                on.classList.remove("hidden");
+                
+                document.getElementById('analyseBtn').classList.remove('hidden');
+                updateStatusUI('ready', 'Session Saved');
+            }
+            resetUIState();
+          };
+        } catch (e) { console.error(e); resetUIState(); }
+      }
+
+      function discardSession() {
+        if (confirm("Discard recording?")) {
+           closeSaveModal();
+           recordedChunks = [];
+           if (mediaStream) {
+             mediaStream.getTracks().forEach(track => track.stop());
+             mediaStream = null;
+           }
+           resetUIState();
+        }
+      }
+
+      function resetUIState() {
+        isRecording = false;
+        const btn = document.getElementById("sessionBtn");
+        btn.innerHTML = '<i class="fas fa-play mr-2"></i> Start Recording';
+        btn.classList.add("bg-cyan-600");
+        btn.classList.remove("bg-red-600");
+        document.getElementById("recordingTimer").innerText = "00:00:00";
+        if (timerInterval) clearInterval(timerInterval);
+        document.getElementById("recIndicator").classList.add("hidden");
+        cameraOn = (mediaStream !== null);
+      }
+
+      function finalizeAnalysis() {
+          // Simulation of analysis logic
+          alert("Analysis processing initiated...");
+      }
+
+      // --- UI Utilities ---
+      function updateStatusUI(status, label) {
+          const tag = document.getElementById('statusTag');
+          const dot = document.getElementById('statusDot');
+          if (!tag || !dot) return;
+          tag.innerText = label;
+          if (status === 'live') dot.className = "w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]";
+          else if (status === 'vault') dot.className = "w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_10px_rgba(0,219,255,0.5)]";
+          else dot.className = "w-2 h-2 bg-gray-500 rounded-full";
+      }
+
+      function toggleFullScreen() {
+        const container = document.querySelector(".video-container");
+        if (container) {
+            if (!document.fullscreenElement) container.requestFullscreen();
+            else document.exitFullscreen();
+        }
+      }
+
+      function resetConfigurations() {
+        const modules = ["toggleFace", "toggleEmotion", "toggleEyeMove", "toggleEyeJumps", "toggleMuscleTwitch", "toggleNasal", "toggleCheeks", "toggleJaw", "toggleMesh"];
+        modules.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.checked = (id === "toggleEmotion" || id === "toggleFace");
+        });
+      }
+
+      function openVaultSelection() {
+          VaultComponent.open((item) => {
+              if (item.type !== 'video') { alert("Please select a video file."); return; }
+              const video = document.getElementById("webcam");
+              if (mediaStream) { mediaStream.getTracks().forEach(track => track.stop()); mediaStream = null; }
+              video.srcObject = null;
+              video.src = item.filepath;
+              video.setAttribute('controls', 'true');
+              video.style.transform = "none";
+              document.querySelector("h1").innerHTML = item.filename + ' <span class="text-cyan-400 font-normal">| VAULT SCAN</span>';
+              updateStatusUI('vault', 'Vault Analysis');
+              cameraOn = true;
+              document.getElementById("camOffState").classList.add("hidden");
+              document.getElementById("camOnState").classList.remove("hidden");
+              document.getElementById("camOnState").classList.add("flex");
+              video.play();
+          });
+      }
+
+      // --- Data Simulation Loop ---
       setInterval(() => {
-        if (!cameraOn) return;
-
-        // Radar
-        radarChart.data.datasets[0].data = radarChart.data.datasets[0].data.map(
-          (val) => {
+        if (!cameraOn || !radarChart) return;
+        radarChart.data.datasets[0].data = radarChart.data.datasets[0].data.map(val => {
             const shift = (Math.random() - 0.5) * 5;
             return Math.max(0, Math.min(100, val + shift));
-          },
-        );
+        });
         radarChart.update("none");
 
-        // Progress Bars
         const updateBar = (id, valId) => {
-          const newVal = Math.floor(Math.random() * 80) + 10;
-          document.getElementById(id).style.width = newVal + "%";
-          document.getElementById(valId).innerText = newVal + "%";
+          const el = document.getElementById(id);
+          const valEl = document.getElementById(valId);
+          if (el && valEl) {
+            const newVal = Math.floor(Math.random() * 80) + 10;
+            el.style.width = newVal + "%";
+            valEl.innerText = newVal + "%";
+          }
         };
-
         updateBar("barLip", "valLip");
         updateBar("barBrow", "valBrow");
         updateBar("barPupil", "valPupil");
         updateBar("barNose", "valNose");
       }, 800);
-    </script>
-    <script>
-      const body = document.body;
-
-      function toggleSidebar() {
-        body.classList.toggle("sidebar-collapsed");
-        localStorage.setItem(
-          "sidebarCollapsed",
-          body.classList.contains("sidebar-collapsed"),
-        );
-      }
-
-      // Theme Toggle Logic
-      const themeToggle = document.getElementById("theme-toggle");
-      const themeIcon = themeToggle.querySelector("i");
-
-      function toggleTheme() {
-        const isLight = body.classList.toggle("light-mode");
-        localStorage.setItem("theme", isLight ? "light" : "dark");
-        updateThemeUI(isLight);
-        updateChartsTheme(isLight);
-      }
-
-      function updateChartsTheme(isLight) {
-        const gridColor = isLight
-          ? "rgba(0, 0, 0, 0.12)"
-          : "rgba(255, 255, 255, 0.05)";
-        const labelColor = isLight ? "#27374d" : "#64748b";
-
-        radarChart.options.scales.r.angleLines.color = gridColor;
-        radarChart.options.scales.r.grid.color = gridColor;
-        radarChart.options.scales.r.pointLabels.color = labelColor;
-
-        radarChart.data.datasets[1].borderColor = isLight
-          ? "rgba(0, 0, 0, 0.1)"
-          : "rgba(255, 255, 255, 0.2)";
-        radarChart.data.datasets[1].backgroundColor = isLight
-          ? "rgba(0, 0, 0, 0.02)"
-          : "rgba(255, 255, 255, 0.05)";
-
-        radarChart.update();
-      }
-
-      function updateThemeUI(isLight) {
-        themeIcon.className = isLight ? "fas fa-sun" : "fas fa-moon";
-        themeToggle.classList.toggle("bg-gray-200", isLight);
-        themeToggle.classList.toggle("text-gray-900", isLight);
-        themeToggle.classList.toggle("border-gray-300", isLight);
-      }
-
-      themeToggle.addEventListener("click", toggleTheme);
 
       // Initial Load
       document.addEventListener("DOMContentLoaded", async () => {
         // Check session
-        const user = await eel.get_current_user()();
+        const result = await eel.get_current_user()();
+        const user = (result.success && result.data) ? result.data : null;
+        
         if (!user) {
           window.location.href = 'login.html';
           return;
         }
-
-        // Update Member Name and Title
         const activeMember = document.querySelector('.active-member-info span.ml-1');
         const pageTitle = document.querySelector('h1');
-        if (activeMember) {
-          activeMember.textContent = `${user.firstName} ${user.lastName} • Unit #${user.username.toUpperCase()}`;
-        }
-        if (pageTitle) {
-          pageTitle.textContent = `${user.firstName} ${user.lastName}`;
-        }
+        if (activeMember) activeMember.textContent = `${user.firstName} ${user.lastName} • Unit #${user.username.toUpperCase()}`;
+        if (pageTitle) pageTitle.textContent = `${user.firstName} ${user.lastName}`;
 
-        // Populate device sources
         populateDevices();
 
-        if (localStorage.getItem("sidebarCollapsed") === "true") {
-          body.classList.add("sidebar-collapsed");
-        }
-        if (
-          localStorage.getItem("theme") === "light" ||
-          (!localStorage.getItem("theme") &&
-            body.classList.contains("light-mode"))
-        ) {
-          body.classList.add("light-mode");
-          updateThemeUI(true);
-          updateChartsTheme(true);
-        } else {
-          updateThemeUI(false);
-          updateChartsTheme(false);
-        }
+        // Update Theme UI state (icons, buttons, charts)
+        const isLight = body.classList.contains('light-mode');
+        updateThemeUI(isLight);
+        updateChartsTheme(isLight);
       });
 
       async function logout() {
-          if(confirm("Are you sure you want to logout?")) {
-              await eel.logout()();
-              window.location.href = 'login.html';
-          }
+          if(confirm("Are you sure?")) { await eel.logout()(); window.location.href = 'login.html'; }
       }
       window.closeApp = logout;
     </script>

@@ -6,6 +6,7 @@
     <title>Deceptron - Settings</title>
     <link rel="stylesheet" href="../styles/output.css">
     <link rel="stylesheet" href="../vendor/font-awesome/css/all.min.css">
+    <link rel="stylesheet" href="../styles/sidebar.css">
     <style>
         :root {
             --primary-blue: #0076D6;
@@ -157,138 +158,21 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
-        .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: rgba(10, 17, 32, 0.98);
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
-            position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-            backdrop-filter: blur(20px);
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .sidebar::-webkit-scrollbar { display: none; }
-
         .main-content {
-            margin-left: var(--sidebar-width);
-            height: 100vh;
-            overflow-y: auto;
-            overflow-x: hidden;
             padding: 2rem;
-            max-width: 100%;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 0.6rem 1.5rem;
-            color: #94a3b8;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border-left: 3px solid transparent;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            color: var(--accent-cyan);
-            background: rgba(0, 219, 255, 0.05);
-            border-left-color: var(--accent-cyan);
-        }
-
-        .nav-item i { width: 24px; font-size: 1rem; margin-right: 1rem; }
-
-        /* Sidebar Transition Logic */
-        .sidebar {
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .main-content {
-            transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body.sidebar-collapsed .sidebar {
-            transform: translateX(-100%);
-        }
-
-        body.sidebar-collapsed .main-content {
-            margin-left: 0;
-            padding-left: 4.5rem;
-        }
-
-        .collapse-btn {
-            position: absolute;
-            top: 1.25rem;
-            right: 0.5rem;
-            width: 26px;
-            height: 26px;
-            background: var(--accent-cyan);
-            color: #05080f;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 100;
-            box-shadow: 0 0 15px rgba(0, 219, 255, 0.4);
-            border: none;
-            transition: all 0.3s ease;
-        }
-
-        .glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px) saturate(180%);
-            border: 1px solid var(--border-subtle);
-            border-radius: 1.5rem;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border-subtle);
-            position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 50;
             display: flex;
             flex-direction: column;
-            backdrop-filter: blur(20px);
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
+            gap: 2rem;
         }
 
-        .collapse-btn:hover {
-            transform: scale(1.1);
-        }
-
-        #restore-sidebar {
-            position: fixed;
-            top: 1.5rem;
-            left: 1rem;
-            width: 38px;
-            height: 38px;
-            background: var(--accent-cyan);
-            color: #05080f;
-            border: none;
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 55;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(0, 219, 255, 0.4);
+        .setting-card {
+            background: rgba(16, 28, 45, 0.6);
+            backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body.sidebar-collapsed #restore-sidebar {
@@ -411,28 +295,6 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
 
-        .logo-section {
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 120px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        select option {
-            background-color: #161c2b;
-            color: white;
-        }
-
-        body.light-mode select {
-            background-color: #ffffff !important;
-            border-color: rgba(0, 219, 255, 0.4) !important;
-            color: #1e293b !important;
-        }
-
         body.light-mode select option {
             background-color: white;
             color: #1e293b;
@@ -443,7 +305,20 @@
     <!-- Sidebar Component Container -->
     <script type="text/javascript" src="/eel.js"></script>
     <script src="../js/sidebar.js"></script>
-    <script>initSidebar();</script>
+    <script>
+        // Anti-Flash Theme Optimization
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+            if (savedTheme === 'light' || (!savedTheme && prefersLight)) {
+                document.body.classList.add('light-mode');
+            }
+            if (localStorage.getItem('sidebarCollapsed') === 'true') {
+                document.body.classList.add('sidebar-collapsed');
+            }
+        })();
+        initSidebar();
+    </script>
 
     <main class="main-content">
         <header class="p-8 pb-4 flex justify-between items-center">
@@ -581,7 +456,7 @@
 
         // --- Theme Logic ---
         const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = themeToggle.querySelector('i');
+        const themeIcon = themeToggle ? themeToggle.querySelector('i') : null;
 
         function toggleTheme() {
             const isLight = body.classList.toggle('light-mode');
@@ -590,56 +465,59 @@
         }
 
         function updateThemeUI(isLight) {
+            if (!themeIcon) return;
             themeIcon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
-            themeToggle.classList.toggle('bg-gray-200', isLight);
-            themeToggle.classList.toggle('text-gray-900', isLight);
-            themeToggle.classList.toggle('border-gray-300', isLight);
+            if (themeToggle) {
+                themeToggle.classList.toggle('bg-gray-200', isLight);
+                themeToggle.classList.toggle('text-gray-900', isLight);
+                themeToggle.classList.toggle('border-gray-300', isLight);
+            }
         }
 
-        themeToggle.addEventListener('click', toggleTheme);
+        if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
 
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', async () => {
-            // Restore UI State
-            if (localStorage.getItem('sidebarCollapsed') === 'true') {
-                body.classList.add('sidebar-collapsed');
-            }
-            if (localStorage.getItem('theme') === 'light' || (!localStorage.getItem('theme') && body.classList.contains('light-mode'))) {
-                body.classList.add('light-mode');
-                updateThemeUI(true);
-            } else {
-                updateThemeUI(false);
-            }
+            // Check session
+            try {
+                const result = await eel.get_current_user()();
+                const user = (result.success && result.data) ? result.data : null;
+                
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // Update Name
+                const activeMember = document.querySelector('.active-member-info span.ml-1');
+                if (activeMember) activeMember.textContent = `${user.firstName} ${user.lastName} • Unit #${user.username.toUpperCase()}`;
+            } catch (err) { console.error("Session check failed:", err); }
 
-
+            // Update Theme UI state (icons, buttons)
+            updateThemeUI(body.classList.contains('light-mode'));
 
             // Initialize Sliders
             setupSliders();
-            
-            // Load saved slider values from localStorage
             loadSliderValues();
-
-            // Attach Logout Handler
             setupLogoutHandler();
         
-            // --- Camera & Settings Logic ---
-            const camSelect = document.getElementById('camSelect');
+            // Populate Devices
+            await populateCameras(); 
+            await loadSavedPreferences();
+        });
 
-            // Populate Devices (Camera & Mic)
+        // --- Camera & Settings Logic ---
+        async function populateCameras() {
+            const camSelect = document.getElementById('camSelect');
+            if (!camSelect) return;
             try {
                 if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
                     camSelect.innerHTML = '<option value="">Searching...</option>';
                     return;
                 }
-
                 const devices = await navigator.mediaDevices.enumerateDevices();
-                
-                // Clear existing
                 camSelect.innerHTML = '';
-                
                 const videoDevices = devices.filter(d => d.kind === 'videoinput');
-
-                // Populate Cameras
                 if (videoDevices.length > 0) {
                     videoDevices.forEach((device, index) => {
                         const option = document.createElement('option');
@@ -648,66 +526,42 @@
                         camSelect.appendChild(option);
                     });
                 } else {
-                    const option = document.createElement('option');
-                    option.text = "No Camera Detected";
-                    camSelect.appendChild(option);
+                    camSelect.innerHTML = '<option value="">No Camera Detected</option>';
                 }
-
-                // Load saved preferences
-                await loadSavedPreferences();
             } catch (err) {
                 console.error("Error enumerating devices:", err);
-                camSelect.innerHTML = '<option>Access Denied</option>';
             }
-        });
+        }
 
         async function loadSavedPreferences() {
             try {
                 const result = await eel.load_preferences()();
                 if (result.success && result.preferences) {
                     const prefs = result.preferences;
-                    
-                    // Load Camera
-                    if (prefs.default_camera) {
-                        document.getElementById('camSelect').value = prefs.default_camera;
-                    }
-
-                    
-                    // Load Sliders
+                    if (prefs.default_camera) document.getElementById('camSelect').value = prefs.default_camera;
                     if (prefs.brightness) document.getElementById('brightnessSlider').value = prefs.brightness;
                     if (prefs.contrast) document.getElementById('contrastSlider').value = prefs.contrast;
                     if (prefs.saturation) document.getElementById('saturationSlider').value = prefs.saturation;
-
-                    // Load Toggles
                     if (prefs.mirror_camera !== undefined) document.getElementById('mirrorToggle').checked = prefs.mirror_camera;
                     if (prefs.grid_overlay !== undefined) document.getElementById('gridToggle').checked = prefs.grid_overlay;
                     
-                    // Update Text Labels
                     document.querySelectorAll('.range-slider').forEach(s => {
                         const display = s.previousElementSibling.querySelector('.text-cyan-400');
                         if(display) display.innerText = s.value + '%';
                     });
-                    
-                    // Apply visual filter
                     applySettings();
                 }
-            } catch (e) {
-                console.error("Failed to load preferences:", e);
-            }
+            } catch (e) { console.error("Failed to load preferences:", e); }
         }
 
         async function saveCameraConfiguration(btn) {
              const camId = document.getElementById('camSelect').value;
-
-             
-             // Get visual settings
              const brightness = document.getElementById('brightnessSlider').value;
              const contrast = document.getElementById('contrastSlider').value;
              const saturation = document.getElementById('saturationSlider').value;
              const mirror = document.getElementById('mirrorToggle').checked;
              const grid = document.getElementById('gridToggle').checked;
              
-             // Visual feedback
              const originalText = btn.innerText;
              btn.innerText = "SAVING...";
              btn.disabled = true;
@@ -722,30 +576,16 @@
                      'grid_overlay': grid
                  };
                  const result = await eel.save_preferences(prefs)();
-                 
                  if (result && result.success) {
                      btn.innerText = "SAVED!";
                      btn.classList.add('bg-emerald-500', 'text-black', 'border-emerald-500');
-                     btn.classList.remove('bg-cyan-500/10', 'text-cyan-400');
-                     
                      setTimeout(() => {
                          btn.innerText = originalText;
                          btn.classList.remove('bg-emerald-500', 'text-black', 'border-emerald-500');
-                         btn.classList.add('bg-cyan-500/10', 'text-cyan-400');
                          btn.disabled = false;
                      }, 2000);
-                 } else {
-                     throw new Error(result ? result.message : "Unknown backend error");
                  }
-             } catch (e) {
-                 console.error("Failed to save preferences:", e);
-                 btn.innerText = "ERROR";
-                 alert("Failed to save: " + e.message); // Show error to user
-                 setTimeout(() => {
-                    btn.innerText = originalText;
-                    btn.disabled = false;
-                 }, 2000);
-             }
+             } catch (e) { console.error("Save error:", e); btn.innerText = "ERROR"; setTimeout(() => { btn.innerText = originalText; btn.disabled = false; }, 2000); }
         }
 
         async function toggleCam() {
@@ -756,66 +596,39 @@
             const select = document.getElementById('camSelect');
 
             if (!mediaStream) {
-                // Turn On
                 try {
                     const deviceId = select.value;
-                    const constraints = {
-                        video: {
-                            deviceId: deviceId ? { exact: deviceId } : undefined,
-                            width: { ideal: 1280 },
-                            height: { ideal: 720 }
-                        }
-                    };
-
-                    mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    mediaStream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: deviceId ? { exact: deviceId } : undefined, width: { ideal: 1280 }, height: { ideal: 720 } } });
                     video.srcObject = mediaStream;
                     videoTrack = mediaStream.getVideoTracks()[0];
-                    
-                    // Force display block and wait a moment for video to be ready
                     video.style.display = 'block';
                     camOff.classList.add('hidden');
                     statusTag.classList.remove('hidden');
-                    
                     toggleBtn.innerHTML = '<i class="fas fa-video"></i>';
-                    toggleBtn.classList.remove('bg-rose-500/20', 'text-rose-500', 'border-rose-500/30');
-                    toggleBtn.classList.add('bg-emerald-500/20', 'text-emerald-500', 'border-emerald-500/30');
-
-                    // Apply current slider values immediately
+                    toggleBtn.classList.remove('bg-rose-500/20', 'text-rose-500');
+                    toggleBtn.classList.add('bg-emerald-500/20', 'text-emerald-500');
                     setTimeout(applySettings, 500);
-
-                } catch (err) {
-                    console.error("Error starting camera:", err);
-                }
+                } catch (err) { console.error("Camera error:", err); }
             } else {
-                // Turn Off
                 if(videoTrack) videoTrack.stop();
                 mediaStream = null;
                 videoTrack = null;
                 video.srcObject = null;
-
                 video.style.display = 'none';
                 camOff.classList.remove('hidden');
                 statusTag.classList.add('hidden');
-
                 toggleBtn.innerHTML = '<i class="fas fa-power-off"></i>';
-                toggleBtn.classList.add('bg-rose-500/20', 'text-rose-500', 'border-rose-500/30');
-                toggleBtn.classList.remove('bg-emerald-500/20', 'text-emerald-500', 'border-emerald-500/30');
+                toggleBtn.classList.add('bg-rose-500/20', 'text-rose-500');
+                toggleBtn.classList.remove('bg-emerald-500/20', 'text-emerald-500');
             }
         }
 
         function setupSliders() {
-            const sliders = document.querySelectorAll('.range-slider');
-            sliders.forEach(slider => {
-                // Use 'input' event for real-time updates while dragging
+            document.querySelectorAll('.range-slider').forEach(slider => {
                 slider.addEventListener('input', (e) => {
-                    // Update the value display next to slider
                     const display = e.target.previousElementSibling.querySelector('.text-cyan-400');
                     if(display) display.innerText = e.target.value + (e.target.dataset.unit || '%');
-                    
-                    // Save to localStorage
                     localStorage.setItem(e.target.id, e.target.value);
-                    
-                    // Apply to camera
                     applySettings();
                 });
             });
@@ -825,143 +638,69 @@
             const brightness = document.getElementById('brightnessSlider').value;
             const contrast = document.getElementById('contrastSlider').value;
             const saturation = document.getElementById('saturationSlider').value;
-            
             const video = document.getElementById('webcamPreview');
+            if(!video) return;
 
-            // 1. ALWAYS Apply CSS Filter (Visual Feedback)
-            // Mapping: 0-100 -> CSS 0.5 - 1.5 (centered at 50/1.0)
             const bVal = 0.5 + (brightness / 100);
             const cVal = 0.5 + (contrast / 100);
             const sVal = 0.5 + (saturation / 100);
-            
-            // Apply scaleX(-1) if you want mirroring in details, but user asked for "transformer scale issue" fix in other pages. 
-            // In settings, mirroring is usually standard for self-view.
-            // Mirror logic
             const mirror = document.getElementById('mirrorToggle').checked;
-            const transform = mirror ? 'scaleX(-1)' : 'scaleX(1)';
-
             video.style.filter = `brightness(${bVal}) contrast(${cVal}) saturate(${sVal})`;
-            video.style.transform = transform;
+            video.style.transform = mirror ? 'scaleX(-1)' : 'scaleX(1)';
             
-            // Grid Logic
-            // Check if grid exists
             let gridOverlay = document.getElementById('settingsGridOverlay');
             if(document.getElementById('gridToggle').checked) {
                 if(!gridOverlay) {
-                    // Create Grid
                     const parent = video.parentElement;
                     gridOverlay = document.createElement('div');
                     gridOverlay.id = 'settingsGridOverlay';
                     gridOverlay.className = "absolute inset-0 pointer-events-none z-10";
-                    gridOverlay.innerHTML = `
-                        <div class="w-full h-full grid grid-cols-3 grid-rows-3">
-                            <div class="border-r border-b border-white/20"></div>
-                            <div class="border-r border-b border-white/20"></div>
-                            <div class="border-b border-white/20"></div>
-                            <div class="border-r border-b border-white/20"></div>
-                            <div class="border-r border-b border-white/20"></div>
-                            <div class="border-b border-white/20"></div>
-                            <div class="border-r border-white/20"></div>
-                            <div class="border-r border-white/20"></div>
-                            <div></div>
-                        </div>
-                    `;
+                    gridOverlay.innerHTML = `<div class="w-full h-full grid grid-cols-3 grid-rows-3"><div class="border-r border-b border-white/20"></div><div class="border-r border-b border-white/20"></div><div class="border-b border-white/20"></div><div class="border-r border-b border-white/20"></div><div class="border-r border-b border-white/20"></div><div class="border-b border-white/20"></div><div class="border-r border-white/20"></div><div class="border-r border-white/20"></div><div></div></div>`;
                     parent.appendChild(gridOverlay);
                 }
                 gridOverlay.classList.remove('hidden');
-            } else {
-                if(gridOverlay) gridOverlay.classList.add('hidden');
-            }
+            } else if(gridOverlay) gridOverlay.classList.add('hidden');
 
-            // 2. Try Hardware Constraints (if stream exists)
             if (videoTrack) {
-                // Note: Constraints often require advanced capability check
-                const constraints = {
-                    advanced: [{
-                        brightness: parseInt(brightness), // Hardware often expects specific ranges
-                        contrast: parseInt(contrast),
-                        saturation: parseInt(saturation)
-                    }]
-                };
-
-                videoTrack.applyConstraints(constraints).catch(err => {
-                    // Ignore errors here, as we rely on CSS filter for the user experience
-                    // console.warn("Hardware constraints not supported:", err);
-                });
+                videoTrack.applyConstraints({ advanced: [{ brightness: parseInt(brightness), contrast: parseInt(contrast), saturation: parseInt(saturation) }] }).catch(err => {});
             }
         }
 
         function loadSliderValues() {
-            const brightness = localStorage.getItem('brightnessSlider') || '50';
-            const contrast = localStorage.getItem('contrastSlider') || '50';
-            const saturation = localStorage.getItem('saturationSlider') || '50';
-            
-            document.getElementById('brightnessSlider').value = brightness;
-            document.getElementById('contrastSlider').value = contrast;
-            document.getElementById('saturationSlider').value = saturation;
-            
-            // Update UI text
+            ['brightnessSlider', 'contrastSlider', 'saturationSlider'].forEach(id => {
+                const val = localStorage.getItem(id) || '50';
+                const el = document.getElementById(id);
+                if(el) el.value = val;
+            });
             document.querySelectorAll('.range-slider').forEach(s => {
-                const val = localStorage.getItem(s.id) || '50';
                 const display = s.previousElementSibling.querySelector('.text-cyan-400');
-                if(display) display.innerText = val + '%';
+                if(display) display.innerText = s.value + '%';
             });
         }
 
         function resetSettings() {
-            // Reset values to 50
-            document.getElementById('brightnessSlider').value = 50;
-            document.getElementById('contrastSlider').value = 50;
-            document.getElementById('saturationSlider').value = 50;
-            
-            // Clear localStorage
-            localStorage.removeItem('brightnessSlider');
-            localStorage.removeItem('contrastSlider');
-            document.getElementById('saturationSlider').value = 50;
+            ['brightnessSlider', 'contrastSlider', 'saturationSlider'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.value = 50;
+                localStorage.removeItem(id);
+            });
             document.getElementById('mirrorToggle').checked = false;
             document.getElementById('gridToggle').checked = false;
-            
-            // Clear localStorage
-            localStorage.removeItem('brightnessSlider');
-            localStorage.removeItem('contrastSlider');
-            localStorage.removeItem('saturationSlider');
-            // We removed other localStorage usages for sliders in setupSliders but good to keep clean
-            // Actually setupSliders still uses it. Correct.
-            
             localStorage.removeItem('mirrorToggle');
             localStorage.removeItem('gridToggle');
-            
-            // Update UI text
-            document.querySelectorAll('.range-slider').forEach(s => {
-                const display = s.previousElementSibling.querySelector('.text-cyan-400');
-                if(display) display.innerText = '50%';
-            });
-
+            loadSliderValues();
             applySettings();
-
-            // Clear backend preferences
             eel.save_preferences(null)();
         }
 
-        // --- Logout App Logic ---
         function setupLogoutHandler() {
-            const exitBtns = document.querySelectorAll('.nav-item span');
-            // Find the "Logout" button in nav
             document.querySelectorAll('.nav-item').forEach(item => {
-                if(item.innerText.includes('Logout')) {
-                   item.onclick = (e) => {
-                       e.preventDefault();
-                       e.stopPropagation();
-                       closeApp();
-                   }
-                }
+                if(item.innerText.includes('Logout')) item.onclick = (e) => { e.preventDefault(); closeApp(); }
             });
         }
 
         function closeApp() {
-            if(confirm("Are you sure you want to logout?")) {
-                window.location.href = 'login.html';
-            }
+            if(confirm("Are you sure you want to logout?")) window.location.href = 'login.html';
         }
     </script>
 </body>

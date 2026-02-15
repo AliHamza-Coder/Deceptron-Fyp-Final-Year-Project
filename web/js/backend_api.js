@@ -9,9 +9,13 @@
  */
 async function getAvailableCameras() {
     try {
-        const cameras = await eel.get_available_cameras()();
-        console.log('📷 Available cameras:', cameras);
-        return cameras;
+        const result = await eel.get_available_cameras()();
+        if (result.success) {
+            console.log('📷 Available cameras:', result.data);
+            return result.data;
+        }
+        console.error('❌ Error getting cameras:', result.message);
+        return [];
     } catch (error) {
         console.error('❌ Error getting cameras:', error);
         return [];
@@ -24,9 +28,13 @@ async function getAvailableCameras() {
  */
 async function getAvailableMicrophones() {
     try {
-        const mics = await eel.get_available_microphones()();
-        console.log('🎤 Available microphones:', mics);
-        return mics;
+        const result = await eel.get_available_microphones()();
+        if (result.success) {
+            console.log('🎤 Available microphones:', result.data);
+            return result.data;
+        }
+        console.error('❌ Error getting microphones:', result.message);
+        return [];
     } catch (error) {
         console.error('❌ Error getting microphones:', error);
         return [];

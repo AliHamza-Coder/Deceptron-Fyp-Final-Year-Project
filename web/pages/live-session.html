@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../styles/output.css" />
     <script src="../scripts/chart.min.js"></script>
     <link rel="stylesheet" href="../vendor/font-awesome/css/all.min.css" />
+    <link rel="stylesheet" href="../styles/sidebar.css" />
     <style>
       :root {
         --primary-blue: #0076d6;
@@ -144,40 +145,11 @@
         cursor: pointer !important;
       }
 
-      /* Sidebar Styles */
-      .sidebar {
-        width: var(--sidebar-width);
-        height: 100vh;
-        background: var(--sidebar-bg);
-        border-right: 1px solid var(--border-subtle);
-        position: fixed;
-        left: 0;
-        top: 0;
-        z-index: 50;
-        overflow-y: auto;
-        overflow-x: hidden;
-        backdrop-filter: blur(20px);
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-        transition:
-          transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-          background 0.3s ease;
-      }
-
-      .sidebar::-webkit-scrollbar {
-        display: none;
-      } /* Chrome, Safari, Opera */
-
       .main-content {
-        margin-left: var(--sidebar-width);
-        height: 100vh;
-        overflow-y: auto;
-        overflow-x: hidden;
         padding: 1.5rem;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
-        max-width: 100%;
       }
 
       /* Shared UI Elements */
@@ -267,92 +239,11 @@
         transform: translateY(-2px);
       }
 
-      .nav-item {
-        display: flex;
-        align-items: center;
-        padding: 0.6rem 1.5rem;
-        color: #94a3b8;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        border-left: 3px solid transparent;
-      }
-
-      .nav-item:hover,
-      .nav-item.active {
-        color: var(--accent-cyan);
-        background: rgba(0, 219, 255, 0.05);
-        border-left-color: var(--accent-cyan);
-      }
-
-      .nav-item i {
-        width: 24px;
-        font-size: 1rem;
-        margin-right: 1rem;
-      }
-
-      /* Sidebar Transition Logic */
-      .sidebar {
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .main-content {
-        transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      body.sidebar-collapsed .sidebar {
-        transform: translateX(-100%);
-      }
-
-      body.sidebar-collapsed .main-content {
-        margin-left: 0;
-        padding-left: 4.5rem;
-      }
-
-      .collapse-btn {
-        position: absolute;
-        top: 1.25rem;
-        right: 0.5rem;
-        width: 26px;
-        height: 26px;
-        background: var(--accent-cyan);
-        color: #05080f;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 100;
-        box-shadow: 0 0 15px rgba(0, 219, 255, 0.4);
-        border: none;
-        transition: all 0.3s ease;
-      }
-
-      .collapse-btn:hover {
-        transform: scale(1.1);
-      }
-
-      #restore-sidebar {
-        position: fixed;
-        top: 1.5rem;
-        left: 1rem;
-        width: 38px;
-        height: 38px;
-        background: var(--accent-cyan);
-        color: #05080f;
-        border: none;
-        border-radius: 50%;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 55;
-        transition: all 0.3s ease;
-        box-shadow: 0 0 20px rgba(0, 219, 255, 0.4);
-      }
-
       body.sidebar-collapsed #restore-sidebar {
         display: flex;
       }
+
+      /* Video Area */
 
       /* Video Area */
       .video-container {
@@ -505,17 +396,6 @@
         background: rgba(255, 255, 255, 0.2);
       }
 
-      .logo-section {
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 120px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
       .logo-section img {
         width: 100%;
         height: 100%;
@@ -632,7 +512,20 @@
     <!-- Sidebar Component Container -->
     <script src="../js/sidebar.js"></script>
     <script src="../js/vault-component.js"></script>
-    <script>initSidebar();</script>
+    <script>
+      // Anti-Flash Theme Optimization
+      (function() {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        if (savedTheme === 'light' || (!savedTheme && prefersLight)) {
+          document.body.classList.add('light-mode');
+        }
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+          document.body.classList.add('sidebar-collapsed');
+        }
+      })();
+      initSidebar();
+    </script>
 
 
     <!-- Main Content -->
@@ -714,7 +607,12 @@
                 id="webcam"
                 class="absolute inset-0 w-full h-full object-cover"
                 style="transform: scaleX(-1);"
+                muted
               ></video>
+              <!-- Hidden canvas for recording capture (un-mirrored) -->
+              <canvas id="recordCanvas" class="hidden"></canvas>
+              <!-- Hidden canvas for recording capture (optional for future mirroring needs) -->
+              <canvas id="recordCanvas" class="hidden"></canvas>
               <!-- Canvas overlay for emotion detection drawing -->
               <canvas id="emotionCanvas" class="absolute inset-0 w-full h-full pointer-events-none" style="transform: scaleX(-1);"></canvas>
             </div>
@@ -752,9 +650,21 @@
               <button class="btn-action" id="camBtn" onclick="toggleCamera()">
                 <i class="fas fa-camera"></i>
               </button>
+              <!-- Pause Button -->
+              <button id="pauseBtn" class="w-10 h-10 rounded-xl flex items-center justify-center text-amber-500 hover:text-white hover:bg-amber-500 transition-all border border-amber-500/20 hidden" onclick="togglePause()">
+                <i class="fas fa-pause"></i>
+              </button>
+              
               <div class="h-8 w-[1px] bg-white/10 mx-2"></div>
-              <div class="text-xl font-mono text-white/80 tabular-nums">
-                00:15:22
+              
+              <!-- REC Indicator (Moved to Front) -->
+              <div id="recIndicator" class="flex items-center bg-rose-500/10 border border-rose-500/20 px-2 py-1 rounded-md hidden mr-2">
+                <span class="w-2 h-2 bg-rose-600 rounded-full animate-pulse mr-1.5"></span>
+                <span class="text-[9px] font-bold text-rose-500 uppercase tracking-tighter">REC</span>
+              </div>
+
+              <div class="text-xl font-mono text-white/80 tabular-nums" id="recordingTimer">
+                00:00:00
               </div>
             </div>
             <div class="flex items-center space-x-4">
@@ -764,6 +674,13 @@
                 onclick="handleSessionToggle()"
               >
                 <i class="fas fa-play mr-2"></i> Start Recording
+              </button>
+              <button
+                id="analyseBtn"
+                class="px-8 py-3 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase rounded-xl transition-all shadow-lg shadow-purple-500/20 hidden"
+                onclick="finalizeAnalysis()"
+              >
+                <i class="fas fa-brain mr-2"></i> Analyse
               </button>
             </div>
           </div>
@@ -1117,7 +1034,7 @@
     <!-- Modal remains the same but with better colors -->
     <div
       id="saveModal"
-      class="fixed inset-0 bg-black/90 backdrop-blur-md z-[100] hidden flex items-center justify-center opacity-0 transition-all duration-300"
+      class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[999] hidden flex items-center justify-center opacity-0 transition-all duration-300"
     >
       <div
         class="bg-[#0b121f] border border-white/10 p-10 rounded-3xl w-full max-w-lg transform scale-95 transition-all duration-300 shadow-2xl"
@@ -1362,11 +1279,28 @@
             const cameraId = cameraSelect.value;
             const micId = micSelect.value;
             const constraints = {
-              video: cameraId ? { deviceId: { ideal: cameraId } } : true,
-              audio: micId ? { deviceId: { ideal: micId } } : true
+              video: cameraId ? { deviceId: { exact: cameraId } } : true,
+              audio: (micId && micId.trim()) ? { deviceId: { exact: micId } } : true
             };
             
             mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+            
+            // FIX: Ensure audio track exists - if mic failed, try to get audio separately
+            const audioTracks = mediaStream.getAudioTracks();
+            if (audioTracks.length === 0 && micId) {
+              console.warn("⚠️ Audio track missing with selected mic, trying default...");
+              try {
+                const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                audioStream.getAudioTracks().forEach(track => mediaStream.addTrack(track));
+                console.log("✅ Audio track added successfully");
+              } catch (e) {
+                console.warn("⚠️ Could not get audio:", e);
+              }
+            }
+            
+            // Debug: Log track info
+            console.log("📹 Stream tracks - Video:", mediaStream.getVideoTracks().length, ", Audio:", mediaStream.getAudioTracks().length);
+            
             videoElement.srcObject = mediaStream;
             videoElement.src = ""; // Clear vault source
             videoElement.play();
@@ -1567,15 +1501,77 @@
       }
 
       let isRecording = false;
+      let mediaRecorder;
+      let recordedChunks = [];
+      let startTime;
+      let timerInterval;
+
+      function updateTimer() {
+        if (!startTime) return;
+        const now = new Date();
+        const diff = new Date(now - startTime);
+        const h = String(diff.getUTCHours()).padStart(2, '0');
+        const m = String(diff.getUTCMinutes()).padStart(2, '0');
+        const s = String(diff.getUTCSeconds()).padStart(2, '0');
+        document.getElementById("recordingTimer").innerText = `${h}:${m}:${s}`;
+      }
 
       function handleSessionToggle() {
         const btn = document.getElementById("sessionBtn");
+        const pauseBtn = document.getElementById("pauseBtn");
+        const recIndicator = document.getElementById("recIndicator");
         if (!isRecording) {
+          // Check if camera is on
+          if (!mediaStream) {
+            alert("Please turn on the camera first.");
+            return;
+          }
+
+          // FIX: Check if audio track exists for recording
+          const streamAudioTracks = mediaStream.getAudioTracks();
+          if (streamAudioTracks.length === 0) {
+            alert("⚠️ No microphone detected! Please select a microphone and restart the camera.");
+            return;
+          }
+
           // Start Recording
+          recordedChunks = [];
+          
+          // Try to use a high-quality codec if available
+          // Try to use a high-quality codec if available
+          // Prefer WebM format, ensuring audio and video are packed together
+          const options = MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus') 
+              ? { mimeType: 'video/webm;codecs=vp8,opus' } 
+              : {};
+          
+          console.log("🎬 Starting recording with mimeType:", options.mimeType);
+          console.log("🎤 Recording with audio:", mediaStream.getAudioTracks().length > 0);
+          
+          // Fix orientation issue: Record the raw stream which is usually standard.
+          // If the user feels it's 'wrong', it's because they are used to the mirrored view.
+          // We capture the raw stream to ensure it's a standard viewer orientation.
+          mediaRecorder = new MediaRecorder(mediaStream, options);
+          
+          mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+              recordedChunks.push(event.data);
+            }
+          };
+          
+          mediaRecorder.start(1000); // Capture in 1s chunks
+          
           isRecording = true;
           btn.innerHTML = '<i class="fas fa-stop-circle mr-2"></i> End Session';
           btn.classList.remove("bg-cyan-600", "shadow-cyan-500/20");
           btn.classList.add("bg-red-600", "shadow-red-500/20");
+
+          // Show Pause and REC indicator
+          if (pauseBtn) pauseBtn.classList.remove("hidden");
+          if (recIndicator) recIndicator.classList.remove("hidden");
+
+          // Start Timer
+          startTime = new Date();
+          timerInterval = setInterval(updateTimer, 1000);
 
           // Show a small notification
           const toast = document.getElementById("videoToast");
@@ -1588,25 +1584,93 @@
           );
         } else {
           // End Session logic
+          mediaRecorder.stop();
+          if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream = null;
+          }
+          if (pauseBtn) pauseBtn.classList.add("hidden");
+          if (recIndicator) recIndicator.classList.add("hidden");
+          clearInterval(timerInterval);
           openSaveModal();
         }
       }
 
-      function saveData() {
-        closeSaveModal();
-        resetUIState();
+      function togglePause() {
+        const pauseBtn = document.getElementById('pauseBtn');
+        const recIndicator = document.getElementById('recIndicator');
+        
+        if (mediaRecorder.state === 'recording') {
+            mediaRecorder.pause();
+            pauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            pauseBtn.classList.add('bg-amber-500', 'text-white');
+            if (recIndicator) recIndicator.querySelector('span').classList.remove('animate-pulse');
+            clearInterval(timerInterval);
+        } else if (mediaRecorder.state === 'paused') {
+            mediaRecorder.resume();
+            pauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            pauseBtn.classList.remove('bg-amber-500', 'text-white');
+            if (recIndicator) recIndicator.querySelector('span').classList.add('animate-pulse');
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+      }
 
-        // Success Notification
+      async function saveData() {
+        const subjectId = document.querySelector('#saveModal input[placeholder="Enter name or ID..."]').value || "Unknown_Subject";
+        const filename = `session_${subjectId}_${new Date().getTime()}.webm`;
+        
+        closeSaveModal();
+        
+        // Show loading toast
         const toast = document.getElementById("videoToast");
-        toast.querySelector("div").innerText = "Session Saved & Secured";
-        toast.querySelector("div").className =
-          "px-6 py-2 bg-emerald-500 text-white text-[10px] font-bold uppercase rounded-full shadow-lg shadow-emerald-500/40";
+        toast.querySelector("div").innerText = "Saving Recording...";
         toast.classList.remove("opacity-0", "translate-y-4");
         toast.classList.add("opacity-1", "translate-y-0");
-        setTimeout(
-          () => toast.classList.add("opacity-0", "translate-y-4"),
-          2500,
-        );
+
+        try {
+          // Note: If video is mirrored in UI, we might want to mirror it in recording too?
+          // But standard behavior is to record raw stream.
+          const blob = new Blob(recordedChunks, { type: 'video/webm' });
+          const reader = new FileReader();
+          reader.readAsDataURL(blob);
+          reader.onloadend = async () => {
+            const base64data = reader.result;
+            const result = await eel.save_recording(filename, base64data, 'live')();
+            
+            if (result.success) {
+              toast.querySelector("div").innerText = "Session Saved & Secured";
+              toast.querySelector("div").className = "px-6 py-2 bg-emerald-500 text-white text-[10px] font-bold uppercase rounded-full shadow-lg shadow-emerald-500/40";
+              
+              // Load saved file into player
+              const video = document.getElementById("webcam");
+              video.srcObject = null;
+              video.src = result.filepath || `../uploads/${filename}`;
+              video.setAttribute('controls', 'true');
+              video.muted = false; // Unmute for playback
+              video.style.transform = "none";
+              
+              const off = document.getElementById("camOffState");
+              const on = document.getElementById("camOnState");
+              off.classList.add("hidden");
+              on.classList.remove("hidden");
+              
+              // Show Analyse button after save
+              const analyseBtn = document.getElementById("analyseBtn");
+              if (analyseBtn) analyseBtn.classList.remove("hidden");
+            } else {
+              toast.querySelector("div").innerText = "Save Failed: " + result.message;
+              toast.querySelector("div").className = "px-6 py-2 bg-red-500 text-white text-[10px] font-bold uppercase rounded-full shadow-lg shadow-red-500/40";
+            }
+            
+            setTimeout(() => toast.classList.add("opacity-0", "translate-y-4"), 2500);
+            resetUIState();
+          };
+        } catch (error) {
+          console.error("Save error:", error);
+          toast.querySelector("div").innerText = "Error saving file";
+          setTimeout(() => toast.classList.add("opacity-0", "translate-y-4"), 2500);
+          resetUIState();
+        }
       }
 
       function discardSession() {
@@ -1616,6 +1680,11 @@
           )
         ) {
           closeSaveModal();
+          recordedChunks = [];
+          if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream = null;
+          }
           resetUIState();
 
           // Discard Notification
@@ -1634,10 +1703,19 @@
 
       function resetUIState() {
         const btn = document.getElementById("sessionBtn");
+        const pauseBtn = document.getElementById("pauseBtn");
         isRecording = false;
         btn.innerHTML = '<i class="fas fa-play mr-2"></i> Start Recording';
         btn.classList.add("bg-cyan-600", "shadow-cyan-500/20");
         btn.classList.remove("bg-red-600", "shadow-red-500/20");
+        document.getElementById("recordingTimer").innerText = "00:00:00";
+        if (timerInterval) clearInterval(timerInterval);
+        document.getElementById("recIndicator").classList.add("hidden");
+        if (pauseBtn) {
+            pauseBtn.classList.add("hidden");
+            pauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            pauseBtn.classList.remove('bg-amber-500', 'text-white');
+        }
       }
     </script>
     <script>
@@ -1681,6 +1759,10 @@
           select.innerHTML = '';
           const videoDevices = devices.filter(d => d.kind === 'videoinput');
           videoDevices.forEach((device, index) => {
+            const label = (device.label || `Camera ${index + 1}`).toLowerCase();
+            // FILTER: Skip virtual devices
+            if (label.includes('virtual') || label.includes('fliflik')) return;
+
             const option = document.createElement('option');
             option.value = device.deviceId;
             option.text = device.label || `Camera ${index + 1}`;
@@ -1761,6 +1843,10 @@
           select.innerHTML = '';
           const audioDevices = devices.filter(d => d.kind === 'audioinput');
           audioDevices.forEach((device, index) => {
+            const label = (device.label || `Microphone ${index + 1}`).toLowerCase();
+            // FILTER: Skip virtual devices
+            if (label.includes('virtual') || label.includes('fliflik')) return;
+
             const option = document.createElement('option');
             option.value = device.deviceId;
             option.text = device.label || `Microphone ${index + 1}`;
@@ -1820,7 +1906,9 @@
       // Initial Load
       document.addEventListener("DOMContentLoaded", async () => {
         // Check session
-        const user = await eel.get_current_user()();
+        const result = await eel.get_current_user()();
+        const user = (result.success && result.data) ? result.data : null;
+        
         if (!user) {
           window.location.href = 'login.html';
           return;
@@ -1840,15 +1928,10 @@
         populateCameras();
         populateMicrophones();
 
-        if (localStorage.getItem("sidebarCollapsed") === "true") {
-          body.classList.add("sidebar-collapsed");
-        }
-        
+        // Update Theme UI state (icons, buttons, charts)
         const isLight = body.classList.contains('light-mode');
         updateThemeUI(isLight);
-        if (isLight) {
-          updateChartsTheme(true);
-        }
+        updateChartsTheme(isLight);
       });
         function closeApp() {
             if(confirm("Are you sure you want to logout?")) {

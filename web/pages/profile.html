@@ -6,6 +6,7 @@
     <title>Deceptron - Profile Management</title>
     <link rel="stylesheet" href="../styles/output.css">
     <link rel="stylesheet" href="../vendor/font-awesome/css/all.min.css">
+    <link rel="stylesheet" href="../styles/sidebar.css">
     <script type="text/javascript" src="/eel.js"></script>
     <style>
         :root {
@@ -75,48 +76,11 @@
 
         .heading-font { font-family: 'Orbitron', sans-serif; }
 
-        /* Sidebar Styles (Synced with Dashboard) */
-        .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border-subtle);
-            position: fixed;
-            left: 0; top: 0; z-index: 50;
-            display: flex; flex-direction: column;
-            backdrop-filter: blur(20px);
-            transition: transform 0.4s ease;
-        }
-
-        .nav-item {
-            display: flex; align-items: center;
-            padding: 0.8rem 1.5rem;
-            color: var(--text-dim);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border-left: 3px solid transparent;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            color: var(--accent-cyan);
-            background: rgba(0, 219, 255, 0.05);
-            border-left-color: var(--accent-cyan);
-        }
-
-        .nav-item i { width: 24px; margin-right: 1rem; text-align: center; }
-
-        .logo-section {
-            height: 120px; display: flex; align-items: center; justify-content: center;
-            padding: 1.5rem; border-bottom: 1px solid var(--border-subtle);
-        }
-
         .logo-section img { max-width: 100%; height: auto; filter: drop-shadow(0 0 10px rgba(0, 219, 255, 0.5)); }
 
         /* Main Content */
         .main-content {
-            margin-left: var(--sidebar-width);
             padding: 2.5rem;
-            transition: margin-left 0.4s ease;
         }
 
         /* Hero Section */
@@ -425,21 +389,6 @@
 
         .theme-btn:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); }
 
-        /* Sidebar collapsed responsiveness */
-        body.sidebar-collapsed .sidebar { transform: translateX(-100%); }
-        body.sidebar-collapsed .main-content { margin-left: 0; }
-
-        #restore-sidebar {
-            position: fixed; top: 1.5rem; left: 1rem;
-            width: 38px; height: 38px;
-            background: var(--neon-cyan); color: #05080f;
-            border-radius: 50%; display: none;
-            align-items: center; justify-content: center;
-            z-index: 55; box-shadow: 0 0 20px rgba(0, 219, 255, 0.4);
-        }
-
-        body.sidebar-collapsed #restore-sidebar { display: flex; }
-
         .collapse-btn {
             position: absolute; top: 1.25rem; right: 0.5rem;
             width: 26px; height: 26px;
@@ -452,7 +401,20 @@
 <body>
     <!-- Sidebar Component Container -->
     <script src="../js/sidebar.js"></script>
-    <script>initSidebar();</script>
+    <script>
+        // Anti-Flash Theme Optimization
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+            if (savedTheme === 'light' || (!savedTheme && prefersLight)) {
+                document.body.classList.add('light-mode');
+            }
+            if (localStorage.getItem('sidebarCollapsed') === 'true') {
+                document.body.classList.add('sidebar-collapsed');
+            }
+        })();
+        initSidebar();
+    </script>
 
     <main class="main-content">
         <header class="flex justify-between items-center mb-10">
@@ -611,11 +573,23 @@
             localStorage.setItem('sidebarCollapsed', body.classList.contains('sidebar-collapsed'));
         }
 
+        const themeToggle = document.getElementById("theme-toggle");
+        const themeIcon = themeToggle ? themeToggle.querySelector("i") : null;
+
         function toggleTheme() {
             const isLight = body.classList.toggle('light-mode');
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            const icon = document.querySelector('#theme-toggle i');
-            icon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+            updateThemeUI(isLight);
+        }
+
+        function updateThemeUI(isLight) {
+            if (!themeIcon) return;
+            themeIcon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+            if (themeToggle) {
+                themeToggle.classList.toggle("bg-gray-200", isLight);
+                themeToggle.classList.toggle("text-gray-900", isLight);
+                themeToggle.classList.toggle("border-gray-300", isLight);
+            }
         }
 
         function openModal() { document.getElementById('edit-modal').style.display = 'flex'; }
@@ -741,17 +715,14 @@
 
         // Initial Load
         document.addEventListener('DOMContentLoaded', async () => {
-            if (localStorage.getItem('sidebarCollapsed') === 'true') body.classList.add('sidebar-collapsed');
-            if (localStorage.getItem('theme') === 'light') {
-                body.classList.add('light-mode');
-                document.querySelector('#theme-toggle i').className = 'fas fa-sun';
-            }
+            // Update Theme UI state (icons, buttons)
+            updateThemeUI(body.classList.contains('light-mode'));
 
             // Fetch real user data immediately and update UI
             try {
-                const user = await eel.get_current_user()();
-                if (user) {
-                    updateProfileUI(user);
+                const result = await eel.get_current_user()();
+                if (result.success && result.data) {
+                    updateProfileUI(result.data);
                 } else {
                     // Redirect if no session
                     window.location.href = 'login.html';

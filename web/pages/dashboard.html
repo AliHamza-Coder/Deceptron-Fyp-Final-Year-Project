@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../styles/output.css">
     <script src="../scripts/chart.min.js"></script>
     <link rel="stylesheet" href="../vendor/font-awesome/css/all.min.css">
+    <link rel="stylesheet" href="../styles/sidebar.css">
     <script type="text/javascript" src="/eel.js"></script>
     <style>
         :root {
@@ -120,129 +121,15 @@
             transform: translateY(-2px);
         }
 
-        .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border-subtle);
-            position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 50;
+        .main-content {
+            padding: 2.5rem;
             display: flex;
             flex-direction: column;
-            backdrop-filter: blur(20px);
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
-        }
-
-        .sidebar::-webkit-scrollbar { display: none; }
-
-        .main-content {
-            margin-left: var(--sidebar-width);
-            height: 100vh;
-            overflow-y: auto;
-            overflow-x: hidden;
-            background: var(--bg-main);
-            max-width: 100%;
-            transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 0.6rem 1.5rem;
-            color: var(--text-dim);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border-left: 3px solid transparent;
-        }
-
-        .nav-item:hover,
-        .nav-item.active {
-            color: var(--accent-cyan);
-            background: rgba(0, 219, 255, 0.05);
-            border-left-color: var(--accent-cyan);
-        }
-
-        body.light-mode .nav-item:hover,
-        body.light-mode .nav-item.active {
-            background: rgba(0, 118, 214, 0.06);
-            color: var(--primary-blue);
-            border-left-color: var(--primary-blue);
-        }
-
-        .nav-item i {
-            width: 24px;
-            font-size: 1rem;
-            margin-right: 1rem;
-        }
-
-        /* Sidebar Transition Logic */
-        .sidebar {
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .main-content {
-            transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body.sidebar-collapsed .sidebar {
-            transform: translateX(-100%);
-        }
-
-        body.sidebar-collapsed .main-content {
-            margin-left: 0;
-            padding-left: 4.5rem;
-        }
-
-        .collapse-btn {
-            position: absolute;
-            top: 1.25rem;
-            right: 0.5rem;
-            width: 26px;
-            height: 26px;
-            background: var(--accent-cyan);
-            color: #05080f;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 100;
-            box-shadow: 0 0 15px rgba(0, 219, 255, 0.4);
-            border: none;
-            transition: all 0.3s ease;
+            gap: 2.5rem;
         }
 
         .collapse-btn:hover {
             transform: scale(1.1);
-        }
-
-        #restore-sidebar {
-            position: fixed;
-            top: 1.5rem;
-            left: 1rem;
-            width: 38px;
-            height: 38px;
-            background: var(--accent-cyan);
-            color: #05080f;
-            border: none;
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 55;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(0, 219, 255, 0.4);
-        }
-
-        body.sidebar-collapsed #restore-sidebar {
-            display: flex;
         }
 
         .card {
@@ -286,7 +173,6 @@
             gap: 0.5rem;
             transition: all 0.3s ease;
         }
-
         .btn-action:hover {
             text-shadow: 0 0 10px rgba(0, 219, 255, 0.5);
         }
@@ -452,56 +338,27 @@
             color: #334155 !important;
         }
 
-        .logo-section {
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 120px;
-            border-bottom: 1px solid var(--border-subtle);
-        }
 
-        .logo-section img {
-            width: 100%;
-            height: 100%;
-            filter: drop-shadow(0 0 10px rgba(0, 219, 255, 0.5));
-        }
-
-        @media (max-width: 1024px) {
-            :root {
-                --sidebar-width: 80px;
-            }
-
-            .sidebar span,
-            .sidebar .logo-text,
-            .sidebar .nav-category {
-                display: none;
-            }
-
-            .nav-item {
-                justify-content: center;
-                padding: 1.25rem 0;
-            }
-
-            .nav-item i {
-                margin-right: 0;
-                font-size: 1.3rem;
-            }
-
-            .logo-section {
-                justify-content: center;
-                padding: 1.5rem 0 !important;
-            }
-        }
     </style>
 </head>
 
 <body>
     <!-- Sidebar Component Container -->
     <script src="../js/sidebar.js"></script>
-    <script>initSidebar();</script>
+    <script>
+        // Anti-Flash Theme Optimization
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+            if (savedTheme === 'light' || (!savedTheme && prefersLight)) {
+                document.body.classList.add('light-mode');
+            }
+            if (localStorage.getItem('sidebarCollapsed') === 'true') {
+                document.body.classList.add('sidebar-collapsed');
+            }
+        })();
+        initSidebar();
+    </script>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -812,34 +669,41 @@
         // Initial Load
         document.addEventListener('DOMContentLoaded', async () => {
             // Check session
-            const user = await eel.get_current_user()();
-            if (!user) {
+            try {
+                const result = await eel.get_current_user()();
+                const user = (result.success && result.data) ? result.data : null;
+                
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Update Header Name/Initials
+                const userInitials = document.querySelector('.w-8.h-8.rounded-xl');
+                if (userInitials) {
+                    const initials = (user.firstName[0] + user.lastName[0]).toUpperCase();
+                    userInitials.textContent = initials;
+                }
+            } catch (err) {
+                console.error("Auth check failed:", err);
+                // Optionally redirect to login or show an error message if the API call itself fails
                 window.location.href = 'login.html';
                 return;
             }
 
-            // Update Header Name/Initials
-            const userInitials = document.querySelector('.w-8.h-8.rounded-xl');
-            if (userInitials) {
-                const initials = (user.firstName[0] + user.lastName[0]).toUpperCase();
-                userInitials.textContent = initials;
-            }
-
-            if (localStorage.getItem('sidebarCollapsed') === 'true') {
-                body.classList.add('sidebar-collapsed');
-            }
-            if (localStorage.getItem('theme') === 'light' || (!localStorage.getItem('theme') && body.classList.contains('light-mode'))) {
-                body.classList.add('light-mode');
-                updateThemeUI(true);
-            } else {
-                updateThemeUI(false);
-            }
+            // Update Theme UI state (icons, buttons)
+            updateThemeUI(body.classList.contains('light-mode'));
         });
 
         async function logout() {
             if(confirm("Are you sure you want to logout?")) {
-                await eel.logout()();
-                window.location.href = 'login.html';
+                const result = await eel.logout()();
+                if (result.success) {
+                    window.location.href = 'login.html';
+                } else {
+                    console.error("Logout failed:", result.error);
+                    alert("Logout failed. Please try again.");
+                }
             }
         }
         window.closeApp = logout;

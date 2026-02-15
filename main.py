@@ -9,6 +9,20 @@ import os
 import base64
 import uuid
 import time
+from pathlib import Path
+
+# ========================================
+# PATH CONFIGURATION
+# ========================================
+# Resolve absolute paths relative to this script
+BASE_DIR = Path(__file__).resolve().parent
+WEB_DIR = BASE_DIR / "web"
+UPLOADS_DIR = WEB_DIR / "uploads"
+RECORDINGS_DIR = WEB_DIR / "recordings"
+
+# Ensure required directories exist
+UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+RECORDINGS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Import our custom modules
 from modules import device_functions
@@ -21,7 +35,7 @@ from modules import database
 # ========================================
 
 # Set web folder location
-eel.init('web')
+eel.init(str(WEB_DIR))
 
 print("\n" + "="*60)
 print("🚀 DECEPTRON - TRUTH VERIFICATION SYSTEM")
@@ -38,33 +52,6 @@ print("✅ All models loaded successfully!\n")
 # ========================================
 # EEL EXPOSED FUNCTIONS (callable from JavaScript)
 # ========================================
-
-@eel.expose
-def get_available_cameras():
-    """
-    Get list of all available cameras.
-    Called from JavaScript to populate camera dropdown.
-    
-    Returns:
-        list: List of camera dictionaries
-    """
-    print("🔍 Frontend requested camera list")
-    cameras = device_functions.find_all_cameras()
-    return cameras
-
-
-@eel.expose
-def get_available_microphones():
-    """
-    Get list of all available microphones.
-    Called from JavaScript to populate microphone dropdown.
-    
-    Returns:
-        list: List of microphone dictionaries
-    """
-    print("🔍 Frontend requested microphone list")
-    mics = device_functions.find_all_microphones()
-    return mics
 
 
 @eel.expose
@@ -189,32 +176,53 @@ def login(identity, password):
         print(f"✅ Login successful: {current_user['username']}")
     return result
 
+# Helper for consistent frontend responses
+def response(success=True, data=None, message=""):
+    return {
+        "success": success,
+        "data": data,
+        "message": message
+    }
+
 @eel.expose
 def logout():
-    """
-    Log out the current user.
-    """
+    """Log out the current user (standardized)"""
     global current_user
     if current_user:
         print(f"🚪 User logged out: {current_user['username']}")
     current_user = None
-    return {'success': True}
+    return response()
+
+@eel.expose
+def get_available_cameras():
+    """Get list of cameras (standardized)"""
+    try:
+        cameras = device_functions.find_all_cameras()
+        return response(data=cameras)
+    except Exception as e:
+        return response(success=False, message=str(e))
+
+@eel.expose
+def get_available_microphones():
+    """Get list of microphones (standardized)"""
+    try:
+        mics = device_functions.find_all_microphones()
+        return response(data=mics)
+    except Exception as e:
+        return response(success=False, message=str(e))
 
 @eel.expose
 def get_current_user():
-    """
-    Get the currently logged-in user information.
-    """
-    return current_user
+    """Get current user (standardized)"""
+    return response(data=current_user)
 
 @eel.expose
 def get_uploads():
-    """
-    Get all uploads for the currently logged-in user.
-    """
+    """Get user uploads (standardized)"""
     if not current_user:
-        return []
-    return database.get_user_uploads(current_user['username'])
+        return response(success=False, message="Not logged in")
+    data = database.get_user_uploads(current_user['username'])
+    return response(data=data)
 
 # Track active chunked uploads
 active_uploads = {}
@@ -230,28 +238,22 @@ def initiate_upload(filename, total_size, file_type):
             
         upload_id = str(uuid.uuid4())
         safe_filename = filename.replace(' ', '_')
-        
-        upload_dir = os.path.join('web', 'uploads')
-        if not os.path.exists(upload_dir):
-            os.makedirs(upload_dir)
-            
-        temp_path = os.path.join(upload_dir, f"temp_{upload_id}")
+        temp_path = UPLOADS_DIR / f"temp_{upload_id}"
         
         active_uploads[upload_id] = {
             'filename': safe_filename,
             'type': file_type,
-            'size_str': total_size, # This is the formatted string from frontend
+            'size_str': total_size,
             'temp_path': temp_path,
             'username': current_user['username']
         }
         
-        # Create/Clear temp file
         with open(temp_path, 'wb') as f:
             pass
             
-        return {'success': True, 'upload_id': upload_id}
+        return response(data={'upload_id': upload_id})
     except Exception as e:
-        return {'success': False, 'message': str(e)}
+        return response(success=False, message=str(e))
 
 @eel.expose
 def append_upload_chunk(upload_id, base64_data):
@@ -287,20 +289,19 @@ def finalize_upload(upload_id):
             return {'success': False, 'message': 'Upload session invalid'}
             
         info = active_uploads.pop(upload_id)
-        final_path = os.path.join('web', 'uploads', info['filename'])
+        final_path = UPLOADS_DIR / info['filename']
         
-        # Handle filename collisions if necessary (optional)
-        if os.path.exists(final_path):
+        if final_path.exists():
             base, ext = os.path.splitext(info['filename'])
-            final_path = os.path.join('web', 'uploads', f"{base}_{int(time.time())}{ext}")
-            info['filename'] = os.path.basename(final_path)
+            final_path = UPLOADS_DIR / f"{base}_{int(time.time())}{ext}"
+            info['filename'] = final_path.name
 
         os.rename(info['temp_path'], final_path)
         
         relative_path = f"../uploads/{info['filename']}"
         return database.add_upload(info['username'], info['filename'], info['type'], info['size_str'], relative_path)
     except Exception as e:
-        return {'success': False, 'message': str(e)}
+        return response(success=False, message=str(e))
 
 @eel.expose
 def add_upload_record(filename, file_type, file_size, base64_data):
@@ -313,17 +314,10 @@ def add_upload_record(filename, file_type, file_size, base64_data):
         
         # 1. Clean filename
         safe_filename = filename.replace(' ', '_')
+        file_path = UPLOADS_DIR / safe_filename
         
-        # 2. Save file physically to web/uploads/
-        upload_dir = os.path.join('web', 'uploads')
-        if not os.path.exists(upload_dir):
-            os.makedirs(upload_dir)
-            
-        file_path = os.path.join(upload_dir, safe_filename)
-        
-        # Decode base64 data
+        # 2. Save file physically
         try:
-            # Extract header if present (e.g., "data:audio/wav;base64,")
             if ',' in base64_data:
                 base64_data = base64_data.split(',')[1]
                 
@@ -334,15 +328,62 @@ def add_upload_record(filename, file_type, file_size, base64_data):
             print(f"📦 Physically saved: {file_path}")
         except Exception as e:
             print(f"❌ Error saving file physically: {e}")
-            return {'success': False, 'message': f'File saving failed: {str(e)}'}
+            return response(success=False, message=f'File saving failed: {str(e)}')
 
-        # 3. Add to database with the relative path for the frontend
+        # 3. Add to database
         relative_path = f"../uploads/{safe_filename}"
         return database.add_upload(current_user['username'], safe_filename, file_type, file_size, relative_path)
         
     except Exception as e:
         print(f"❌ General error in add_upload_record: {e}")
-        return {'success': False, 'message': str(e)}
+        return response(success=False, message=str(e))
+
+@eel.expose
+def save_recording(filename, base64_data, category):
+    """
+    Save a recorded session (video/audio) to the web/recordings directory.
+    """
+    try:
+        if not current_user:
+            return {'success': False, 'message': 'Not logged in'}
+        
+        # 1. Ensure recordings directory exists
+        rec_dir = os.path.join('web', 'recordings')
+        if not os.path.exists(rec_dir):
+            os.makedirs(rec_dir)
+            
+        # 2. Clean filename and ensure extension
+        safe_filename = filename.replace(' ', '_')
+        if not safe_filename.endswith('.webm'):
+            safe_filename += '.webm'
+            
+        file_path = RECORDINGS_DIR / safe_filename
+        
+        # 3. Decode and save
+        if ',' in base64_data:
+            base64_data = base64_data.split(',')[1]
+            
+        file_content = base64.b64decode(base64_data)
+        with open(file_path, 'wb') as f:
+            f.write(file_content)
+            
+        print(f"🎥 Recording saved: {file_path}")
+        
+        # 4. Add to database
+        size_mb = f"{len(file_content) / (1024*1024):.1f} MB"
+        relative_path = f"../recordings/{safe_filename}"
+        
+        return database.add_upload(
+            current_user['username'], 
+            safe_filename, 
+            'video' if category == 'live' else 'audio', 
+            size_mb, 
+            relative_path
+        )
+        
+    except Exception as e:
+        print(f"❌ Error saving recording: {e}")
+        return response(success=False, message=str(e))
 
 @eel.expose
 def delete_upload_record(upload_id):
@@ -360,25 +401,23 @@ def delete_upload_record(upload_id):
             # 2. Try to delete the physical file
             upload_data = result.get('data')
             if upload_data and 'filepath' in upload_data:
-                # Relative path is typically "../uploads/filename"
-                # We need the actual system path: web/uploads/filename
                 filename = os.path.basename(upload_data['filepath'])
-                file_path = os.path.join('web', 'uploads', filename)
+                file_path = UPLOADS_DIR / filename
                 
-                if os.path.exists(file_path):
+                if file_path.exists():
                     try:
-                        os.remove(file_path)
+                        file_path.unlink()
                         print(f"🗑️ Physically deleted: {file_path}")
                     except Exception as e:
                         print(f"⚠️ Failed to delete physical file: {e}")
             
-            return {'success': True}
+            return response()
         else:
             return result
             
     except Exception as e:
         print(f"❌ Error in delete_upload_record: {e}")
-        return {'success': False, 'message': str(e)}
+        return response(success=False, message=str(e))
 
 
 @eel.expose
