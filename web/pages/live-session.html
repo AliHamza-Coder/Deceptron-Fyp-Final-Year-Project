@@ -8,6 +8,7 @@
     <script src="/eel.js"></script>
     <link rel="stylesheet" href="../styles/output.css" />
     <script src="../scripts/chart.min.js"></script>
+    <script src="../js/loader.js"></script>
     <link rel="stylesheet" href="../vendor/font-awesome/css/all.min.css" />
     <link rel="stylesheet" href="../styles/sidebar.css" />
     <style>
@@ -1487,6 +1488,15 @@
         }
       }
 
+      function finalizeAnalysis() {
+          Loader.show("Processing Evidence");
+          // Simulation of analysis processing
+          setTimeout(() => {
+              Loader.hide();
+              // In live session, this usually ends the session or shows final results
+          }, 2500);
+      }
+
       function openSaveModal() {
         const m = document.getElementById("saveModal");
         m.classList.remove("hidden");
@@ -1840,13 +1850,13 @@
 
       async function populateMicrophones() {
         const select = document.getElementById('microphoneSelect');
+        select.innerHTML = '';
         try {
           if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
             select.innerHTML = '<option value="">Searching...</option>';
             return;
           }
           const devices = await navigator.mediaDevices.enumerateDevices();
-          select.innerHTML = '';
           const audioDevices = devices.filter(d => d.kind === 'audioinput');
           audioDevices.forEach((device, index) => {
             const label = (device.label || `Microphone ${index + 1}`).toLowerCase();
@@ -1867,11 +1877,12 @@
                      const exists = audioDevices.some(d => d.deviceId === result.preferences.default_mic);
                      if (exists) select.value = result.preferences.default_mic;
                 }
-             } catch (e) { }
+             } catch (e) { console.error("Pref load error:", e); }
           }
-          if (audioDevices.length === 0) select.innerHTML = '<option value="">No Mic Detected</option>';
+          if (select.options.length === 0) select.innerHTML = '<option value="">No Mic Detected</option>';
         } catch (err) {
           console.error("Error enumerating microphones:", err);
+          select.innerHTML = '<option value="">No Mic Detected</option>';
         }
       }
 
@@ -1909,7 +1920,11 @@
               const analyseBtn = document.getElementById("analyseBtn");
               if (analyseBtn) analyseBtn.classList.remove("hidden");
 
-              video.play();
+              Loader.show("Loading Evidence");
+              video.oncanplay = () => {
+                  Loader.hide();
+                  video.play();
+              };
           });
       }
 

@@ -494,6 +494,7 @@
     <!-- Sidebar Component Container -->
     <script src="../js/sidebar.js"></script>
     <script src="../js/vault-component.js"></script>
+    <script src="../js/loader.js"></script>
     <script>
         // Anti-Flash Theme Optimization
         (function () {
@@ -1088,7 +1089,12 @@
             if (isRecording) setTimeout(simulateRealTimeAnalysis, 200);
         }
 
-        function finalizeAnalysis() {
+        async function finalizeAnalysis() {
+            Loader.show("Acoustic Fingerprinting");
+            
+            // Simulation of analysis processing time
+            await new Promise(resolve => setTimeout(resolve, 2500));
+            
             // Updated Mock metrics
             document.getElementById('valF0').innerText = "224.5";
             document.getElementById('descF0').innerText = "High variation detected (Micro-Stress)";
@@ -1107,7 +1113,6 @@
             document.getElementById('valCertainty').innerText = "22%";
             document.getElementById('barCertainty').style.width = "22%";
 
-            // Update Deception
             // Update Deception Chart
             const deceptionPct = 82;
             document.getElementById('deceptionVal').innerText = deceptionPct + "%";
@@ -1133,6 +1138,7 @@
             `;
 
             document.getElementById('playBtn').disabled = false;
+            Loader.hide();
         }
 
         function openVaultSelection() {
@@ -1142,15 +1148,19 @@
                     return;
                 }
 
+                Loader.show("Syncing Acoustic Data");
+
                 document.getElementById('statusLabel').innerText = `Loaded from Vault: ${item.filename}`;
                 document.getElementById('statusLabel').classList.className = "text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400";
 
                 // Load physical file into WaveSurfer
-                // Note: items in DB have filepath starting with ../uploads/
                 wavesurfer.load(item.filepath);
 
-                // Simulate analysis flow
-                setTimeout(finalizeAnalysis, 1500);
+                wavesurfer.on('ready', () => {
+                    Loader.hide();
+                    // Simulate analysis flow
+                    finalizeAnalysis();
+                });
             });
         }
 
@@ -1311,6 +1321,19 @@
 
             // Update Theme UI state (icons, buttons)
             updateThemeUI(document.body.classList.contains('light-mode'));
+
+            // Check for file parameter in URL for seamless analysis
+            const urlParams = new URLSearchParams(window.location.search);
+            const autoFile = urlParams.get('file');
+            if (autoFile) {
+                Loader.show("Syncing Acoustic Data");
+                document.getElementById('statusLabel').innerText = `Evidence Loaded for Analysis`;
+                wavesurfer.load(autoFile);
+                wavesurfer.once('ready', () => {
+                    Loader.hide();
+                    finalizeAnalysis();
+                });
+            }
         });
 
         async function logout() {

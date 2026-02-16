@@ -13,6 +13,7 @@
     <script src="../scripts/wavesurfer.js"></script>
     <script src="../js/sidebar.js"></script>
     <script src="../js/vault-component.js"></script>
+    <script src="../js/loader.js"></script>
     <style>
       :root {
         --primary-blue: #0076d6;
@@ -819,7 +820,7 @@
           >
             <span class="status-dot"></span>
             Active Member:
-            <span class="ml-1 opacity-80">John Doe • Unit #DECEP-09</span>
+            <span class="ml-1 opacity-80">ALI HAMZA • Unit #ALI</span>
           </div>
         </div>
         <div class="flex items-center space-x-3">
@@ -1489,8 +1490,12 @@
       }
 
       function finalizeAnalysis() {
+          Loader.show("Analyzing Patterns");
           // Simulation of analysis logic
-          alert("Analysis processing initiated...");
+          setTimeout(() => {
+              Loader.hide();
+              showToast("Analysis Complete", "success");
+          }, 2500);
       }
 
       // --- UI Utilities ---
@@ -1523,6 +1528,9 @@
       function openVaultSelection() {
           VaultComponent.open((item) => {
               if (item.type !== 'video') { alert("Please select a video file."); return; }
+              
+              Loader.show("Loading Evidence");
+              
               const video = document.getElementById("webcam");
               if (mediaStream) { mediaStream.getTracks().forEach(track => track.stop()); mediaStream = null; }
               video.srcObject = null;
@@ -1540,7 +1548,10 @@
               const analyseBtn = document.getElementById("analyseBtn");
               if (analyseBtn) analyseBtn.classList.remove("hidden");
               
-              video.play();
+              video.oncanplay = () => {
+                  Loader.hide();
+                  video.play();
+              };
           });
       }
 
@@ -1581,14 +1592,41 @@
         const activeMember = document.querySelector('.active-member-info span.ml-1');
         const pageTitle = document.querySelector('h1');
         if (activeMember) activeMember.textContent = `${user.firstName} ${user.lastName} • Unit #${user.username.toUpperCase()}`;
-        if (pageTitle) pageTitle.textContent = `${user.firstName} ${user.lastName}`;
+        // Keep the title as "Facial Analysis Unit" as per user request
+
 
         populateDevices();
 
         // Update Theme UI state (icons, buttons, charts)
         const isLight = body.classList.contains('light-mode');
-        updateThemeUI(isLight);
+        // Update charts theme
         updateChartsTheme(isLight);
+
+        // Check for file parameter in URL for seamless analysis
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoFile = urlParams.get('file');
+        if (autoFile) {
+            Loader.show("Loading Evidence");
+            const video = document.getElementById("webcam");
+            if (mediaStream) { mediaStream.getTracks().forEach(track => track.stop()); mediaStream = null; }
+            video.srcObject = null;
+            video.src = autoFile;
+            video.setAttribute('controls', 'true');
+            video.style.transform = "none";
+            updateStatusUI('vault', 'Vault Analysis');
+            cameraOn = true;
+            document.getElementById("camOffState").classList.add("hidden");
+            document.getElementById("camOnState").classList.remove("hidden");
+            document.getElementById("camOnState").classList.add("flex");
+            
+            const analyseBtn = document.getElementById("analyseBtn");
+            if (analyseBtn) analyseBtn.classList.remove("hidden");
+            
+            video.oncanplay = () => {
+                Loader.hide();
+                video.play();
+            };
+        }
       });
 
       async function logout() {

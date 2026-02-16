@@ -245,11 +245,9 @@ def initiate_upload(filename, total_size, file_type):
             'type': file_type,
             'size_str': total_size,
             'temp_path': temp_path,
-            'username': current_user['username']
+            'username': current_user['username'],
+            'handle': open(temp_path, 'wb') # Open handle immediately for speed
         }
-        
-        with open(temp_path, 'wb') as f:
-            pass
             
         return response(data={'upload_id': upload_id})
     except Exception as e:
@@ -258,7 +256,7 @@ def initiate_upload(filename, total_size, file_type):
 @eel.expose
 def append_upload_chunk(upload_id, base64_data):
     """
-    Append a chunk of data to an active upload.
+    Append a chunk of data to an active upload using an open handle.
     """
     try:
         if upload_id not in active_uploads:
@@ -266,14 +264,14 @@ def append_upload_chunk(upload_id, base64_data):
             
         upload_info = active_uploads[upload_id]
         
-        # Decode base64 data
-        if ',' in base64_data:
-            base64_data = base64_data.split(',')[1]
+        # Faster decoding: only split if prefix is present
+        if base64_data.startswith('data:'):
+             base64_data = base64_data.split(',', 1)[1]
             
         file_content = base64.b64decode(base64_data)
         
-        with open(upload_info['temp_path'], 'ab') as f:
-            f.write(file_content)
+        # Use existing handle
+        upload_info['handle'].write(file_content)
             
         return {'success': True}
     except Exception as e:
@@ -282,13 +280,18 @@ def append_upload_chunk(upload_id, base64_data):
 @eel.expose
 def finalize_upload(upload_id):
     """
-    Complete the upload by renaming the temp file and adding a DB record.
+    Complete the upload by closing the handle, renaming, and adding a DB record.
     """
     try:
         if upload_id not in active_uploads:
             return {'success': False, 'message': 'Upload session invalid'}
             
         info = active_uploads.pop(upload_id)
+        
+        # Close handle before renaming
+        if 'handle' in info:
+            info['handle'].close()
+            
         final_path = UPLOADS_DIR / info['filename']
         
         if final_path.exists():
