@@ -210,18 +210,9 @@ def format_emotion_data(emotion, scores):
 # TEST CODE (runs when you execute this file directly)
 # ========================================
 
-if __name__ == "__main__":
-    print("\n" + "="*50)
-    print("EMOTION DETECTION TEST")
-    print("="*50 + "\n")
-    
-    # Load model
-    model = load_emotion_model()
-    
-    # Test with a sample image (you need a test image)
-    print("\n✅ Model loaded successfully!")
-    print("   To test emotion detection, provide a face image.")
-    
-    print("\n" + "="*50)
-    print("TEST COMPLETE")
-    print("="*50)
+# ========================================
+# TEST CODE (runs when you execute this file directly)
+# ========================================
+
+# No test code - purely for import
+pass

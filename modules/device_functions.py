@@ -44,20 +44,6 @@ def find_all_cameras():
     return available_cameras
 
 
-def test_camera(camera_id):
-    """
-    Test if a specific camera ID works.
-    
-    Parameters:
-        camera_id (int): The camera index to test
-    
-    Returns:
-        bool: True if camera works, False otherwise
-    """
-    camera = cv2.VideoCapture(camera_id, cv2.CAP_DSHOW)
-    is_working = camera.isOpened()
-    camera.release()
-    return is_working
 
 
 # ========================================
@@ -108,59 +94,9 @@ def find_all_microphones():
     return available_mics
 
 
-def get_device_info(device_id, device_type='camera'):
-    """
-    Get detailed information about a specific device.
-    
-    Parameters:
-        device_id (int): The device index
-        device_type (str): Either 'camera' or 'microphone'
-    
-    Returns:
-        dict: Device information or None if not found
-    """
-    if device_type == 'camera':
-        if test_camera(device_id):
-            return {'id': device_id, 'name': f'Camera {device_id}', 'type': 'camera'}
-        else:
-            return None
-    
-    elif device_type == 'microphone':
-        try:
-            audio = pyaudio.PyAudio()
-            device_info = audio.get_device_info_by_index(device_id)
-            audio.terminate()
-            
-            if device_info['maxInputChannels'] > 0:
-                return {
-                    'id': device_id,
-                    'name': device_info['name'],
-                    'type': 'microphone',
-                    'channels': device_info['maxInputChannels']
-                }
-        except:
-            return None
-    
-    return None
-
-
 # ========================================
 # TEST CODE (runs when you execute this file directly)
 # ========================================
 
-if __name__ == "__main__":
-    print("\n" + "="*50)
-    print("DEVICE DETECTION TEST")
-    print("="*50 + "\n")
-    
-    # Test camera detection
-    cameras = find_all_cameras()
-    print(f"\nCameras: {cameras}\n")
-    
-    # Test microphone detection
-    mics = find_all_microphones()
-    print(f"\nMicrophones: {mics}\n")
-    
-    print("="*50)
-    print("TEST COMPLETE")
-    print("="*50)
+# No test code - purely for import
+pass

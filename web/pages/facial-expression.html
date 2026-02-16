@@ -1629,10 +1629,7 @@
         }
       });
 
-      async function logout() {
-          if(confirm("Are you sure?")) { await eel.logout()(); window.location.href = 'login.html'; }
-      }
-      window.closeApp = logout;
+      // Logout logic is handled globally by sidebar.js
     </script>
   </body>
 </html>

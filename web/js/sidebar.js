@@ -121,6 +121,34 @@ function initSidebar() {
     document.body.insertAdjacentHTML('afterbegin', sidebarHTML);
 }
 
+/**
+ * Handle user logout globally
+ */
+async function logout() {
+    if(confirm("Are you sure you want to logout?")) {
+        try {
+            // Find logout button icon to add spinner
+            const logoutBtn = document.querySelector('.fa-sign-out-alt');
+            if(logoutBtn) {
+                logoutBtn.className = 'fas fa-spinner fa-spin';
+            }
+            
+            if (typeof eel !== 'undefined') {
+                const result = await eel.logout()();
+            }
+            
+            // Redirect regardless of backend result to ensure user isn't stuck
+            window.location.href = 'login.html';
+        } catch (error) {
+            console.error("Logout failed:", error);
+            window.location.href = 'login.html';
+        }
+    }
+}
+
+// Expose logout globally for sidebar button
+window.closeApp = logout;
+
 // Export for use in HTML pages
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { renderSidebar, initSidebar };

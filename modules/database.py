@@ -15,10 +15,15 @@ def signup_user(user_data):
     Register a new user in the database.
     """
     User = Query()
-    if users_table.search(User.email == user_data['email']):
-        return {'success': False, 'message': 'Email already registered'}
-    if users_table.search(User.username == user_data['username']):
-        return {'success': False, 'message': 'Username already taken'}
+    # Check for existing user with same email OR username in one query
+    result = users_table.search((User.email == user_data['email']) | (User.username == user_data['username']))
+    
+    if result:
+        existing = result[0]
+        if existing.get('email') == user_data['email']:
+             return {'success': False, 'message': 'Email already registered'}
+        if existing.get('username') == user_data['username']:
+             return {'success': False, 'message': 'Username already taken'}
     
     users_table.insert(user_data)
     return {'success': True, 'message': 'User registered successfully'}

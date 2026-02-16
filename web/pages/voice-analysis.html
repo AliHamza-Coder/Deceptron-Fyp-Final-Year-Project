@@ -1336,13 +1336,7 @@
             }
         });
 
-        async function logout() {
-            if (confirm("Are you sure you want to logout?")) {
-                await eel.logout()();
-                window.location.href = 'login.html';
-            }
-        }
-        window.closeApp = logout;
+        // Logout logic is handled globally by sidebar.js
     </script>
     <!-- Media Player Modal -->
     <div id="playerModal" class="fixed inset-0 z-[100000] hidden items-center justify-center p-4">

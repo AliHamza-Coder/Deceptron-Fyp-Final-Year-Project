@@ -794,19 +794,7 @@
             loadUploads();
         });
 
-        async function logout() {
-            showConfirmModal(
-                "Logout Confirmation",
-                "Are you sure you want to log out of Deceptron?",
-                async () => {
-                    await eel.logout()();
-                    window.location.href = 'login.html';
-                }
-            );
-        }
-
-        // Override closeApp if it was calling something else
-        window.closeApp = logout;
+        // Logout logic is handled globally by sidebar.js
 
     </script>
 </body>

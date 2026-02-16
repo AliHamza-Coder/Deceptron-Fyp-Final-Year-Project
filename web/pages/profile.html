@@ -705,13 +705,7 @@
             }
         }
 
-        function logout() {
-            if(confirm("Confirm system termination?")) {
-                eel.logout()(() => {
-                    window.location.href = 'login.html';
-                });
-            }
-        }
+        // Logout logic is handled globally by sidebar.js
 
         // Initial Load
         document.addEventListener('DOMContentLoaded', async () => {

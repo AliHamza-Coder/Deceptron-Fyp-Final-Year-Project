@@ -158,8 +158,12 @@ def signup(user_data):
     """
     Handle user signup from the frontend.
     """
-    print(f"📝 New signup attempt: {user_data.get('username')}")
-    return database.signup_user(user_data)
+    try:
+        print(f"📝 New signup attempt: {user_data.get('username')}")
+        return database.signup_user(user_data)
+    except Exception as e:
+        print(f"❌ Signup error: {e}")
+        return {'success': False, 'message': str(e)}
 
 @eel.expose
 def login(identity, password):
@@ -306,40 +310,6 @@ def finalize_upload(upload_id):
     except Exception as e:
         return response(success=False, message=str(e))
 
-@eel.expose
-def add_upload_record(filename, file_type, file_size, base64_data):
-    """
-    Physically save the file and add a record to the database.
-    """
-    try:
-        if not current_user:
-            return {'success': False, 'message': 'Not logged in'}
-        
-        # 1. Clean filename
-        safe_filename = filename.replace(' ', '_')
-        file_path = UPLOADS_DIR / safe_filename
-        
-        # 2. Save file physically
-        try:
-            if ',' in base64_data:
-                base64_data = base64_data.split(',')[1]
-                
-            file_content = base64.b64decode(base64_data)
-            with open(file_path, 'wb') as f:
-                f.write(file_content)
-                
-            print(f"📦 Physically saved: {file_path}")
-        except Exception as e:
-            print(f"❌ Error saving file physically: {e}")
-            return response(success=False, message=f'File saving failed: {str(e)}')
-
-        # 3. Add to database
-        relative_path = f"../uploads/{safe_filename}"
-        return database.add_upload(current_user['username'], safe_filename, file_type, file_size, relative_path)
-        
-    except Exception as e:
-        print(f"❌ General error in add_upload_record: {e}")
-        return response(success=False, message=str(e))
 
 @eel.expose
 def save_recording(filename, base64_data, category):
