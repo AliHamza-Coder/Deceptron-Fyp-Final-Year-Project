@@ -22,7 +22,7 @@ tinydb
 numpy==1.26.4
 
 # Audio Processing
-# pyaudio
+pyaudio
 
 # Additional Dependencies (auto-installed with above packages)
 # Pillow - Image processing
