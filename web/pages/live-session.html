@@ -1633,32 +1633,72 @@
         const subjectId = document.querySelector('#saveModal input[placeholder="Enter name or ID..."]').value || "Unknown_Subject";
         const filename = `session_${subjectId}_${new Date().getTime()}.webm`;
         
+        // Show saving state in modal
+        const saveBtn = document.querySelector('#saveModal button[onclick="saveData()"]');
+        const originalText = saveBtn.innerText;
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving... <span id="saveProgress">0%</span>';
+        
         closeSaveModal();
         
-        // Show loading toast
-        const toast = document.getElementById("videoToast");
-        toast.querySelector("div").innerText = "Saving Recording...";
-        toast.classList.remove("opacity-0", "translate-y-4");
-        toast.classList.add("opacity-1", "translate-y-0");
+        // Use Global Loader for meaningful blocking feedback
+        Loader.show("Encrypting & Saving to Vault...");
 
         try {
-          // Note: If video is mirrored in UI, we might want to mirror it in recording too?
-          // But standard behavior is to record raw stream.
           const blob = new Blob(recordedChunks, { type: 'video/webm' });
-          const reader = new FileReader();
-          reader.readAsDataURL(blob);
-          reader.onloadend = async () => {
-            const base64data = reader.result;
-            const result = await eel.save_recording(filename, base64data, 'live')();
-            
-            if (result.success) {
+          const size = blob.size;
+          const sizeMB = (size / (1024 * 1024)).toFixed(1) + " MB";
+          
+          // 1. Initiate Upload
+          const initResult = await eel.initiate_upload(filename, sizeMB, 'video', true)();
+          if (!initResult.success) throw new Error(initResult.message);
+          
+          const uploadId = initResult.data.upload_id;
+          const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
+          let offset = 0;
+          
+          // 2. Upload Chunks
+          while (offset < size) {
+             const chunk = blob.slice(offset, offset + CHUNK_SIZE);
+             const reader = new FileReader();
+             
+             await new Promise((resolve, reject) => {
+                 reader.onload = async (e) => {
+                     try {
+                         const result = await eel.append_upload_chunk(uploadId, e.target.result)();
+                         if (!result.success) reject(new Error(result.message));
+                         resolve();
+                     } catch (err) { reject(err); }
+                 };
+                 reader.onerror = reject;
+                 reader.readAsDataURL(chunk);
+             });
+             
+             offset += CHUNK_SIZE;
+             const progress = Math.min(100, Math.round((offset / size) * 100));
+             
+             // Update Loader text
+             const loaderText = document.querySelector('#globalLoader p');
+             if(loaderText) loaderText.innerText = `Encrypting & Saving... ${progress}%`;
+          }
+          
+          // 3. Finalize
+          const finalResult = await eel.finalize_upload(uploadId)();
+          
+          if (finalResult.success) {
+              Loader.hide();
+              
+              // Success Toast
+              const toast = document.getElementById("videoToast");
               toast.querySelector("div").innerText = "Session Saved & Secured";
               toast.querySelector("div").className = "px-6 py-2 bg-emerald-500 text-white text-[10px] font-bold uppercase rounded-full shadow-lg shadow-emerald-500/40";
+              toast.classList.remove("opacity-0", "translate-y-4");
+              toast.classList.add("opacity-1", "translate-y-0");
               
               // Load saved file into player
               const video = document.getElementById("webcam");
               video.srcObject = null;
-              video.src = (result.data && result.data.filepath) ? result.data.filepath : `../recordings/${filename}`;
+              video.src = (finalResult.data && finalResult.data.filepath) ? finalResult.data.filepath : `../recordings/${filename}`;
               video.setAttribute('controls', 'true');
               video.muted = false; // Unmute for playback
               video.style.transform = "scaleX(-1)";
@@ -1673,18 +1713,32 @@
               // Show Analyse button after save
               const analyseBtn = document.getElementById("analyseBtn");
               if (analyseBtn) analyseBtn.classList.remove("hidden");
-            } else {
-              toast.querySelector("div").innerText = "Save Failed: " + result.message;
-              toast.querySelector("div").className = "px-6 py-2 bg-red-500 text-white text-[10px] font-bold uppercase rounded-full shadow-lg shadow-red-500/40";
-            }
-            
-            setTimeout(() => toast.classList.add("opacity-0", "translate-y-4"), 2500);
-            resetUIState();
-          };
+              
+              setTimeout(() => toast.classList.add("opacity-0", "translate-y-4"), 2500);
+          } else {
+              throw new Error(finalResult.message);
+          }
+          
+          resetUIState();
+          
+          // Reset button state just in case modal reopens
+          setTimeout(() => {
+              saveBtn.disabled = false;
+              saveBtn.innerText = originalText;
+          }, 1000);
+
         } catch (error) {
           console.error("Save error:", error);
-          toast.querySelector("div").innerText = "Error saving file";
-          setTimeout(() => toast.classList.add("opacity-0", "translate-y-4"), 2500);
+          Loader.hide();
+          const toast = document.getElementById("videoToast");
+          toast.querySelector("div").innerText = "Error: " + error.message;
+          toast.querySelector("div").className = "px-6 py-2 bg-red-500 text-white text-[10px] font-bold uppercase rounded-full shadow-lg shadow-red-500/40";
+          toast.classList.remove("opacity-0", "translate-y-4");
+          toast.classList.add("opacity-1", "translate-y-0");
+          setTimeout(() => toast.classList.add("opacity-0", "translate-y-4"), 4000);
+          
+          saveBtn.disabled = false;
+          saveBtn.innerText = originalText;
           resetUIState();
         }
       }
@@ -1764,127 +1818,110 @@
       themeToggle.addEventListener("click", toggleTheme);
 
       // Populate Camera and Microphone Sources
-      async function populateCameras() {
-        const select = document.getElementById('cameraSelect');
-        try {
-          if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
-            select.innerHTML = '<option value="">Searching...</option>';
-            return;
-          }
-          const devices = await navigator.mediaDevices.enumerateDevices();
-          select.innerHTML = '';
-          const videoDevices = devices.filter(d => d.kind === 'videoinput');
-          videoDevices.forEach((device, index) => {
-            const label = (device.label || `Camera ${index + 1}`).toLowerCase();
-            // FILTER: Skip virtual devices
-            if (label.includes('virtual') || label.includes('fliflik')) return;
 
-            const option = document.createElement('option');
-            option.value = device.deviceId;
-            option.text = device.label || `Camera ${index + 1}`;
-            select.appendChild(option);
-          });
+      async function populateDevices() {
+          const camSelect = document.getElementById('cameraSelect');
+          const micSelect = document.getElementById('microphoneSelect');
           
-          if (videoDevices.length > 0) {
-             // Load preference
-             try {
-                const result = await eel.load_preferences()();
-                if (result.success && result.preferences) {
-                    // 1. Camera Selection
-                    if (result.preferences.default_camera) {
-                        const exists = videoDevices.some(d => d.deviceId === result.preferences.default_camera);
-                        if (exists) select.value = result.preferences.default_camera;
-                    }
+          camSelect.innerHTML = '<option>Loading...</option>';
+          micSelect.innerHTML = '<option>Loading...</option>';
+          
+          try {
+              if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+                  camSelect.innerHTML = '<option value="">Permission needed</option>';
+                  micSelect.innerHTML = '<option value="">Permission needed</option>';
+                  return;
+              }
+              
+              const devices = await navigator.mediaDevices.enumerateDevices();
+              camSelect.innerHTML = '';
+              micSelect.innerHTML = '';
+              
+              // 1. Process Video Inputs
+              const videoDevices = devices.filter(d => d.kind === 'videoinput');
+              videoDevices.forEach((device, index) => {
+                  const label = (device.label || `Camera ${index + 1}`).toLowerCase();
+                  if (label.includes('virtual') || label.includes('fliflik')) return; // Filter virtual
+                  
+                  const option = document.createElement('option');
+                  option.value = device.deviceId;
+                  option.text = device.label || `Camera ${index + 1}`;
+                  camSelect.appendChild(option);
+              });
+              if (videoDevices.length === 0) camSelect.innerHTML = '<option value="">No cameras found</option>';
 
-                    // 2. Visual Settings
-                    const v = document.getElementById('webcam');
-                    if (v) {
-                        const b = result.preferences.brightness || 50;
-                        const c = result.preferences.contrast || 50;
-                        const s = result.preferences.saturation || 50;
-                        const mirror = result.preferences.mirror_camera || false;
-                        
-                        const bVal = 0.5 + (b / 100);
-                        const cVal = 0.5 + (c / 100);
-                        const sVal = 0.5 + (s / 100);
-                        
-                        v.style.filter = `brightness(${bVal}) contrast(${cVal}) saturate(${sVal})`;
-                        v.style.transform = mirror ? 'scaleX(-1)' : 'scaleX(1)';
-                        
-                        // Grid Overlay
-                        let gridOverlay = document.getElementById('liveGridOverlay');
-                        if (result.preferences.grid_overlay) {
-                            if (!gridOverlay) {
-                                const parent = v.parentElement;
-                                gridOverlay = document.createElement('div');
-                                gridOverlay.id = 'liveGridOverlay';
-                                gridOverlay.className = "absolute inset-0 pointer-events-none z-10";
-                                gridOverlay.innerHTML = `
-                                    <div class="w-full h-full grid grid-cols-3 grid-rows-3">
-                                        <div class="border-r border-b border-white/20"></div>
-                                        <div class="border-r border-b border-white/20"></div>
-                                        <div class="border-b border-white/20"></div>
-                                        <div class="border-r border-b border-white/20"></div>
-                                        <div class="border-r border-b border-white/20"></div>
-                                        <div class="border-b border-white/20"></div>
-                                        <div class="border-r border-white/20"></div>
-                                        <div class="border-r border-white/20"></div>
-                                        <div></div>
-                                    </div>
-                                `;
-                                parent.appendChild(gridOverlay);
+              // 2. Process Audio Inputs
+              const audioDevices = devices.filter(d => d.kind === 'audioinput');
+              audioDevices.forEach((device, index) => {
+                   const label = (device.label || `Microphone ${index + 1}`).toLowerCase();
+                   if (label.includes('virtual') || label.includes('fliflik') || label.includes('stereo mix')) return; // Filter virtual
+
+                   const option = document.createElement('option');
+                   option.value = device.deviceId;
+                   option.text = device.label || `Microphone ${index + 1}`;
+                   micSelect.appendChild(option);
+              });
+              if (audioDevices.length === 0) micSelect.innerHTML = '<option value="">No microphones found</option>';
+              
+              // 3. Load Preferences
+              try {
+                  const result = await eel.load_preferences()();
+                  if (result.success && result.preferences) {
+                      // Camera Pref
+                      if (result.preferences.default_camera) {
+                          const exists = videoDevices.some(d => d.deviceId === result.preferences.default_camera);
+                          if (exists) camSelect.value = result.preferences.default_camera;
+                      }
+                      // Mic Pref
+                      if (result.preferences.default_mic) {
+                           const exists = audioDevices.some(d => d.deviceId === result.preferences.default_mic);
+                           if (exists) micSelect.value = result.preferences.default_mic;
+                      }
+
+                      // Visual Settings apply
+                      const v = document.getElementById('webcam');
+                      if (v) {
+                          const b = result.preferences.brightness || 50;
+                          const c = result.preferences.contrast || 50;
+                          const s = result.preferences.saturation || 50;
+                          const mirror = result.preferences.mirror_camera || false;
+                          
+                          const bVal = 0.5 + (b / 100);
+                          const cVal = 0.5 + (c / 100);
+                          const sVal = 0.5 + (s / 100);
+                          
+                          v.style.filter = `brightness(${bVal}) contrast(${cVal}) saturate(${sVal})`;
+                          v.style.transform = mirror ? 'scaleX(-1)' : 'scaleX(1)';
+                          
+                          // Grid Overlay logic existing...
+                           let gridOverlay = document.getElementById('liveGridOverlay');
+                            if (result.preferences.grid_overlay) {
+                                if (!gridOverlay) {
+                                    const parent = v.parentElement;
+                                    gridOverlay = document.createElement('div');
+                                    gridOverlay.id = 'liveGridOverlay';
+                                    gridOverlay.className = 'absolute inset-0 pointer-events-none z-10';
+                                    gridOverlay.style.backgroundImage = `
+                                        linear-gradient(rgba(0, 219, 255, 0.1) 1px, transparent 1px),
+                                        linear-gradient(90deg, rgba(0, 219, 255, 0.1) 1px, transparent 1px)
+                                    `;
+                                    gridOverlay.style.backgroundSize = '33.3% 33.3%';
+                                    parent.appendChild(gridOverlay);
+                                }
+                            } else if (gridOverlay) {
+                                gridOverlay.remove();
                             }
-                            gridOverlay.classList.remove('hidden');
-                        } else {
-                            if (gridOverlay) gridOverlay.classList.add('hidden');
-                        }
-                    }
-                }
-             } catch (e) { console.error("Pref load error:", e); }
+                      }
+                  }
+              } catch (e) { console.error("Pref load error:", e); }
+
+          } catch (err) {
+              console.error("Error enumerating devices:", err);
+              camSelect.innerHTML = '<option>Error</option>';
+              micSelect.innerHTML = '<option>Error</option>';
           }
-          if (videoDevices.length === 0) select.innerHTML = '<option value="">No Camera Detected</option>';
-        } catch (err) {
-          console.error("Error enumerating cameras:", err);
-        }
       }
 
-      async function populateMicrophones() {
-        const select = document.getElementById('microphoneSelect');
-        select.innerHTML = '';
-        try {
-          if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
-            select.innerHTML = '<option value="">Searching...</option>';
-            return;
-          }
-          const devices = await navigator.mediaDevices.enumerateDevices();
-          const audioDevices = devices.filter(d => d.kind === 'audioinput');
-          audioDevices.forEach((device, index) => {
-            const label = (device.label || `Microphone ${index + 1}`).toLowerCase();
-            // FILTER: Skip virtual devices
-            if (label.includes('virtual') || label.includes('fliflik')) return;
-
-            const option = document.createElement('option');
-            option.value = device.deviceId;
-            option.text = device.label || `Microphone ${index + 1}`;
-            select.appendChild(option);
-          });
-          
-          if (audioDevices.length > 0) {
-             // Load preference
-             try {
-                const result = await eel.load_preferences()();
-                if (result.success && result.preferences && result.preferences.default_mic) {
-                     const exists = audioDevices.some(d => d.deviceId === result.preferences.default_mic);
-                     if (exists) select.value = result.preferences.default_mic;
-                }
-             } catch (e) { console.error("Pref load error:", e); }
-          }
-          if (select.options.length === 0) select.innerHTML = '<option value="">No Mic Detected</option>';
-        } catch (err) {
-          console.error("Error enumerating microphones:", err);
-          select.innerHTML = '<option value="">No Mic Detected</option>';
-        }
-      }
 
       function openVault() {
           VaultComponent.open((item) => {
@@ -1939,22 +1976,17 @@
           return;
         }
 
-        // Update Member Name and Title
+        // Update Member Name
         const activeMember = document.querySelector('.active-member-info span.ml-1');
-        const pageTitle = document.querySelector('h1');
         if (activeMember) {
           activeMember.textContent = `${user.firstName} ${user.lastName} • Unit #${user.username.toUpperCase()}`;
         }
-        if (pageTitle && !pageTitle.querySelector('.text-cyan-400')) {
-          pageTitle.textContent = `${user.firstName} ${user.lastName}`;
-        }
 
         // Populate device sources
-        populateCameras();
-        populateMicrophones();
+        populateDevices();
 
         // Update Theme UI state (icons, buttons, charts)
-        const isLight = body.classList.contains('light-mode');
+        const isLight = localStorage.getItem('theme') === 'light';
         updateThemeUI(isLight);
         updateChartsTheme(isLight);
       });

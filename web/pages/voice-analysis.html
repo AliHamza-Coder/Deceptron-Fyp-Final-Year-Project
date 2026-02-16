@@ -1009,39 +1009,75 @@
             status.innerText = "Encrypting & Saving to Vault...";
             status.classList.remove('text-red-500');
             status.classList.add('text-cyan-400');
+            
+             // Show loading toast if available, or use status label
+            Loader.show("Syncing Acoustic Data...");
 
             try {
                 const blob = new Blob(recordedChunks, { type: 'audio/webm' });
-                const reader = new FileReader();
-                reader.readAsDataURL(blob);
-                reader.onloadend = async () => {
-                    const base64data = reader.result;
-                    const result = await eel.save_recording(filename, base64data, 'voice')();
+                const size = blob.size;
+                const sizeMB = (size / (1024 * 1024)).toFixed(1) + " MB";
+                
+                // 1. Initiate Upload
+                const initResult = await eel.initiate_upload(filename, sizeMB, 'audio', true)();
+                if (!initResult.success) throw new Error(initResult.message);
+                
+                const uploadId = initResult.data.upload_id;
+                const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
+                let offset = 0;
+                
+                // 2. Upload Chunks
+                while (offset < size) {
+                     const chunk = blob.slice(offset, offset + CHUNK_SIZE);
+                     const reader = new FileReader();
+                     
+                     await new Promise((resolve, reject) => {
+                         reader.onload = async (e) => {
+                             try {
+                                 const result = await eel.append_upload_chunk(uploadId, e.target.result)();
+                                 if (!result.success) reject(new Error(result.message));
+                                 resolve();
+                             } catch (err) { reject(err); }
+                         };
+                         reader.onerror = reject;
+                         reader.readAsDataURL(chunk);
+                     });
+                     
+                     offset += CHUNK_SIZE;
+                     const progress = Math.min(100, Math.round((offset / size) * 100));
+                     status.innerText = `Saving to Vault... ${progress}%`;
+                }
 
-                    if (result.success) {
-                        status.innerText = "Session Saved Successfully";
-                        status.classList.remove('text-cyan-400');
-                        status.classList.add('text-emerald-500');
+                // 3. Finalize
+                const finalResult = await eel.finalize_upload(uploadId)();
 
-                        // Load saved file into WaveSurfer
-                        const blob = new Blob(recordedChunks, { type: 'audio/webm' });
-                        wavesurfer.loadBlob(blob);
+                if (finalResult.success) {
+                    Loader.hide();
+                    status.innerText = "Session Saved Successfully";
+                    status.classList.remove('text-cyan-400');
+                    status.classList.add('text-emerald-500');
 
-                        // Show Analyse Audio button
-                        const analyseBtn = document.getElementById("analyseAudioBtn");
-                        if (analyseBtn) analyseBtn.classList.remove("hidden");
+                    // Load saved file into WaveSurfer
+                    const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                    wavesurfer.loadBlob(blob);
 
-                        // Enable play button
-                        document.getElementById('playBtn').disabled = false;
-                    } else {
-                        status.innerText = "Vault Error: " + result.message;
-                        status.classList.add('text-rose-500');
-                    }
-                    setTimeout(() => resetUIState(), 3000);
-                };
+                    // Show Analyse Audio button
+                    const analyseBtn = document.getElementById("analyseAudioBtn");
+                    if (analyseBtn) analyseBtn.classList.remove("hidden");
+
+                    // Enable play button
+                    document.getElementById('playBtn').disabled = false;
+                } else {
+                    throw new Error(finalResult.message);
+                }
+                
+                setTimeout(() => resetUIState(), 3000);
+
             } catch (error) {
                 console.error("Save error:", error);
-                status.innerText = "Critical Save Failure";
+                Loader.hide();
+                status.innerText = "Vault Error: " + error.message;
+                status.classList.add('text-rose-500');
                 setTimeout(() => resetUIState(), 3000);
             }
         }

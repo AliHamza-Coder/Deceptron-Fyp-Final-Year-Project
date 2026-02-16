@@ -1437,19 +1437,56 @@
       async function saveData() {
         const subjectId = document.getElementById('subjectIdInput').value || "Unknown_Subject";
         const filename = `facial_${subjectId}_${new Date().getTime()}.webm`;
-        closeSaveModal();
+        
+        // Show saving state in modal
+        const saveBtn = document.querySelector('#saveModal button[onclick="saveData()"]');
+        const originalText = saveBtn.innerText;
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving... <span id="saveProgress">0%</span>';
+        
         try {
           const blob = new Blob(recordedChunks, { type: 'video/webm' });
-          const reader = new FileReader();
-          reader.readAsDataURL(blob);
-          reader.onloadend = async () => {
-            const result = await eel.save_recording(filename, reader.result, 'facial')();
-            if (result.success) {
+          const size = blob.size;
+          const sizeMB = (size / (1024 * 1024)).toFixed(1) + " MB";
+          
+          // 1. Initiate Upload
+          const initResult = await eel.initiate_upload(filename, sizeMB, 'video', true)();
+          if (!initResult.success) throw new Error(initResult.message);
+          
+          const uploadId = initResult.data.upload_id;
+          const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
+          let offset = 0;
+          
+          // 2. Upload Chunks
+          while (offset < size) {
+             const chunk = blob.slice(offset, offset + CHUNK_SIZE);
+             const reader = new FileReader();
+             
+             await new Promise((resolve, reject) => {
+                 reader.onload = async (e) => {
+                     try {
+                         const result = await eel.append_upload_chunk(uploadId, e.target.result)();
+                         if (!result.success) reject(new Error(result.message));
+                         resolve();
+                     } catch (err) { reject(err); }
+                 };
+                 reader.onerror = reject;
+                 reader.readAsDataURL(chunk);
+             });
+             
+             offset += CHUNK_SIZE;
+             const progress = Math.min(100, Math.round((offset / size) * 100));
+             document.getElementById('saveProgress').innerText = progress + "%";
+          }
+          
+          // 3. Finalize
+          const finalResult = await eel.finalize_upload(uploadId)();
+          if (finalResult.success) {
+                closeSaveModal();
                 // Visualization
                 const video = document.getElementById("webcam");
                 video.srcObject = null;
-                // Fix: Access result.data.filepath and use correct fallback path
-                video.src = (result.data && result.data.filepath) ? result.data.filepath : `../recordings/${filename}`;
+                video.src = (finalResult.data && finalResult.data.filepath) ? finalResult.data.filepath : `../recordings/${filename}`;
                 video.setAttribute('controls', 'true');
                 video.style.transform = "scaleX(-1)";
                 const off = document.getElementById("camOffState");
@@ -1459,10 +1496,16 @@
                 
                 document.getElementById('analyseBtn').classList.remove('hidden');
                 updateStatusUI('ready', 'Session Saved');
-            }
-            resetUIState();
-          };
-        } catch (e) { console.error(e); resetUIState(); }
+          } else {
+             throw new Error(finalResult.message);
+          }
+          resetUIState();
+        } catch (e) { 
+            console.error(e); 
+            alert("Error saving recording: " + e.message);
+            saveBtn.disabled = false;
+            saveBtn.innerText = originalText;
+        }
       }
 
       function discardSession() {

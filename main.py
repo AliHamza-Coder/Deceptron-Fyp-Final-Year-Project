@@ -232,7 +232,7 @@ def get_uploads():
 active_uploads = {}
 
 @eel.expose
-def initiate_upload(filename, total_size, file_type):
+def initiate_upload(filename, total_size, file_type, is_recording=False):
     """
     Prepare the server for a chunked upload.
     """
@@ -250,6 +250,7 @@ def initiate_upload(filename, total_size, file_type):
             'size_str': total_size,
             'temp_path': temp_path,
             'username': current_user['username'],
+            'is_recording': is_recording,
             'handle': open(temp_path, 'wb') # Open handle immediately for speed
         }
             
@@ -296,18 +297,34 @@ def finalize_upload(upload_id):
         if 'handle' in info:
             info['handle'].close()
             
-        final_path = UPLOADS_DIR / info['filename']
+        # Determine target directory based on type
+        target_dir = UPLOADS_DIR
+        relative_prefix = "../uploads/"
+        
+        # Check if this is a recording
+        if info.get('is_recording'):
+            target_dir = RECORDINGS_DIR
+            relative_prefix = "../recordings/"
+            
+        # Ensure target directory exists
+        if not target_dir.exists():
+            target_dir.mkdir(parents=True, exist_ok=True)
+
+        final_path = target_dir / info['filename']
         
         if final_path.exists():
             base, ext = os.path.splitext(info['filename'])
-            final_path = UPLOADS_DIR / f"{base}_{int(time.time())}{ext}"
+            final_path = target_dir / f"{base}_{int(time.time())}{ext}"
             info['filename'] = final_path.name
 
         os.rename(info['temp_path'], final_path)
         
-        relative_path = f"../uploads/{info['filename']}"
+        relative_path = f"{relative_prefix}{info['filename']}"
         return database.add_upload(info['username'], info['filename'], info['type'], info['size_str'], relative_path)
     except Exception as e:
+        import traceback
+        print(f"❌ Error finalizing upload: {e}")
+        print(traceback.format_exc())
         return response(success=False, message=str(e))
 
 
