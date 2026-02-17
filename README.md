@@ -2,11 +2,11 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)
-![Python](https://img.shields.io/badge/python-3.8+-green.svg)
+![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)
+![Python](https://img.shields.io/badge/python-3.9-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg)
 
-**A cutting-edge AI-powered desktop application for real-time emotion detection and behavioral analysis**
+**A cutting-edge AI-powered desktop application for behavioral analysis and evidence management**
 
 </div>
 
@@ -19,8 +19,8 @@
 - [System Requirements](#-system-requirements)
 - [Installation Guide](#-installation-guide)
 - [Quick Start](#-quick-start)
+- [Project Structure](#-project-structure)
 - [User Guide](#-user-guide)
-- [Technical Architecture](#-technical-architecture)
 - [Troubleshooting](#-troubleshooting)
 - [Developer Information](#-developer-information)
 
@@ -28,7 +28,7 @@
 
 ## 🎯 Overview
 
-DECEPTRON is a professional-grade hybrid desktop application that combines advanced AI/ML algorithms with an intuitive user interface for real-time emotion detection and behavioral analysis. Built with Python for robust backend processing and modern web technologies for a responsive frontend experience.
+DECEPTRON is a professional-grade hybrid desktop application combining Python backend processing with modern web technologies for a responsive frontend experience. Designed for security professionals, researchers, and analysts.
 
 ### Use Cases
 
@@ -43,21 +43,20 @@ DECEPTRON is a professional-grade hybrid desktop application that combines advan
 
 ### Core Capabilities
 
-- 🎥 **Real-time Facial Expression Analysis** - Detect 8 emotions with confidence scores (HSEmotion)
-- 🎙️ **Voice Stress Detection** - Analyze vocal patterns for stress indicators (New in v1.1.0)
-- 📊 **Live Dashboard** - Comprehensive real-time analytics and visualizations
-- 📁 **File Processing** - Analyze pre-recorded video/audio files
-- 📝 **Detailed Reports** - Generate professional analysis reports
-- 🎨 **Dual Theme Support** - Light and Dark modes for comfortable viewing
-- 🔒 **Secure Vault** - Encrypted evidence storage and management
-- 🛠️ **Smart Device Management** - Auto-detects real hardware, filters virtual devices
+- 🎥 **Live Session Recording** - High-quality video/audio capture
+- 🎙️ **Voice Analysis** - Vocal pattern analysis
+- 📊 **Live Dashboard** - Comprehensive real-time analytics
+- 📁 **File Processing** - Analyze pre-recorded media files
+- 📝 **Detailed Reports** - Professional analysis reports
+- 🎨 **Dual Theme Support** - Light and Dark modes
+- 🔒 **Secure Vault** - Encrypted evidence storage
+- 🛠️ **Smart Device Management** - Auto-detects real hardware
 
 ### Technical Highlights
 
-- **AI Models**: HSEmotion (EfficientNet-based emotion recognition)
-- **Face Detection**: MediaPipe (Google's ML solution)
-- **Real-time Processing**: High-performance detection with minimal latency
-- **Chunked Data Transfer**: Optimized saving for large video/audio files (New in v1.1.0)
+- **Real-time Processing**: High-performance with minimal latency
+- **Chunked Data Transfer**: Optimized for large files (v1.2.0)
+- **Modular Architecture**: Clean separation of concerns (v1.2.0)
 - **Cross-platform**: Windows, macOS, Linux support
 
 ---
@@ -67,7 +66,7 @@ DECEPTRON is a professional-grade hybrid desktop application that combines advan
 ### Minimum Requirements
 
 - **OS**: Windows 10/11, macOS 10.14+, or Linux (Ubuntu 18.04+)
-- **Python**: 3.9 (recommended)
+- **Python**: 3.9 (required)
 - **RAM**: 4 GB
 - **Storage**: 2 GB free space
 - **Camera**: USB/built-in webcam (720p minimum)
@@ -78,9 +77,8 @@ DECEPTRON is a professional-grade hybrid desktop application that combines advan
 
 - **Python**: 3.9
 - **RAM**: 8 GB or higher
-- **GPU**: NVIDIA GPU with CUDA support (for faster processing)
-- **Camera**: 1080p webcam for optimal accuracy
-- **Internet**: Required for initial model downloads
+- **Camera**: 1080p webcam for optimal quality
+- **Internet**: Required for initial setup
 
 ---
 
@@ -112,7 +110,7 @@ Or download ZIP from [GitHub Repository](https://github.com/AliHamza-Coder/Decep
 
 ```bash
 python -m venv myenv
-myenv\Scripts\activate
+myenv\\Scripts\\activate
 ```
 
 **macOS/Linux:**
@@ -128,8 +126,6 @@ source myenv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
-
-**Note**: First run will download AI models (~200MB). Ensure stable internet connection.
 
 ### Step 5: Verify Installation
 
@@ -155,7 +151,7 @@ If successful, the application window will open automatically.
 2. Navigate to project directory
 3. Activate virtual environment:
    ```bash
-   myenv\Scripts\activate  # Windows
+   myenv\\Scripts\\activate  # Windows
    source myenv/bin/activate  # macOS/Linux
    ```
 4. Run application:
@@ -165,77 +161,102 @@ If successful, the application window will open automatically.
 
 ---
 
+## 📁 Project Structure
+
+```
+Frontend/
+├── main.py                 # Application entry point
+├── requirements.txt        # Python dependencies
+├── RUN.bat                # Windows launcher
+├── db.json                # User database
+│
+├── modules/               # Backend modules
+│   └── database.py        # Database operations
+│
+└── web/                   # Frontend files
+    ├── assets/            # Images, fonts, icons
+    │   ├── images/
+    │   └── fonts/
+    │
+    ├── css/               # Stylesheets
+    │   └── spa-shell.css
+    │
+    ├── js/                # JavaScript modules
+    │   ├── common/        # Shared utilities
+    │   │   ├── utils.js       # Helper functions
+    │   │   ├── api.js         # EEL API wrappers
+    │   │   ├── auth.js        # Session management
+    │   │   └── constants.js   # App constants
+    │   │
+    │   ├── components/    # Reusable components
+    │   │   ├── loader.js
+    │   │   ├── sidebar.js
+    │   │   ├── vault-component.js
+    │   │   └── media-preview.js
+    │   │
+    │   └── pages/         # Page-specific logic
+    │       └── (page scripts)
+    │
+    ├── pages/             # HTML pages
+    │   ├── login.html
+    │   ├── signup.html
+    │   ├── dashboard.html
+    │   ├── live-session.html
+    │   ├── voice-analysis.html
+    │   ├── facial-expression.html
+    │   ├── uploads.html
+    │   ├── settings.html
+    │   └── profile.html
+    │
+    ├── uploads/           # User uploaded files
+    └── recordings/        # Session recordings
+```
+
+---
+
 ## 📖 User Guide
 
 ### First Time Setup
 
 1. **Launch Application** - Use `RUN.bat` or `python main.py`
-2. **Login/Signup** - Create a secure account to access the dashboard
+2. **Login/Signup** - Create a secure account
 3. **Grant Permissions** - Allow camera and microphone access
-4. **Navigate Interface** - Explore the dashboard overview
+4. **Navigate Interface** - Explore the dashboard
 
 ### Using Live Session Mode
 
 1. **Navigate**: Click "Live Session" from sidebar
-2. **Setup Devices**: Select your preferred **Camera** and **Microphone** from the right sidebar. _Virtual devices are automatically filtered._
+2. **Setup Devices**: Select Camera and Microphone
 3. **Start Camera**: Click "Turn on Camera" button
-4. **Record Session**: Click "Start Recording" to capture video & audio
-5. **End Session**: Click "Stop Recording" and name your session. Wait for the "Encrypting & Saving to Vault..." loader to finish.
+4. **Record Session**: Click "Start Recording"
+5. **End Session**: Click "Stop Recording" and name your session
 
-### Using Facial Expression Analysis
+### Using Voice Analysis
 
-1. **Navigate**: Click "Facial Micro-Exp" from sidebar
-2. **Choose Source**:
-   - **Live Camera**: Click "Initiate Deep Scanner"
-   - **File Upload**: Click "Load File" and select video
-3. **View Analysis**: Monitor emotion radar and micro-expression metrics
-4. **Adjust Settings**: Toggle detection modules in right panel
+1. **Navigate**: Click "Voice Analysis"
+2. **Record/Load**: Record live or load from Vault
+3. **Analyze**: View stress indicators and patterns
 
-### Using Voice Analysis (New)
+### Evidence Vault
 
-1. **Navigate**: Click "Voice Analysis" to access vocal stress metrics.
-2. **Record/Load**: Record live audio or load a session from the Vault.
-3. **Analyze**: View stress indicators, pitch analysis, and speech patterns.
-
-### Analyzing Evidence (Vault)
-
-1. Click "Evidence Vault" or use the "Load from Vault" button in any analysis page.
-2. Browse securely stored recordings (Video sessions, Voice logs).
-3. Click any file to load it directly into the analysis pipeline.
-
-### Understanding Results
-
-#### Emotion Detection
-
-- **8 Emotions Tracked**: Anger, Contempt, Disgust, Fear, Happiness, Neutral, Sadness, Surprise
-- **Confidence Score**: 0-100% accuracy indicator
-- **Color Coding**:
-  - 🔵 Cyan = Neutral/Calm
-  - 🔴 Red = Negative emotions
-  - 🟡 Amber = Stress/Fear
-  - 🟢 Green = Positive emotions
-
-#### Bounding Box
-
-- **Cyan Box**: Face detection area
-- **Label**: Current emotion with confidence percentage
-- **Real-time Updates**: Refreshes every 500ms
+1. Click "Evidence Vault" button
+2. Browse securely stored recordings
+3. Click any file to load into analysis
 
 ### Tips for Best Results
 
 ✅ **DO:**
 
-- Use good lighting (face clearly visible)
+- Use good lighting
 - Position face 2-3 feet from camera
 - Keep face centered in frame
 - Minimize background movement
-- Use stable internet for first run
 
 ❌ **DON'T:**
 
-- Cover face with hands/objects
+- Cover face with objects
 - Use in very dark environments
-- Move too quickly or erratically
+- Move too quickly
 - Use low-quality cameras (<480p)
 
 ---
@@ -244,138 +265,130 @@ If successful, the application window will open automatically.
 
 ### Camera/Mic Not Detected
 
-**Problem**: "No Camera Detected" or dropdown is empty.
-
 **Solutions**:
 
-1. Check browser/system permissions.
-2. Ensure you are using a **physical device** (virtual cameras/mics are filtered out).
-3. Restart the application (`python main.py`) to refresh device list.
+1. Check browser/system permissions
+2. Ensure using **physical device** (virtual devices filtered)
+3. Restart application
 
 ### Recording Save Failed
 
-**Problem**: Updates stick at "Saving... 0%" or error toast appears.
-
 **Solutions**:
 
-1. Ensure you have sufficient disk space.
-2. Wait for the **Chunked Upload** process to finish (do not close the app while saving).
-3. Check `main.py` console output for specific error codes.
-
-### Model Loading Errors
-
-**Problem**: "Failed to load model" or "WeightsUnpickler" error.
-
-**Solutions**:
-
-1. Ensure stable internet connection.
-2. Delete and reinstall dependencies:
-   ```bash
-   pip uninstall hsemotion torch
-   pip install -r requirements.txt
-   ```
-3. Check Python version (must be 3.9).
-4. Try running as administrator.
+1. Ensure sufficient disk space
+2. Wait for upload process to finish
+3. Check console for error messages
 
 ### Application Won't Start
 
-**Problem**: Window doesn't open or crashes immediately.
-
 **Solutions**:
 
-1. Verify Python installation: `python --version` (should be 3.9).
-2. Activate virtual environment.
-3. Reinstall dependencies: `pip install -r requirements.txt`.
-4. Check console for error messages.
-5. Ensure port 8000 is not in use.
+1. Verify Python 3.9: `python --version`
+2. Activate virtual environment
+3. Reinstall dependencies: `pip install -r requirements.txt`
+4. Ensure port 8000 is available
 
 ---
 
 ## 👨‍💻 Developer Information
 
-### For Developers
+### Architecture
 
-#### Adding New Features
+**Backend (Python)**:
 
-**Camera/Video Processing**:
+- `main.py` - Eel application server
+- `modules/database.py` - TinyDB operations
+- EEL exposed functions for frontend communication
 
-- Frontend: Use `navigator.mediaDevices.getUserMedia()` for display
-- Backend: Process frames in Python with OpenCV
-- Communication: Use `eel.expose` decorator for Python functions
+**Frontend (Web)**:
 
-**Example**:
+- HTML5 for structure
+- Vanilla CSS for styling
+- Vanilla JavaScript (ES6+) for logic
+- Modular architecture with shared utilities
+
+### Code Organization
+
+**Common Utilities** (`web/js/common/`):
+
+- `utils.js` - Helper functions (formatFileSize, showToast, etc.)
+- `api.js` - Centralized EEL API calls
+- `auth.js` - Session management
+- `constants.js` - App-wide configuration
+
+**Components** (`web/js/components/`):
+
+- Reusable UI components (loader, sidebar, vault, etc.)
+
+**Pages** (`web/js/pages/`):
+
+- Page-specific logic separated from HTML
+
+### Adding New Features
+
+**Example EEL Function**:
 
 ```python
 @eel.expose
-def process_frame(base64_image):
-    frame = decode_base64_to_frame(base64_image)
-    result = analyze_frame(frame)
-    return result
+def my_function(data):
+    # Process data
+    return {'success': True, 'data': result}
 ```
 
-#### Code Style
+**Frontend Call**:
 
-- Python: PEP 8 guidelines
-- JavaScript: ES6+ standards
-- Comments: Docstrings for all functions
-
-#### Testing
-
-```bash
-python modules/emotion_functions.py  # Test emotion module
-python modules/camera_functions.py   # Test camera module
+```javascript
+const result = await eel.my_function(data)();
+if (result.success) {
+  // Handle success
+}
 ```
 
 ### Contributing
 
-Contributions welcome! Please:
-
 1. Fork the repository
 2. Create feature branch
-3. Commit changes with clear messages
+3. Commit with clear messages
 4. Submit pull request
 
 ### License
 
 MIT License - See LICENSE file for details
 
-### Support
-
-For issues or questions:
-
-- 📧 Email: support@deceptron.ai
-- 🐛 Issues: GitHub Issues page
-- 📚 Docs: [Documentation Portal]
-
 ---
 
 ## 📝 Version History
 
-### v1.1.0 (Current)
+### v1.2.0 (Current)
 
-- ✅ **New**: Voice Stress Analysis Module
-- ✅ **New**: Smart Device Detection (Auto-filters virtual hardware)
-- ✅ **New**: Chunked Upload System (Optimized for large recordings)
-- ✅ **New**: Secure Vault System for Evidence Management
-- ✅ **Improved**: Login/Signup Flow with Visual Feedback
-- ✅ **Improved**: Live Session UI and UX
+- ✅ **New**: Modular JavaScript architecture
+- ✅ **New**: Centralized API wrapper functions
+- ✅ **New**: Common utility library
+- ✅ **Improved**: Code organization and maintainability
+- ✅ **Improved**: Performance optimizations
+- ✅ **Removed**: Unused emotion detection code
+- ✅ **Removed**: Redundant backend files
+
+### v1.1.0
+
+- ✅ Voice Stress Analysis Module
+- ✅ Smart Device Detection
+- ✅ Chunked Upload System
+- ✅ Secure Vault System
 
 ### v1.0.0
 
-- ✅ Real-time emotion detection
-- ✅ Facial expression analysis module
-- ✅ Live session recording
+- ✅ Real-time session recording
 - ✅ File upload and processing
 - ✅ Light/Dark theme support
 - ✅ Professional reporting system
-- ✅ Camera flip fix for accurate detection
 
 ### Upcoming Features
 
-- 🔜 Multi-face detection support
-- 🔜 Advanced report customization
+- 🔜 Advanced analytics dashboard
+- 🔜 Export functionality
 - 🔜 Cloud storage integration
-- 🔜 Mobile app companion
+- 🔜 Mobile companion app
 
 ---
 
