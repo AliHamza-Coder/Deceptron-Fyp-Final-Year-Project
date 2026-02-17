@@ -25,9 +25,9 @@ UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 RECORDINGS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Import our custom modules
-from modules import device_functions
-from modules import camera_functions
-from modules import emotion_functions
+# REMOVED: device_functions - JavaScript handles device enumeration directly
+# REMOVED: camera_functions - No longer used
+# REMOVED: emotion_functions - No longer using emotion detection
 from modules import database
 
 # ========================================
@@ -44,107 +44,22 @@ print("="*60 + "\n")
 # ========================================
 # LOAD EMOTION MODEL AT STARTUP
 # ========================================
-
-print("📦 Loading AI models...")
-emotion_model = emotion_functions.load_emotion_model()
-print("✅ All models loaded successfully!\n")
+# REMOVED: Emotion detection disabled
+# print("📦 Loading AI models...")
+# emotion_model = emotion_functions.load_emotion_model()
+# print("✅ All models loaded successfully!\n")
 
 # ========================================
 # EEL EXPOSED FUNCTIONS (callable from JavaScript)
 # ========================================
 
 
-@eel.expose
-def process_frame(base64_image):
-    """
-    Process a single frame from the frontend camera.
-    This is the MAIN function for real-time emotion detection.
-    
-    Parameters:
-        base64_image (str): Base64 encoded image from JavaScript
-    
-    Returns:
-        dict: Emotion detection results
-              Example: {
-                  'success': True,
-                  'face_found': True,
-                  'emotion': 'Happy',
-                  'confidence': 0.85,
-                  'all_scores': {...}
-              }
-    """
-    try:
-        # Step 1: Decode base64 image to OpenCV frame
-        frame = camera_functions.decode_base64_to_frame(base64_image)
-        
-        # Check if frame is None (not using == to avoid array comparison)
-        if frame is None:
-            return {
-                'success': False,
-                'error': 'Failed to decode image'
-            }
-        
-        # Step 2: Detect face in frame
-        face_info = emotion_functions.detect_face(frame)
-        
-        if not face_info['found']:
-            return {
-                'success': True,
-                'face_found': False,
-                'emotion': 'No Face',
-                'confidence': 0.0
-            }
-        
-        # Step 3: Extract face crop
-        x = face_info['x']
-        y = face_info['y']
-        w = face_info['w']
-        h = face_info['h']
-        
-        # Make sure we have valid coordinates
-        if w <= 0 or h <= 0:
-            return {
-                'success': True,
-                'face_found': False,
-                'emotion': 'Invalid Face',
-                'confidence': 0.0
-            }
-        
-        face_crop = frame[y:y+h, x:x+w]
-        
-        # Step 4: Get emotion from face
-        emotion, scores = emotion_functions.get_emotion(face_crop)
-        
-        # Check if emotion detection failed
-        if emotion is None:
-            return {
-                'success': True,
-                'face_found': True,
-                'emotion': 'Unknown',
-                'confidence': 0.0
-            }
-        
-        # Step 5: Format results
-        emotion_data = emotion_functions.format_emotion_data(emotion, scores)
-        
-        # Step 6: Return results to frontend
-        return {
-            'success': True,
-            'face_found': True,
-            'emotion': emotion_data['emotion'],
-            'confidence': emotion_data['confidence'],
-            'all_scores': emotion_data['all_scores'],
-            'face_box': face_info  # Include face coordinates for drawing
-        }
-        
-    except Exception as e:
-        import traceback
-        print(f"❌ Error processing frame: {e}")
-        print(traceback.format_exc())
-        return {
-            'success': False,
-            'error': str(e)
-        }
+# ========================================
+# REMOVED: Emotion detection and device functions
+# ========================================
+# - process_frame() - Emotion detection disabled
+# - get_available_cameras() - JavaScript handles device enumeration
+# - get_available_microphones() - JavaScript handles device enumeration
 
 
 # ========================================
@@ -197,23 +112,12 @@ def logout():
     current_user = None
     return response()
 
-@eel.expose
-def get_available_cameras():
-    """Get list of cameras (standardized)"""
-    try:
-        cameras = device_functions.find_all_cameras()
-        return response(data=cameras)
-    except Exception as e:
-        return response(success=False, message=str(e))
-
-@eel.expose
-def get_available_microphones():
-    """Get list of microphones (standardized)"""
-    try:
-        mics = device_functions.find_all_microphones()
-        return response(data=mics)
-    except Exception as e:
-        return response(success=False, message=str(e))
+# ========================================
+# REMOVED: Device enumeration functions
+# ========================================
+# JavaScript handles device enumeration directly via navigator.mediaDevices.enumerateDevices()
+# - get_available_cameras() - REMOVED
+# - get_available_microphones() - REMOVED
 
 @eel.expose
 def get_current_user():
