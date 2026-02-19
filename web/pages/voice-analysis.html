@@ -749,7 +749,7 @@
                         <canvas id="voiceStressPieChart"></canvas>
                         <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                             <h2 id="deceptionVal"
-                                class="text-4xl font-extrabold heading-font text-white drop-shadow-lg">12%</h2>
+                                class="text-4xl font-extrabold heading-font text-white drop-shadow-lg">--</h2>
                             <p class="text-[9px] text-gray-400 font-bold tracking-[0.25em] uppercase mt-2">RIEX SCORE
                             </p>
                         </div>
@@ -759,20 +759,20 @@
                         <div class="bg-white/5 border border-white/10 rounded-2xl p-3">
                             <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest mb-1">Risk Assessment
                             </p>
-                            <h4 id="riskLevel" class="text-xs font-bold text-emerald-400 uppercase tracking-wider">
-                                SECURE (CALIBRATING..)</h4>
+                            <h4 id="riskLevel" class="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                AWAITING INPUT</h4>
                         </div>
 
                         <div class="space-y-2">
                             <div
                                 class="flex justify-between text-[9px] font-bold uppercase tracking-widest text-gray-500">
                                 <span>Voice Stability</span>
-                                <span id="valStability">22%</span>
+                                <span id="valStability">0%</span>
                             </div>
                             <div class="h-2 bg-white/5 rounded-full overflow-hidden">
                                 <div id="barStability"
                                     class="h-full bg-cyan-400 rounded-full transition-all duration-1000"
-                                    style="width: 22%"></div>
+                                    style="width: 0%"></div>
                             </div>
                         </div>
 
@@ -810,7 +810,7 @@
             data: {
                 labels: Array(20).fill(''),
                 datasets: [{
-                    data: [150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150],
+                    data: Array(20).fill(0),
                     borderColor: '#00DBFF',
                     borderWidth: 2,
                     pointRadius: 0,
@@ -828,7 +828,7 @@
             data: {
                 labels: ['Risk', 'Safe'],
                 datasets: [{
-                    data: [12, 88],
+                    data: [0, 100],
                     backgroundColor: ['#f43f5e', 'rgba(255, 255, 255, 0.05)'],
                     borderWidth: 0,
                     borderRadius: 20,
@@ -908,8 +908,6 @@
                         }
                     }
 
-                    // Debug: Log track info
-                    console.log("🎤 Stream tracks - Audio:", mediaStream.getAudioTracks().length);
 
                     recordedChunks = [];
                     // Prefer WebM format for audio
@@ -918,8 +916,6 @@
                         options.mimeType = 'audio/webm';
                     }
 
-                    console.log("🎙️ Starting AUDIO-ONLY recording with mimeType:", options.mimeType);
-                    console.log("🎙️ Audio tracks in stream:", mediaStream.getAudioTracks().length);
                     mediaRecorder = new MediaRecorder(mediaStream, options);
 
                     mediaRecorder.ondataavailable = (event) => {
@@ -943,7 +939,6 @@
                     timerInterval = setInterval(updateTimerUI, 1000);
 
                     document.getElementById('transcript').innerHTML = '<p class="text-cyan-400">Listening to audio input stream...</p>';
-                    simulateRealTimeAnalysis();
                 } catch (err) {
                     console.error("Recording Error:", err);
                     alert("Microphone access denied.");
@@ -1118,71 +1113,42 @@
 
         function stopTimer() { clearInterval(timerInterval); }
 
-        function simulateRealTimeAnalysis() {
-            if (!isRecording) return;
-
-            // Randomly update metrics
-            const f0 = (210 + Math.random() * 20).toFixed(1);
-            document.getElementById('valF0').innerText = f0;
-
-            // Update Stability Chart
-            stabilityChart.data.datasets[0].data.shift();
-            stabilityChart.data.datasets[0].data.push(f0);
-            stabilityChart.update('none');
-
-            if (isRecording) setTimeout(simulateRealTimeAnalysis, 200);
-        }
 
         async function finalizeAnalysis() {
-            Loader.show("Acoustic Fingerprinting");
-            
-            // Simulation of analysis processing time
-            await new Promise(resolve => setTimeout(resolve, 2500));
-            
-            // Updated Mock metrics
-            document.getElementById('valF0').innerText = "224.5";
-            document.getElementById('descF0').innerText = "High variation detected (Micro-Stress)";
-            document.getElementById('descF0').className = "text-[10px] text-rose-400 mt-2 italic font-bold";
+            Loader.show("Processing audio...");
+            try {
+                // Analysis results are populated by the backend (eel) when integrated.
+                // For now, show a pending placeholder.
+                document.getElementById('valF0').innerText = "---";
+                document.getElementById('descF0').innerText = "Analysis pending — upload audio first.";
+                document.getElementById('descF0').className = "text-[10px] text-gray-500 mt-2 italic";
 
-            document.getElementById('valJitter').innerText = "1.02";
-            document.getElementById('descJitter').innerText = "Standard baseline within range";
+                document.getElementById('valJitter').innerText = "---";
+                document.getElementById('descJitter').innerText = "Awaiting signal processing.";
+                document.getElementById('descJitter').className = "text-[10px] text-gray-500 mt-2 italic";
 
-            document.getElementById('valShimmer').innerText = "0.48";
-            document.getElementById('descShimmer').innerText = "Elevated vocal intensity shift";
-            document.getElementById('descShimmer').className = "text-[10px] text-amber-500 mt-2 italic font-bold";
+                document.getElementById('valShimmer').innerText = "---";
+                document.getElementById('descShimmer').innerText = "Awaiting signal processing.";
+                document.getElementById('descShimmer').className = "text-[10px] text-gray-500 mt-2 italic";
 
-            // Update Bars
-            document.getElementById('valAnxiety').innerText = "74%";
-            document.getElementById('barAnxiety').style.width = "74%";
-            document.getElementById('valCertainty').innerText = "22%";
-            document.getElementById('barCertainty').style.width = "22%";
+                document.getElementById('valAnxiety').innerText = "0%";
+                document.getElementById('barAnxiety').style.width = "0%";
+                document.getElementById('valCertainty').innerText = "0%";
+                document.getElementById('barCertainty').style.width = "0%";
 
-            // Update Deception Chart
-            const deceptionPct = 82;
-            document.getElementById('deceptionVal').innerText = deceptionPct + "%";
+                document.getElementById('deceptionVal').innerText = "--";
+                document.getElementById('riskLevel').innerText = "ANALYSIS REQUIRED";
+                document.getElementById('riskLevel').className = "text-xs font-bold text-gray-500 tracking-wider";
+                document.getElementById('barStability').style.width = "0%";
+                document.getElementById('valStability').innerText = "0%";
 
-            if (voiceStressPieChart) {
-                voiceStressPieChart.data.datasets[0].data = [deceptionPct, 100 - deceptionPct];
-                voiceStressPieChart.update();
+                document.getElementById('transcript').innerHTML =
+                    '<p class="text-gray-600 italic opacity-60">No audio analysed yet. Record or load a file, then press Analyse.</p>';
+
+                document.getElementById('playBtn').disabled = false;
+            } finally {
+                Loader.hide();
             }
-            document.getElementById('riskLevel').innerText = "CRITICAL: DECEPTION DETECTED";
-            document.getElementById('riskLevel').className = "text-xs font-bold text-rose-500 tracking-wider";
-            document.getElementById('barStability').style.width = "40%";
-            document.getElementById('valStability').innerText = "40%";
-
-            // Update Transcript
-            document.getElementById('transcript').innerHTML = `
-                <div class="space-y-4">
-                    <p><span class="text-cyan-500 font-bold">[00:02]</span> "I entered the secure facility at 9 PM using my card."</p>
-                    <p class="text-rose-400 border-l-2 border-rose-500 pl-3 bg-rose-500/5 py-2">
-                        <span class="font-bold">[00:08]</span> "I did not access the server core room at any time last night."
-                    </p>
-                    <p><span class="text-cyan-500 font-bold">[00:15]</span> "My logs should show my presence in the cafeteria."</p>
-                </div>
-            `;
-
-            document.getElementById('playBtn').disabled = false;
-            Loader.hide();
         }
 
         function openVaultSelection() {
