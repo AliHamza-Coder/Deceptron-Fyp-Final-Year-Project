@@ -386,14 +386,6 @@
                             </div>
                             <input type="checkbox" id="mirrorToggle" class="w-4 h-4 accent-purple-500" onchange="applySettings()">
                         </div>
-                        <!-- Grid Toggle -->
-                        <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
-                            <div>
-                                <p class="text-xs font-bold text-gray-300 uppercase">Grid Overlay</p>
-                                <p class="text-[9px] text-gray-500">Show 3x3 rule of thirds grid.</p>
-                            </div>
-                            <input type="checkbox" id="gridToggle" class="w-4 h-4 accent-purple-500" onchange="applySettings()">
-                        </div>
                     </div>
                 </div>
 
@@ -543,7 +535,6 @@
                     if (prefs.contrast) document.getElementById('contrastSlider').value = prefs.contrast;
                     if (prefs.saturation) document.getElementById('saturationSlider').value = prefs.saturation;
                     if (prefs.mirror_camera !== undefined) document.getElementById('mirrorToggle').checked = prefs.mirror_camera;
-                    if (prefs.grid_overlay !== undefined) document.getElementById('gridToggle').checked = prefs.grid_overlay;
                     
                     document.querySelectorAll('.range-slider').forEach(s => {
                         const display = s.previousElementSibling.querySelector('.text-cyan-400');
@@ -560,7 +551,6 @@
              const contrast = document.getElementById('contrastSlider').value;
              const saturation = document.getElementById('saturationSlider').value;
              const mirror = document.getElementById('mirrorToggle').checked;
-             const grid = document.getElementById('gridToggle').checked;
              
              const originalText = btn.innerText;
              btn.innerText = "SAVING...";
@@ -572,8 +562,7 @@
                      'brightness': brightness,
                      'contrast': contrast,
                      'saturation': saturation,
-                     'mirror_camera': mirror,
-                     'grid_overlay': grid
+                     'mirror_camera': mirror
                  };
                  const result = await eel.save_preferences(prefs)();
                  if (result && result.success) {
@@ -647,19 +636,6 @@
             const mirror = document.getElementById('mirrorToggle').checked;
             video.style.filter = `brightness(${bVal}) contrast(${cVal}) saturate(${sVal})`;
             video.style.transform = mirror ? 'scaleX(-1)' : 'scaleX(1)';
-            
-            let gridOverlay = document.getElementById('settingsGridOverlay');
-            if(document.getElementById('gridToggle').checked) {
-                if(!gridOverlay) {
-                    const parent = video.parentElement;
-                    gridOverlay = document.createElement('div');
-                    gridOverlay.id = 'settingsGridOverlay';
-                    gridOverlay.className = "absolute inset-0 pointer-events-none z-10";
-                    gridOverlay.innerHTML = `<div class="w-full h-full grid grid-cols-3 grid-rows-3"><div class="border-r border-b border-white/20"></div><div class="border-r border-b border-white/20"></div><div class="border-b border-white/20"></div><div class="border-r border-b border-white/20"></div><div class="border-r border-b border-white/20"></div><div class="border-b border-white/20"></div><div class="border-r border-white/20"></div><div class="border-r border-white/20"></div><div></div></div>`;
-                    parent.appendChild(gridOverlay);
-                }
-                gridOverlay.classList.remove('hidden');
-            } else if(gridOverlay) gridOverlay.classList.add('hidden');
 
             if (videoTrack) {
                 videoTrack.applyConstraints({ advanced: [{ brightness: parseInt(brightness), contrast: parseInt(contrast), saturation: parseInt(saturation) }] }).catch(err => {});
@@ -685,9 +661,7 @@
                 localStorage.removeItem(id);
             });
             document.getElementById('mirrorToggle').checked = false;
-            document.getElementById('gridToggle').checked = false;
             localStorage.removeItem('mirrorToggle');
-            localStorage.removeItem('gridToggle');
             loadSliderValues();
             applySettings();
             eel.save_preferences(null)();

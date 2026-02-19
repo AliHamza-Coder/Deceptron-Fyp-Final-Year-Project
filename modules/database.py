@@ -112,9 +112,10 @@ def update_user_preferences(username, preferences):
     if not user:
          return {'success': False, 'message': 'User not found'}
     
-    current_prefs = user.get('preferences', {})
-    # Merge new prefs with existing ones
-    updated_prefs = {**current_prefs, **preferences}
+    current_prefs = user.get('preferences') or {}
+    # Merge new prefs with existing ones (guard against None stored in DB)
+    updated_prefs = {**(current_prefs if isinstance(current_prefs, dict) else {}), **preferences}
+
     
     users_table.update({'preferences': updated_prefs}, User.username == username)
     return {'success': True, 'preferences': updated_prefs}

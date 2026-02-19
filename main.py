@@ -1,14 +1,16 @@
 # ========================================
 # DECEPTRON - MAIN APPLICATION
-# Real-time Emotion Detection System
+# Deception Analysis System
 # ========================================
 
 import eel
 import sys
 import os
+import re
 import base64
 import uuid
 import time
+
 from pathlib import Path
 
 # ========================================
@@ -145,7 +147,7 @@ def initiate_upload(filename, total_size, file_type, is_recording=False):
             return {'success': False, 'message': 'Not logged in'}
             
         upload_id = str(uuid.uuid4())
-        safe_filename = filename.replace(' ', '_')
+        safe_filename = re.sub(r'[^\w\-.]', '_', os.path.basename(filename))
         temp_path = UPLOADS_DIR / f"temp_{upload_id}"
         
         active_uploads[upload_id] = {
@@ -247,7 +249,7 @@ def save_recording(filename, base64_data, category):
             os.makedirs(rec_dir)
             
         # 2. Clean filename and ensure extension
-        safe_filename = filename.replace(' ', '_')
+        safe_filename = re.sub(r'[^\w\-.]', '_', os.path.basename(filename))
         if not safe_filename.endswith('.webm'):
             safe_filename += '.webm'
             

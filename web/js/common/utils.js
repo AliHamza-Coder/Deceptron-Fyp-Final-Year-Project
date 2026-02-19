@@ -130,3 +130,129 @@ function debounce(func, wait) {
 function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
+
+// ── Media / Device Utilities ─────────────────────────────────────────────────
+
+/**
+ * Return an object with separated camera, microphone and speaker lists.
+ * @returns {Promise<{cameras: InputDeviceInfo[], microphones: InputDeviceInfo[], speakers: MediaDeviceInfo[]}>}
+ */
+async function enumerateMediaDevices() {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    return {
+        cameras:    devices.filter(d => d.kind === 'videoinput'),
+        microphones:devices.filter(d => d.kind === 'audioinput'),
+        speakers:   devices.filter(d => d.kind === 'audiooutput')
+    };
+}
+
+/**
+ * Populate a <select> element with media devices.
+ * @param {string} selectId     - ID of the <select> element.
+ * @param {InputDeviceInfo[]} devices - Devices to populate.
+ * @param {string} defaultLabel - Fallback label prefix when device.label is empty.
+ */
+function populateDeviceSelect(selectId, devices, defaultLabel = 'Device') {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    select.innerHTML = '';
+    devices.forEach((device, i) => {
+        const option        = document.createElement('option');
+        option.value        = device.deviceId;
+        option.textContent  = device.label || `${defaultLabel} ${i + 1}`;
+        select.appendChild(option);
+    });
+}
+
+/**
+ * Request a MediaStream and optionally attach it to a video element.
+ * @param {MediaStreamConstraints} constraints  - getUserMedia constraints.
+ * @param {string|null}            videoElementId - ID of <video> to attach stream.
+ * @returns {Promise<MediaStream>}
+ */
+async function startMediaStream(constraints, videoElementId = null) {
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    if (videoElementId) {
+        const el = document.getElementById(videoElementId);
+        if (el) el.srcObject = stream;
+    }
+    return stream;
+}
+
+/**
+ * Stop all tracks on a stream and optionally clear a video element.
+ * @param {MediaStream|null} stream        - Stream to stop.
+ * @param {string|null}      videoElementId - Video element to clear.
+ * @returns {null}
+ */
+function stopMediaStream(stream, videoElementId = null) {
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+    }
+    if (videoElementId) {
+        const el = document.getElementById(videoElementId);
+        if (el) el.srcObject = null;
+    }
+    return null;
+}
+
+/**
+ * Load saved device preferences and apply them to select elements.
+ * @param {{ camera?: string, mic?: string }} selectIds - Map of preference key → select element ID.
+ * @returns {Promise<object>} The full preferences object.
+ */
+async function applyDevicePreferences(selectIds = {}) {
+    const prefs = await loadPreferences();
+    if (selectIds.camera && prefs.defaultCamera) {
+        const el = document.getElementById(selectIds.camera);
+        if (el) el.value = prefs.defaultCamera;
+    }
+    if (selectIds.mic && prefs.defaultMic) {
+        const el = document.getElementById(selectIds.mic);
+        if (el) el.value = prefs.defaultMic;
+    }
+    return prefs;
+}
+
+/**
+ * Upload a Blob and manage Loader UI + feedback messages.
+ * @param {Blob}   blob           - The file/recording blob to upload.
+ * @param {string} loaderMessage  - Message shown while loading.
+ * @param {string} successMessage - Alert text on success.
+ * @returns {Promise<boolean>} True on success.
+ */
+async function saveRecordingWithLoader(blob, loaderMessage = 'Saving...', successMessage = 'Saved successfully!') {
+    try {
+        if (typeof Loader !== 'undefined') Loader.show(loaderMessage);
+
+        const result = await uploadFile(blob, true, (progress) => {
+            if (typeof Loader !== 'undefined') Loader.updateProgress(progress);
+        });
+
+        if (result.success) {
+            showToast(successMessage, 'success');
+            return true;
+        } else {
+            showToast('Save failed: ' + (result.message || 'Unknown error'), 'error');
+            return false;
+        }
+    } catch (error) {
+        console.error('saveRecordingWithLoader error:', error);
+        showToast('Save error: ' + error.message, 'error');
+        return false;
+    } finally {
+        if (typeof Loader !== 'undefined') Loader.hide();
+    }
+}
+
+/**
+ * Standard page bootstrap: wait for DOM, check auth, then run the callback.
+ * @param {Function} callback - Async function containing page-specific init logic.
+ */
+function initializePage(callback) {
+    document.addEventListener('DOMContentLoaded', async () => {
+        await requireAuth();
+        if (typeof callback === 'function') await callback();
+    });
+}
+
