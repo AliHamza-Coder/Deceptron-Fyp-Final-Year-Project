@@ -19,8 +19,11 @@ from pathlib import Path
 # Resolve absolute paths relative to this script
 BASE_DIR = Path(__file__).resolve().parent
 WEB_DIR = BASE_DIR / "web"
-UPLOADS_DIR = WEB_DIR / "uploads"
-RECORDINGS_DIR = WEB_DIR / "recordings"
+
+# Persistent storage directory (survives app restarts and PyInstaller extraction)
+DATA_DIR = Path.home() / ".deceptron"
+UPLOADS_DIR = DATA_DIR / "uploads"
+RECORDINGS_DIR = DATA_DIR / "recordings"
 
 # Ensure required directories exist
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
@@ -38,6 +41,12 @@ from modules import database
 
 # Set web folder location
 eel.init(str(WEB_DIR))
+
+# Custom route to serve local persistent data (uploads/recordings) to the UI
+# This is necessary because these files are outside the Eel WEB_DIR
+@eel.btl.route('/data/<filepath:path>')
+def server_static(filepath):
+    return eel.btl.static_file(filepath, root=str(DATA_DIR))
 
 print("\n" + "="*60)
 print("🚀 DECEPTRON - TRUTH VERIFICATION SYSTEM")
@@ -205,12 +214,12 @@ def finalize_upload(upload_id):
             
         # Determine target directory based on type
         target_dir = UPLOADS_DIR
-        relative_prefix = "../uploads/"
+        route_prefix = "/data/uploads/"
         
         # Check if this is a recording
         if info.get('is_recording'):
             target_dir = RECORDINGS_DIR
-            relative_prefix = "../recordings/"
+            route_prefix = "/data/recordings/"
             
         # Ensure target directory exists
         if not target_dir.exists():
@@ -225,7 +234,7 @@ def finalize_upload(upload_id):
 
         os.rename(info['temp_path'], final_path)
         
-        relative_path = f"{relative_prefix}{info['filename']}"
+        relative_path = f"{route_prefix}{info['filename']}"
         return database.add_upload(info['username'], info['filename'], info['type'], info['size_str'], relative_path)
     except Exception as e:
         import traceback
@@ -244,9 +253,8 @@ def save_recording(filename, base64_data, category):
             return {'success': False, 'message': 'Not logged in'}
         
         # 1. Ensure recordings directory exists
-        rec_dir = os.path.join('web', 'recordings')
-        if not os.path.exists(rec_dir):
-            os.makedirs(rec_dir)
+        if not RECORDINGS_DIR.exists():
+            RECORDINGS_DIR.mkdir(parents=True, exist_ok=True)
             
         # 2. Clean filename and ensure extension
         safe_filename = re.sub(r'[^\w\-.]', '_', os.path.basename(filename))
@@ -267,7 +275,7 @@ def save_recording(filename, base64_data, category):
         
         # 4. Add to database
         size_mb = f"{len(file_content) / (1024*1024):.1f} MB"
-        relative_path = f"../recordings/{safe_filename}"
+        relative_path = f"/data/recordings/{safe_filename}"
         
         return database.add_upload(
             current_user['username'], 
@@ -297,15 +305,29 @@ def delete_upload_record(upload_id):
             # 2. Try to delete the physical file
             upload_data = result.get('data')
             if upload_data and 'filepath' in upload_data:
-                filename = os.path.basename(upload_data['filepath'])
-                file_path = UPLOADS_DIR / filename
-                
-                if file_path.exists():
-                    try:
-                        file_path.unlink()
-                        print(f"🗑️ Physically deleted: {file_path}")
-                    except Exception as e:
-                        print(f"⚠️ Failed to delete physical file: {e}")
+                # Use the new path structure to find the file
+                # filepath example: "/data/recordings/filename.webm"
+                db_path = upload_data['filepath']
+                if db_path.startswith('/data/'):
+                    # Map route path back to physical disk path
+                    relative_to_data = db_path.replace('/data/', '', 1)
+                    file_path = DATA_DIR / relative_to_data
+                    
+                    if file_path.exists():
+                        try:
+                            file_path.unlink()
+                            print(f"🗑️ Physically deleted: {file_path}")
+                        except Exception as e:
+                            print(f"⚠️ Failed to delete physical file: {e}")
+                else:
+                    # Fallback for old legacy paths if they exist
+                    filename = os.path.basename(db_path)
+                    # Try both locations
+                    for d in [UPLOADS_DIR, RECORDINGS_DIR]:
+                        p = d / filename
+                        if p.exists():
+                            p.unlink()
+                            break
             
             return response()
         else:

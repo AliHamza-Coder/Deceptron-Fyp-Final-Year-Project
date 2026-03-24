@@ -1,11 +1,14 @@
-import os
+from pathlib import Path
 from tinydb import TinyDB, Query
 from datetime import datetime
 import uuid
 
-# Database setup
-DB_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.path.join(DB_DIR, 'db.json')
+# Persistent Database setup
+# Use Home directory so accounts are NOT wiped when the temp PyInstaller folder is deleted
+DB_DIR = Path.home() / ".deceptron"
+DB_DIR.mkdir(parents=True, exist_ok=True)
+
+DB_PATH = str(DB_DIR / 'db.json')
 db = TinyDB(DB_PATH)
 users_table = db.table('users')
 uploads_table = db.table('uploads')
