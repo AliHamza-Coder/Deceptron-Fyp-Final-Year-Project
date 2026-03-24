@@ -396,6 +396,20 @@
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             cursor: pointer; z-index: 100; box-shadow: 0 0 15px rgba(0, 219, 255, 0.4);
         }
+
+        /* --- Forensic Glow System --- */
+        .glow-cyan { box-shadow: 0 0 20px rgba(0, 219, 255, 0.15); border: 1px solid rgba(0, 219, 255, 0.3) !important; }
+        .glow-purple { box-shadow: 0 0 20px rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3) !important; }
+        .glow-blue { box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3) !important; }
+        .glow-emerald { box-shadow: 0 0 20px rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3) !important; }
+        .glow-amber { box-shadow: 0 0 20px rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3) !important; }
+        .glow-rose { box-shadow: 0 0 20px rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.3) !important; }
+        .glow-slate { box-shadow: 0 0 20px rgba(148, 163, 184, 0.1); border: 1px solid rgba(148, 163, 184, 0.2) !important; }
+
+        .info-card:hover .glow-cyan { box-shadow: 0 0 30px rgba(0, 219, 255, 0.4); background: rgba(0, 219, 255, 0.1) !important; }
+        .info-card:hover .glow-blue { box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); background: rgba(59, 130, 246, 0.1) !important; }
+        .info-card:hover .glow-amber { box-shadow: 0 0 30px rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.1) !important; }
+        .info-card:hover .glow-emerald { box-shadow: 0 0 30px rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.1) !important; }
     </style>
 </head>
 <body>
@@ -434,7 +448,7 @@
 
         <!-- Hero Section -->
         <section class="hero-section">
-            <div class="avatar-wrapper" id="avatar-container">
+            <div class="avatar-wrapper glow-cyan" id="avatar-container">
                 <div class="avatar-inner">
                     <img src="" alt="Avatar" id="display-avatar" onerror="this.src='https://ui-avatars.com/api/?name=User&background=0a1120&color=00dbff'">
                 </div>
@@ -448,31 +462,30 @@
             </div>
         </section>
 
-        <!-- Info Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="info-card">
-                <div class="icon-box"><i class="fas fa-envelope"></i></div>
+            <div class="info-card group">
+                <div class="icon-box glow-cyan transition-all duration-300"><i class="fas fa-envelope"></i></div>
                 <div>
                     <label class="text-[10px] uppercase tracking-widest font-bold text-dim">Email Address</label>
                     <p class="text-lg font-bold" id="display-email">-</p>
                 </div>
             </div>
-            <div class="info-card">
-                <div class="icon-box"><i class="fas fa-user-tag"></i></div>
+            <div class="info-card group">
+                <div class="icon-box glow-blue transition-all duration-300"><i class="fas fa-user-tag"></i></div>
                 <div>
                     <label class="text-[10px] uppercase tracking-widest font-bold text-dim">Full Name</label>
                     <p class="text-lg font-bold" id="display-fullname">-</p>
                 </div>
             </div>
-            <div class="info-card">
-                <div class="icon-box"><i class="fas fa-clock"></i></div>
+            <div class="info-card group">
+                <div class="icon-box glow-amber transition-all duration-300"><i class="fas fa-clock"></i></div>
                 <div>
                     <label class="text-[10px] uppercase tracking-widest font-bold text-dim">Last Login</label>
                     <p class="text-lg font-bold" id="display-last-login">Just now</p>
                 </div>
             </div>
-            <div class="info-card">
-                <div class="icon-box"><i class="fas fa-calendar-alt"></i></div>
+            <div class="info-card group">
+                <div class="icon-box glow-emerald transition-all duration-300"><i class="fas fa-calendar-alt"></i></div>
                 <div>
                     <label class="text-[10px] uppercase tracking-widest font-bold text-dim">Member Since</label>
                     <p class="text-lg font-bold heading-font text-cyan-400" id="display-member-since">-</p>
@@ -490,17 +503,16 @@
                 </div>
                 
                 <div class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <!-- Avatar Management Column -->
-                        <div class="md:col-span-1 border-r border-white/5 pr-4">
+                    <!-- TOP ROW: Avatar + Info -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Avatar Column -->
+                        <div class="md:col-span-1 flex flex-col items-center justify-start pt-2">
                             <div class="modal-avatar-section">
                                 <div class="modal-avatar-wrapper" onclick="document.getElementById('modal-avatar-upload').click()">
                                     <div class="modal-avatar-preview">
                                         <img src="" id="modal-avatar-display" onerror="this.src='https://ui-avatars.com/api/?name=User&background=0a1120&color=00dbff'">
                                     </div>
-                                    <div class="modal-pencil-icon">
-                                        <i class="fas fa-pencil-alt"></i>
-                                    </div>
+                                    <div class="modal-pencil-icon glow-cyan"><i class="fas fa-pencil-alt"></i></div>
                                 </div>
                                 <div class="modal-remove-link" onclick="modalRemoveAvatar()">
                                     <i class="fas fa-trash-alt mr-1"></i> Remove Photo
@@ -509,55 +521,51 @@
                             </div>
                         </div>
 
-                        <!-- Data Column -->
-                        <div class="md:col-span-2 space-y-6">
-                            <div class="grid grid-cols-1 gap-6">
-                                <div class="space-y-4">
-                                    <div class="flex items-center gap-3 mb-2">
-                                        <i class="fas fa-id-card text-cyan-400"></i>
-                                        <h4 class="text-xs font-black uppercase tracking-wider">General Information</h4>
-                                    </div>
-                                    <div class="input-group">
-                                        <label>Full Name</label>
-                                        <input type="text" class="cyber-input" id="edit-name" placeholder="Full Name">
-                                    </div>
-                                    <div class="input-group">
-                                        <label>Designation</label>
-                                        <input type="text" class="cyber-input" id="edit-title" placeholder="Designation">
-                                    </div>
-                                </div>
+                        <!-- Info Column -->
+                        <div class="md:col-span-2 space-y-4">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i class="fas fa-id-card text-cyan-400 text-xs"></i>
+                                <h4 class="text-[10px] font-black uppercase tracking-wider text-gray-400">General Information</h4>
+                            </div>
+                            <div class="input-group">
+                                <label>Full Name</label>
+                                <input type="text" class="cyber-input" id="edit-name" placeholder="Full Name">
+                            </div>
+                            <div class="input-group">
+                                <label>Designation</label>
+                                <input type="text" class="cyber-input" id="edit-title" placeholder="e.g. Senior Analyst">
+                            </div>
+                            <div class="input-group">
+                                <label>Email Address</label>
+                                <input type="text" class="cyber-input opacity-50" id="edit-email" disabled>
                             </div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="space-y-4">
-                            <div class="flex items-center gap-3 mb-2">
-                                <i class="fas fa-lock text-cyan-400"></i>
-                                <h4 class="text-xs font-black uppercase tracking-wider">Account Security</h4>
+                    <!-- SECURITY SECTION -->
+                    <div class="pt-2 border-t border-white/5">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-7 h-7 rounded-lg bg-purple-500/10 flex items-center justify-center glow-purple">
+                                <i class="fas fa-lock text-purple-400 text-xs"></i>
                             </div>
-                            <div class="input-group">
+                            <h4 class="text-[10px] font-black uppercase tracking-wider text-gray-400">Account Security</h4>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="input-group" style="position:relative">
                                 <label>Current Password</label>
-                                <input type="password" class="cyber-input" id="edit-current-pwd" placeholder="••••••••">
+                                <input type="password" class="cyber-input" id="edit-current-pwd" placeholder="Enter current password" style="padding-right:2.5rem">
+                                <button type="button" onclick="toggleModalPwd('edit-current-pwd',this)" style="position:absolute;right:12px;bottom:13px;background:none;border:none;color:rgba(148,163,184,0.5);cursor:pointer;font-size:0.75rem;" tabindex="-1"><i class="fas fa-eye"></i></button>
                             </div>
-                        </div>
-                        <div class="space-y-4">
-                            <div class="flex items-center gap-3 mb-2 invisible">
-                                <h4 class="text-xs font-black uppercase tracking-wider">Hidden</h4>
-                            </div>
-                            <div class="input-group">
+                            <div class="input-group" style="position:relative">
                                 <label>New Password</label>
-                                <input type="password" class="cyber-input" id="edit-new-pwd" placeholder="••••••••">
+                                <input type="password" class="cyber-input" id="edit-new-pwd" placeholder="Enter new password" style="padding-right:2.5rem">
+                                <button type="button" onclick="toggleModalPwd('edit-new-pwd',this)" style="position:absolute;right:12px;bottom:13px;background:none;border:none;color:rgba(148,163,184,0.5);cursor:pointer;font-size:0.75rem;" tabindex="-1"><i class="fas fa-eye"></i></button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="input-group">
-                        <label>Email Address (Primary)</label>
-                        <input type="text" class="cyber-input opacity-50" id="edit-email" disabled>
-                    </div>
-
-                    <div class="flex gap-4 pt-4">
+                    <!-- ACTION BUTTONS -->
+                    <div class="flex gap-4 pt-2">
                         <button class="update-btn flex-1" style="background: rgba(128,128,128,0.1); color: var(--text-main); border: 1px solid var(--border-subtle); box-shadow: none;" onclick="closeModal()">Cancel</button>
                         <button class="update-btn flex-1" onclick="saveProfile()">Save Changes</button>
                     </div>
@@ -725,7 +733,13 @@
                 console.error("Failed to fetch user data:", err);
             }
         });
+
+        function toggleModalPwd(id, btn) {
+            const input = document.getElementById(id);
+            const isText = input.type === 'text';
+            input.type = isText ? 'password' : 'text';
+            btn.querySelector('i').className = isText ? 'fas fa-eye' : 'fas fa-eye-slash';
+        }
     </script>
 </body>
 </html>
-```

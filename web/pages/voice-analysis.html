@@ -19,21 +19,13 @@
             --accent-rose: #f43f5e;
             --bg-dark: #070B14;
             --sidebar-width: 260px;
-            --glass-bg: rgba(10, 17, 32, 0.85);
+            --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
-        }
-
-        :root {
-            --primary-blue: #0076D6;
-            --accent-cyan: #00DBFF;
-            --bg-dark: #070B14;
-            --sidebar-width: 260px;
 
             /* Theme Tokens */
             --bg-main: #05080f;
             --text-main: #e2e8f0;
             --text-dim: #94a3b8;
-            --glass-bg: rgba(255, 255, 255, 0.03);
             --sidebar-bg: rgba(10, 17, 32, 0.98);
             --card-bg: rgba(16, 28, 45, 0.4);
             --border-subtle: rgba(255, 255, 255, 0.05);
@@ -482,6 +474,30 @@
             padding: 2rem;
         }
 
+        /* Localized Glows */
+        .glow-cyan {
+            box-shadow: 0 0 20px rgba(0, 219, 255, 0.2), inset 0 0 10px rgba(0, 219, 255, 0.1);
+            filter: drop-shadow(0 0 5px rgba(0, 219, 255, 0.2));
+        }
+        .glow-purple {
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.2), inset 0 0 10px rgba(168, 85, 247, 0.1);
+            filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.2));
+        }
+        .glow-amber {
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.2), inset 0 0 10px rgba(245, 158, 11, 0.1);
+            filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.2));
+        }
+        .glow-rose {
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.2), inset 0 0 10px rgba(244, 63, 94, 0.1);
+            filter: drop-shadow(0 0 5px rgba(244, 63, 94, 0.2));
+        }
+
+        body.light-mode .glow-cyan, body.light-mode .glow-purple, 
+        body.light-mode .glow-amber, body.light-mode .glow-rose {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            filter: none;
+        }
+
         .logo-section img {
             width: 100%;
             height: 100%;
@@ -629,7 +645,7 @@
                 <div class="glass p-6 group hover:-translate-y-1 transition-transform duration-300">
                     <div class="flex items-start justify-between mb-4">
                         <div
-                            class="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 border border-cyan-500/20 group-hover:bg-cyan-500 group-hover:text-black transition-all duration-300 shadow-[0_0_15px_rgba(0,219,255,0.1)]">
+                            class="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 border border-cyan-500/20 group-hover:bg-cyan-500 group-hover:text-black transition-all duration-300 glow-cyan">
                             <i class="fas fa-wave-square text-lg"></i>
                         </div>
                         <div
@@ -645,7 +661,7 @@
                 <div class="glass p-6 group hover:-translate-y-1 transition-transform duration-300">
                     <div class="flex items-start justify-between mb-4">
                         <div
-                            class="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20 group-hover:bg-purple-500 group-hover:text-white transition-all duration-300 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+                            class="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20 group-hover:bg-purple-500 group-hover:text-white transition-all duration-300 glow-purple">
                             <i class="fas fa-chart-bar text-lg"></i>
                         </div>
                         <div
@@ -661,7 +677,7 @@
                 <div class="glass p-6 group hover:-translate-y-1 transition-transform duration-300">
                     <div class="flex items-start justify-between mb-4">
                         <div
-                            class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-400 border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-black transition-all duration-300 shadow-[0_0_15px_rgba(245,158,11,0.1)]">
+                            class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-400 border border-amber-500/20 group-hover:bg-amber-500 group-hover:text-black transition-all duration-300 glow-amber">
                             <i class="fas fa-volume-up text-lg"></i>
                         </div>
                         <div
@@ -674,7 +690,7 @@
                     </p>
                 </div>
 
-                <div class="glass p-5">
+                <div class="glass p-6">
                     <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Frequency Stability
                     </h4>
                     <div class="h-32"><canvas id="stabilityChart"></canvas></div>
@@ -699,8 +715,8 @@
                 <div class="glass p-6">
                     <div class="flex items-center mb-6">
                         <div
-                            class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20 mr-3 shadow-[0_0_10px_rgba(168,85,247,0.1)]">
-                            <i class="fas fa-chart-pie text-xs"></i>
+                            class="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20 mr-4 glow-purple">
+                            <i class="fas fa-chart-pie text-lg"></i>
                         </div>
                         <h3 class="text-[11px] font-bold uppercase tracking-widest text-purple-400">Acoustic Emotion
                             Mapping</h3>
@@ -739,8 +755,8 @@
                 <div class="glass p-6 h-full flex flex-col items-center border-rose-500/10">
                     <div class="w-full mb-6 flex items-center">
                         <div
-                            class="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-500 border border-rose-500/20 mr-3 shadow-[0_0_10px_rgba(244,63,94,0.1)]">
-                            <i class="fas fa-shield-virus text-xs"></i>
+                            class="w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-500 border border-rose-500/20 mr-4 glow-rose">
+                            <i class="fas fa-shield-virus text-lg"></i>
                         </div>
                         <h3 class="text-[11px] font-bold uppercase tracking-widest text-rose-500">Deception Unit</h3>
                     </div>
@@ -851,18 +867,22 @@
         });
 
         function updateChartTheme(isLight) {
-            if (voiceStressPieChart) {
-                const safeColor = isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)';
-                const hoverSafeColor = isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
+            const chartColor = isLight ? '#475569' : '#64748b';
+            const safeColor = isLight ? 'rgba(0, 118, 214, 0.05)' : 'rgba(255, 255, 255, 0.05)';
+            const hoverSafeColor = isLight ? 'rgba(0, 118, 214, 0.1)' : 'rgba(255, 255, 255, 0.1)';
 
+            if (voiceStressPieChart) {
                 voiceStressPieChart.data.datasets[0].backgroundColor[1] = safeColor;
                 voiceStressPieChart.data.datasets[0].hoverBackgroundColor[1] = hoverSafeColor;
-                voiceStressPieChart.update();
+                voiceStressPieChart.update('none');
+            }
+            if (stabilityChart) {
+                stabilityChart.data.datasets[0].backgroundColor = safeColor;
+                stabilityChart.update('none');
             }
         }
 
-        // Mock Logic
-        // Real Microphone Control
+        // Mock Logic & Audio Controls
         let mediaStream = null;
         let mediaRecorder;
         let recordedChunks = [];
@@ -893,72 +913,39 @@
                         audio: (micId && micId.trim()) ? { deviceId: { exact: micId } } : true,
                         video: false
                     };
-
                     mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-
-                    // FIX: Ensure audio track exists - add fallback if mic fails
                     const audioTracks = mediaStream.getAudioTracks();
                     if (audioTracks.length === 0) {
-                        console.warn("⚠️ No audio track with selected mic, trying default...");
                         try {
                             const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                             audioStream.getAudioTracks().forEach(track => mediaStream.addTrack(track));
-                        } catch (e) {
-                            console.warn("⚠️ Could not get audio:", e);
-                        }
+                        } catch (e) { console.warn("No audio:", e); }
                     }
-
-
                     recordedChunks = [];
-                    // Prefer WebM format for audio
                     const options = { mimeType: 'audio/webm;codecs=opus' };
-                    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                        options.mimeType = 'audio/webm';
-                    }
-
+                    if (!MediaRecorder.isTypeSupported(options.mimeType)) options.mimeType = 'audio/webm';
                     mediaRecorder = new MediaRecorder(mediaStream, options);
-
-                    mediaRecorder.ondataavailable = (event) => {
-                        if (event.data.size > 0) {
-                            recordedChunks.push(event.data);
-                        }
-                    };
-
+                    mediaRecorder.ondataavailable = (event) => { if (event.data.size > 0) recordedChunks.push(event.data); };
                     mediaRecorder.start(1000);
-
                     isRecording = true;
                     btn.classList.add('bg-red-500', 'text-white', 'pulse-recording');
                     btn.innerHTML = '<i class="fas fa-stop"></i>';
                     status.innerText = "VoX Analysis Active...";
                     status.classList.add('text-red-500');
-
                     if (pauseBtn) pauseBtn.classList.remove('hidden');
                     if (recIndicator) recIndicator.classList.remove('hidden');
-
                     startTime = new Date();
                     timerInterval = setInterval(updateTimerUI, 1000);
-
                     document.getElementById('transcript').innerHTML = '<p class="text-cyan-400">Listening to audio input stream...</p>';
-                } catch (err) {
-                    console.error("Recording Error:", err);
-                    alert("Microphone access denied.");
-                }
+                } catch (err) { console.error(err); alert("Microphone access denied."); }
             } else {
-                if (mediaRecorder) {
-                    mediaRecorder.stop();
-                }
-
-                if (mediaStream) {
-                    mediaStream.getTracks().forEach(track => track.stop());
-                    mediaStream = null;
-                }
-
+                if (mediaRecorder) mediaRecorder.stop();
+                if (mediaStream) { mediaStream.getTracks().forEach(track => track.stop()); mediaStream = null; }
                 isRecording = false;
                 btn.classList.remove('bg-red-500', 'text-white', 'pulse-recording');
                 btn.innerHTML = '<i class="fas fa-microphone"></i>';
                 if (pauseBtn) pauseBtn.classList.add('hidden');
                 if (recIndicator) recIndicator.classList.add('hidden');
-
                 clearInterval(timerInterval);
                 openSaveModal();
             }
@@ -967,7 +954,6 @@
         function togglePause() {
             const pauseBtn = document.getElementById('pauseBtn');
             const recIndicator = document.getElementById('recIndicator');
-
             if (mediaRecorder.state === 'recording') {
                 mediaRecorder.pause();
                 pauseBtn.innerHTML = '<i class="fas fa-play text-sm"></i>';
@@ -979,9 +965,6 @@
                 pauseBtn.innerHTML = '<i class="fas fa-pause text-sm"></i>';
                 pauseBtn.classList.remove('bg-amber-500', 'text-white');
                 if (recIndicator) recIndicator.querySelector('span').classList.add('animate-pulse');
-
-                // Adjust startTime to account for pause duration
-                // Simple version: just restart interval
                 timerInterval = setInterval(updateTimerUI, 1000);
             }
         }
@@ -989,16 +972,12 @@
         function openSaveModal() {
             const modal = document.getElementById('saveModal');
             modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modal.querySelector('div').classList.remove('scale-95');
-            }, 10);
+            setTimeout(() => { modal.classList.remove('opacity-0'); modal.querySelector('div').classList.remove('scale-95'); }, 10);
         }
 
         function closeSaveModal() {
             const modal = document.getElementById('saveModal');
-            modal.classList.add('opacity-0');
-            modal.querySelector('div').classList.add('scale-95');
+            modal.classList.add('opacity-0'); modal.querySelector('div').classList.add('scale-95');
             setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
@@ -1006,34 +985,22 @@
             const subjectId = document.getElementById('subjectIdInput').value || "Unknown_Subject";
             const filename = `voice_session_${subjectId}_${new Date().getTime()}.webm`;
             const status = document.getElementById('statusLabel');
-
             closeSaveModal();
-
             status.innerText = "Encrypting & Saving to Vault...";
-            status.classList.remove('text-red-500');
-            status.classList.add('text-cyan-400');
-            
-             // Show loading toast if available, or use status label
+            status.classList.remove('text-red-500'); status.classList.add('text-cyan-400');
             Loader.show("Syncing Acoustic Data...");
-
             try {
                 const blob = new Blob(recordedChunks, { type: 'audio/webm' });
                 const size = blob.size;
                 const sizeMB = (size / (1024 * 1024)).toFixed(1) + " MB";
-                
-                // 1. Initiate Upload
                 const initResult = await eel.initiate_upload(filename, sizeMB, 'audio', true)();
                 if (!initResult.success) throw new Error(initResult.message);
-                
                 const uploadId = initResult.data.upload_id;
-                const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
+                const CHUNK_SIZE = 1024 * 1024;
                 let offset = 0;
-                
-                // 2. Upload Chunks
                 while (offset < size) {
                      const chunk = blob.slice(offset, offset + CHUNK_SIZE);
                      const reader = new FileReader();
-                     
                      await new Promise((resolve, reject) => {
                          reader.onload = async (e) => {
                              try {
@@ -1045,51 +1012,31 @@
                          reader.onerror = reject;
                          reader.readAsDataURL(chunk);
                      });
-                     
                      offset += CHUNK_SIZE;
                      const progress = Math.min(100, Math.round((offset / size) * 100));
                      status.innerText = `Saving to Vault... ${progress}%`;
                 }
-
-                // 3. Finalize
                 const finalResult = await eel.finalize_upload(uploadId)();
-
                 if (finalResult.success) {
                     Loader.hide();
                     status.innerText = "Session Saved Successfully";
-                    status.classList.remove('text-cyan-400');
-                    status.classList.add('text-emerald-500');
-
-                    // Load saved file into WaveSurfer
-                    const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                    status.classList.remove('text-cyan-400'); status.classList.add('text-emerald-500');
                     wavesurfer.loadBlob(blob);
-
-                    // Show Analyse Audio button
                     const analyseBtn = document.getElementById("analyseAudioBtn");
                     if (analyseBtn) analyseBtn.classList.remove("hidden");
-
-                    // Enable play button
                     document.getElementById('playBtn').disabled = false;
-                } else {
-                    throw new Error(finalResult.message);
-                }
-                
+                } else throw new Error(finalResult.message);
                 setTimeout(() => resetUIState(), 3000);
-
             } catch (error) {
-                console.error("Save error:", error);
-                Loader.hide();
-                status.innerText = "Vault Error: " + error.message;
-                status.classList.add('text-rose-500');
+                console.error(error); Loader.hide();
+                status.innerText = "Vault Error: " + error.message; status.classList.add('text-rose-500');
                 setTimeout(() => resetUIState(), 3000);
             }
         }
 
         function discardSession() {
             if (confirm("Permanently discard this voice session?")) {
-                closeSaveModal();
-                recordedChunks = [];
-                resetUIState();
+                closeSaveModal(); recordedChunks = []; resetUIState();
             }
         }
 
@@ -1102,83 +1049,33 @@
             document.getElementById('recIndicator').classList.add('hidden');
         }
 
-        function startTimer() {
-            let s = 0, m = 0;
-            timerInterval = setInterval(() => {
-                s++;
-                if (s === 60) { s = 0; m++; }
-                document.getElementById('timer').innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.00`;
-            }, 1000);
-        }
-
-        function stopTimer() { clearInterval(timerInterval); }
-
-
         async function finalizeAnalysis() {
             Loader.show("Processing audio...");
             try {
-                // Analysis results are populated by the backend (eel) when integrated.
-                // For now, show a pending placeholder.
                 document.getElementById('valF0').innerText = "---";
-                document.getElementById('descF0').innerText = "Analysis pending — upload audio first.";
-                document.getElementById('descF0').className = "text-[10px] text-gray-500 mt-2 italic";
-
                 document.getElementById('valJitter').innerText = "---";
-                document.getElementById('descJitter').innerText = "Awaiting signal processing.";
-                document.getElementById('descJitter').className = "text-[10px] text-gray-500 mt-2 italic";
-
                 document.getElementById('valShimmer').innerText = "---";
-                document.getElementById('descShimmer').innerText = "Awaiting signal processing.";
-                document.getElementById('descShimmer').className = "text-[10px] text-gray-500 mt-2 italic";
-
                 document.getElementById('valAnxiety').innerText = "0%";
                 document.getElementById('barAnxiety').style.width = "0%";
                 document.getElementById('valCertainty').innerText = "0%";
                 document.getElementById('barCertainty').style.width = "0%";
-
                 document.getElementById('deceptionVal').innerText = "--";
                 document.getElementById('riskLevel').innerText = "ANALYSIS REQUIRED";
-                document.getElementById('riskLevel').className = "text-xs font-bold text-gray-500 tracking-wider";
                 document.getElementById('barStability').style.width = "0%";
                 document.getElementById('valStability').innerText = "0%";
-
-                document.getElementById('transcript').innerHTML =
-                    '<p class="text-gray-600 italic opacity-60">No audio analysed yet. Record or load a file, then press Analyse.</p>';
-
+                document.getElementById('transcript').innerHTML = '<p class="text-gray-600 italic opacity-60">No audio analysed yet. Record or load a file, then press Analyse.</p>';
                 document.getElementById('playBtn').disabled = false;
-            } finally {
-                Loader.hide();
-            }
+            } finally { Loader.hide(); }
         }
 
         function openVaultSelection() {
             VaultComponent.open((item) => {
-                if (item.type !== 'audio') {
-                    alert("Please select an audio file for Voice Analysis.");
-                    return;
-                }
-
+                if (item.type !== 'audio') { alert("Select an audio file."); return; }
                 Loader.show("Syncing Acoustic Data");
-
                 document.getElementById('statusLabel').innerText = `Loaded from Vault: ${item.filename}`;
-                document.getElementById('statusLabel').classList.className = "text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400";
-
-                // Load physical file into WaveSurfer
                 wavesurfer.load(item.filepath);
-
-                wavesurfer.on('ready', () => {
-                    Loader.hide();
-                    // Simulate analysis flow
-                    finalizeAnalysis();
-                });
+                wavesurfer.on('ready', () => { Loader.hide(); finalizeAnalysis(); });
             });
-        }
-
-        function selectFile(filename, type) {
-            closeVault();
-            openPlayer(filename, type);
-            // Simulate loading into wavesurfer in future task
-            document.getElementById('statusLabel').innerText = "Analyzing: " + filename;
         }
 
         function openPlayer(filename, type) {
@@ -1187,39 +1084,22 @@
             const audioUI = document.getElementById('audioPlayerUI');
             const audio = document.getElementById('vaultAudio');
             document.getElementById('playerTitle').textContent = `Now Playing: ${filename}`;
-
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-
-            if (type === 'video') {
-                video.classList.remove('hidden');
-                audioUI.classList.add('hidden');
-                video.play();
-            } else {
-                audioUI.classList.remove('hidden');
-                video.classList.add('hidden');
-                audio.play();
-            }
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            if (type === 'video') { video.classList.remove('hidden'); audioUI.classList.add('hidden'); video.play(); }
+            else { audioUI.classList.remove('hidden'); video.classList.add('hidden'); audio.play(); }
         }
 
         function closePlayer() {
             const modal = document.getElementById('playerModal');
-            const video = document.getElementById('vaultVideo');
-            const audio = document.getElementById('vaultAudio');
-            video.pause();
-            audio.pause();
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+            document.getElementById('vaultVideo').pause();
+            document.getElementById('vaultAudio').pause();
+            modal.classList.add('hidden'); modal.classList.remove('flex');
         }
 
-        // Load Audio Event
         document.getElementById('audioInput').onchange = e => {
             const file = e.target.files[0];
             if (file) {
                 document.getElementById('statusLabel').innerText = `Loaded: ${file.name}`;
-                document.getElementById('statusLabel').classList.className = "text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400";
-
-                // Simulate Loading
                 wavesurfer.loadBlob(file);
                 setTimeout(finalizeAnalysis, 1500);
             }
@@ -1228,50 +1108,34 @@
         function togglePlayback() {
             wavesurfer.playPause();
             const btn = document.getElementById('playBtn');
-            const isPlaying = wavesurfer.isPlaying();
-            btn.innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
+            btn.innerHTML = wavesurfer.isPlaying() ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
         }
 
-        wavesurfer.on('finish', () => {
-            const btn = document.getElementById('playBtn');
-            if (btn) btn.innerHTML = '<i class="fas fa-play"></i>';
-        });
-    </script>
-    <script>
-        function togglePlayback() {
-            wavesurfer.playPause();
-            const btn = document.getElementById('playBtn');
-            const isPlaying = wavesurfer.isPlaying();
-            const body = document.body;
-            btn.innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
-        }
+        wavesurfer.on('finish', () => { if (document.getElementById('playBtn')) document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>'; });
 
         function toggleSidebar() {
             document.body.classList.toggle('sidebar-collapsed');
             localStorage.setItem('sidebarCollapsed', document.body.classList.contains('sidebar-collapsed'));
         }
 
-        // Theme Toggle Logic
         const themeToggle = document.getElementById('theme-toggle');
         const themeIcon = themeToggle.querySelector('i');
-
         function toggleTheme() {
             const isLight = document.body.classList.toggle('light-mode');
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
             updateThemeUI(isLight);
         }
-
         function updateThemeUI(isLight) {
             themeIcon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
-            themeToggle.classList.toggle('bg-gray-200', isLight);
-            themeToggle.classList.toggle('text-gray-900', isLight);
-            themeToggle.classList.toggle('border-gray-300', isLight);
+            if (themeToggle) {
+                themeToggle.classList.toggle('bg-gray-200', isLight);
+                themeToggle.classList.toggle('text-gray-900', isLight);
+                themeToggle.classList.toggle('border-gray-300', isLight);
+            }
             updateChartTheme(isLight);
         }
-
         themeToggle.addEventListener('click', toggleTheme);
 
-        // Populate Microphone Sources
         async function populateMicrophones() {
             const select = document.getElementById('micSelect');
             select.innerHTML = '';
@@ -1280,73 +1144,38 @@
                 const audioDevices = devices.filter(d => d.kind === 'audioinput');
                 audioDevices.forEach((device, index) => {
                     const label = (device.label || `Microphone ${index + 1}`).toLowerCase();
-                    // FILTER: Skip virtual devices
                     if (label.includes('virtual') || label.includes('fliflik')) return;
-
                     const option = document.createElement('option');
                     option.value = device.deviceId;
                     option.text = device.label || `Microphone ${index + 1}`;
                     select.appendChild(option);
                 });
-
                 if (audioDevices.length > 0) {
-                    // Load preference
                     try {
                         const result = await eel.load_preferences()();
                         if (result.success && result.preferences && result.preferences.default_mic) {
-                            const exists = audioDevices.some(d => d.deviceId === result.preferences.default_mic);
-                            if (exists) select.value = result.preferences.default_mic;
+                            if (audioDevices.some(d => d.deviceId === result.preferences.default_mic)) select.value = result.preferences.default_mic;
                         }
-                    } catch (e) {
-                        console.error("Pref load error:", e);
-                    }
+                    } catch (e) { console.error(e); }
                 }
-            } catch (err) {
-                console.error("Error enumerating microphones:", err);
-                const option = document.createElement('option');
-                option.text = "No microphones found";
-                select.appendChild(option);
-            }
+            } catch (err) { console.error(err); }
         }
 
-        // Initial Load
         document.addEventListener('DOMContentLoaded', async () => {
-            // Check session
             const result = await eel.get_current_user()();
             const user = (result.success && result.data) ? result.data : null;
-
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
-            }
-
-            // Update Member Name
+            if (!user) { window.location.href = 'login.html'; return; }
             const activeMember = document.querySelector('.active-member-info span.ml-1');
-            if (activeMember) {
-                activeMember.textContent = `${user.firstName} ${user.lastName} • Unit #${user.username.toUpperCase()}`;
-            }
-
-            // Populate microphone sources
+            if (activeMember) activeMember.textContent = `${user.firstName} ${user.lastName} • Unit #${user.username.toUpperCase()}`;
             populateMicrophones();
-
-            // Update Theme UI state (icons, buttons)
             updateThemeUI(document.body.classList.contains('light-mode'));
-
-            // Check for file parameter in URL for seamless analysis
-            const urlParams = new URLSearchParams(window.location.search);
-            const autoFile = urlParams.get('file');
+            const autoFile = new URLSearchParams(window.location.search).get('file');
             if (autoFile) {
                 Loader.show("Syncing Acoustic Data");
-                document.getElementById('statusLabel').innerText = `Evidence Loaded for Analysis`;
                 wavesurfer.load(autoFile);
-                wavesurfer.once('ready', () => {
-                    Loader.hide();
-                    finalizeAnalysis();
-                });
+                wavesurfer.once('ready', () => { Loader.hide(); finalizeAnalysis(); });
             }
         });
-
-        // Logout logic is handled globally by sidebar.js
     </script>
     <!-- Media Player Modal -->
     <div id="playerModal" class="fixed inset-0 z-[100000] hidden items-center justify-center p-4">

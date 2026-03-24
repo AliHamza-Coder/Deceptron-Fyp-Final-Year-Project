@@ -239,6 +239,19 @@
             color: #f43f5e !important;
             text-shadow: 0 0 10px rgba(244, 63, 94, 0.2);
         }
+
+        /* --- Forensic Glow System --- */
+        .glow-cyan { box-shadow: 0 0 20px rgba(0, 219, 255, 0.15); border: 1px solid rgba(0, 219, 255, 0.3) !important; }
+        .glow-purple { box-shadow: 0 0 20px rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3) !important; }
+        .glow-blue { box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3) !important; }
+        .glow-emerald { box-shadow: 0 0 20px rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3) !important; }
+        .glow-amber { box-shadow: 0 0 20px rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3) !important; }
+        .glow-rose { box-shadow: 0 0 20px rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.3) !important; }
+        .glow-slate { box-shadow: 0 0 20px rgba(148, 163, 184, 0.1); border: 1px solid rgba(148, 163, 184, 0.2) !important; }
+
+        .glass:hover .glow-cyan { box-shadow: 0 0 30px rgba(0, 219, 255, 0.4); background: rgba(0, 219, 255, 0.1) !important; }
+        .glass:hover .glow-rose { box-shadow: 0 0 30px rgba(244, 63, 94, 0.4); background: rgba(244, 63, 94, 0.1) !important; }
+        .glass:hover .glow-amber { box-shadow: 0 0 30px rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.1) !important; }
     </style>
 </head>
 <body>
@@ -288,107 +301,151 @@
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2 space-y-8">
-                <!-- Summary & Deception Chart -->
-                <div class="glass p-10">
-                    <div class="flex justify-between items-start mb-10">
-                        <div>
-                            <h3 class="text-sm font-bold heading-font uppercase tracking-widest text-white mb-2">Truth Level Result</h3>
-                            <p class="text-xs text-gray-400">AI analysis of face and voice stress levels.</p>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-5xl font-black heading-font text-rose-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.4)]">78%</span>
-                            <p class="text-[10px] font-bold text-rose-400 uppercase mt-1 tracking-widest">Lying Risk Score</p>
-                        </div>
+        <div class="space-y-8">
+            <!-- Hero: Main Truth Level Chart -->
+            <div class="glass p-10">
+                <div class="flex justify-between items-start mb-10">
+                    <div>
+                        <h3 class="text-sm font-bold heading-font uppercase tracking-widest text-white mb-2">Forensic Timeline Result</h3>
+                        <p class="text-xs text-gray-400">Deep neural synchronization of behavioral markers across the session duration.</p>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="truthChart"></canvas>
+                    <div class="text-right">
+                        <span class="text-5xl font-black heading-font text-rose-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.4)]">78%</span>
+                        <p class="text-[10px] font-bold text-rose-400 uppercase mt-1 tracking-widest">Session Risk Index</p>
                     </div>
                 </div>
+                <div class="chart-container">
+                    <canvas id="truthChart"></canvas>
+                </div>
+            </div>
 
-                <!-- AI Transcript -->
-                <div class="glass p-10">
-                    <h3 class="text-sm font-black heading-font uppercase tracking-[0.2em] text-[#0f172a] mb-8 flex items-center">
-                        <i class="fas fa-comment-dots mr-3 text-cyan-400"></i> Full Text Transcript
-                    </h3>
-                    <div class="transcript-box">
-                        <div class="transcript-item">
-                            <div class="flex justify-between mb-2">
-                                <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Subject [02:14]</span>
-                                <span class="text-[9px] px-2 py-0.5 bg-rose-500/20 text-rose-400 rounded-full font-bold">Stress High</span>
-                            </div>
-                            <p class="text-sm text-gray-300 leading-relaxed italic">"I was never in the secure server room after 10 PM. The logs must be incorrect or tampered with by someone else."</p>
+            <!-- Full Text Transcript Section -->
+            <div class="glass p-10">
+                <h3 class="text-sm font-black heading-font uppercase tracking-[0.2em] text-white mb-8 flex items-center">
+                    <i class="fas fa-comment-dots mr-3 text-cyan-400"></i> Forensic Transcript
+                </h3>
+                <div class="transcript-box">
+                    <div class="transcript-item">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Subject [02:14]</span>
+                            <span class="text-[9px] px-2 py-0.5 bg-rose-500/20 text-rose-400 rounded-full font-bold">Stress High</span>
                         </div>
-                        <div class="transcript-item">
-                            <div class="flex justify-between mb-2">
-                                <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Subject [05:42]</span>
-                                <span class="text-[9px] px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full font-bold">Baseline Normal</span>
-                            </div>
-                            <p class="text-sm text-gray-300 leading-relaxed italic">"I have been working for this company for 8 years and have never had a security violation before this incident."</p>
+                        <p class="text-sm text-gray-300 leading-relaxed italic">"I was never in the secure server room after 10 PM. The logs must be incorrect or tampered with by someone else."</p>
+                    </div>
+                    <div class="transcript-item">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Subject [05:42]</span>
+                            <span class="text-[9px] px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full font-bold">Baseline Normal</span>
                         </div>
-                        <div class="transcript-item">
-                            <div class="flex justify-between mb-2">
-                                <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Subject [08:30]</span>
-                                <span class="text-[9px] px-2 py-0.5 bg-rose-500/20 text-rose-400 rounded-full font-bold">Micro-tremor Alert</span>
-                            </div>
-                            <p class="text-sm text-gray-300 leading-relaxed italic">"I don't recognize the IP address used to access the database. I don't own any devices capable of that."</p>
+                        <p class="text-sm text-gray-300 leading-relaxed italic">"I have been working for this company for 8 years and have never had a security violation before this incident."</p>
+                    </div>
+                    <div class="transcript-item">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Subject [08:30]</span>
+                            <span class="text-[9px] px-2 py-0.5 bg-rose-500/20 text-rose-400 rounded-full font-bold">Micro-tremor Alert</span>
                         </div>
+                        <p class="text-sm text-gray-300 leading-relaxed italic">"I don't recognize the IP address used to access the database. I don't own any devices capable of that."</p>
                     </div>
                 </div>
             </div>
 
-            <div class="space-y-8">
-                <!-- Conclusion Card -->
-                <div class="glass p-8 border-l-4 border-rose-500 pulse-deceptive">
-                    <h3 class="text-xs font-extrabold uppercase tracking-[0.2em] text-rose-500 mb-6">Final Result</h3>
-                    <div class="bg-black/20 p-6 rounded-2xl mb-6">
-                        <p class="text-sm text-gray-300 leading-relaxed">Subject showed unusual <span class="text-rose-400 font-bold">face muscle tension</span> during direct questioning. Combined with voice <span class="text-cyan-400 font-bold">pitch changes</span>, the AI detects high lying risk.</p>
+            <!-- Standardized 3-Card Analysis Output Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                 <!-- Card 1: Output Context -->
+                 <article class="glass p-8 space-y-5 border-white/5 group">
+                    <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                        <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center mr-3 glow-cyan transition-all duration-300">
+                            <i class="fas fa-info-circle text-cyan-400"></i>
+                        </div>
+                        Session Context
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center text-[11px]">
+                            <span class="text-gray-400 font-medium">Capture Unit</span>
+                            <span class="text-white font-mono bg-white/5 px-2 py-0.5 rounded">DX-902-SECURE</span>
+                        </div>
+                        <div class="flex justify-between items-center text-[11px]">
+                            <span class="text-gray-400 font-medium">Integrity</span>
+                            <span class="text-emerald-400 font-bold">SHA-256 Passed</span>
+                        </div>
+                        <div class="flex justify-between items-center text-[11px]">
+                            <span class="text-gray-400 font-medium">Processor</span>
+                            <span class="text-white font-mono text-[9px]">Neural-Engine V4.2</span>
+                        </div>
+                        <div class="flex justify-between items-center text-[11px]">
+                            <span class="text-gray-400 font-medium">Record ID</span>
+                            <span class="text-white font-mono text-[9px]">#4092-A-ARCHIVE</span>
+                        </div>
                     </div>
-                    <div class="p-4 bg-rose-500 text-white font-black heading-font text-center uppercase tracking-widest rounded-xl shadow-lg shadow-rose-500/20">
-                        Lying Risk High
-                    </div>
-                </div>
+                 </article>
 
-                <!-- Metric Breakdown -->
-                <div class="glass p-8">
-                    <h3 class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-8">Metric Distribution</h3>
-                    <div class="space-y-6">
-                        <div>
-                            <div class="flex justify-between text-[10px] font-bold uppercase text-gray-400 mb-2">
-                                <span>Eye Movement</span>
-                                <span class="text-rose-400">82 MHz</span>
-                            </div>
-                            <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                                <div class="h-full bg-rose-500" style="width: 82%"></div>
-                            </div>
+                 <!-- Card 2: Description -->
+                 <article class="glass p-8 space-y-5 border-rose-500/10 group">
+                    <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                        <div class="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center mr-3 glow-rose transition-all duration-300">
+                            <i class="fas fa-align-left text-rose-500"></i>
                         </div>
-                        <div>
-                            <div class="flex justify-between text-[10px] font-bold uppercase text-gray-400 mb-2">
-                                <span>Estimated Pulse</span>
-                                <span class="text-cyan-400">114 BPM</span>
-                            </div>
-                            <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                                <div class="h-full bg-cyan-400" style="width: 65%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-[10px] font-bold uppercase text-gray-400 mb-2">
-                                <span>Asymmetry Ratio</span>
-                                <span class="text-rose-400">0.92 Delta</span>
-                            </div>
-                            <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                                <div class="h-full bg-rose-500" style="width: 92%"></div>
-                            </div>
+                        AI Conclusion
+                    </h3>
+                    <div class="space-y-4">
+                        <p class="text-[11px] text-gray-300 leading-relaxed">
+                            Subject showed unusual <span class="text-rose-400 font-bold">face muscle tension</span> during direct questioning. Combined with voice <span class="text-cyan-400 font-bold">pitch changes</span>, the AI detects high lying risk.
+                        </p>
+                        <ul class="space-y-2 text-[10px] text-gray-400">
+                            <li class="flex items-center">
+                                <span class="w-1 h-1 bg-rose-500 rounded-full mr-2"></span> Elevated pitch instability
+                            </li>
+                            <li class="flex items-center">
+                                <span class="w-1 h-1 bg-rose-500 rounded-full mr-2"></span> Micro-tremor cluster detected
+                            </li>
+                        </ul>
+                        <div class="pt-2">
+                            <span class="px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 text-rose-500 text-[9px] font-bold uppercase rounded-lg">
+                                Verdict: RISK DETECTED
+                            </span>
                         </div>
                     </div>
-                </div>
+                 </article>
 
-                <!-- Investigator Notes -->
-                <div class="glass p-8">
-                    <h3 class="text-[10px] text-[#1e293b] uppercase font-black tracking-[0.2em] mb-4">Investigator Notes</h3>
-                    <textarea class="w-full h-32 bg-transparent text-sm text-[#475569] border-none focus:outline-none resize-none font-medium" placeholder="Enter session notes here...">Subject was visibly agitated during the second phase. Recommend re-interview with polygraph synchronization.</textarea>
-                    <button class="w-full mt-4 py-3 bg-white/5 border border-white/10 rounded-xl text-[9px] font-bold uppercase text-gray-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer">Save Notes</button>
+                 <!-- Card 3: Analysis % -->
+                 <article class="glass p-8 space-y-8 border-cyan-500/10 group">
+                    <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                        <div class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center mr-3 glow-amber transition-all duration-300">
+                            <i class="fas fa-chart-pie text-amber-500"></i>
+                        </div>
+                        Metric Breakdown
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center space-y-3">
+                            <div class="relative w-20 h-20 mx-auto group">
+                                <canvas id="radialMetricA"></canvas>
+                                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                    <span class="text-xs font-black text-white">82%</span>
+                                </div>
+                            </div>
+                            <span class="text-[9px] text-gray-500 uppercase font-black tracking-widest">Facial</span>
+                        </div>
+                        <div class="text-center space-y-3">
+                            <div class="relative w-20 h-20 mx-auto group">
+                                <canvas id="radialMetricB"></canvas>
+                                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                    <span class="text-xs font-black text-white">65%</span>
+                                </div>
+                            </div>
+                            <span class="text-[9px] text-gray-500 uppercase font-black tracking-widest">Voice</span>
+                        </div>
+                    </div>
+                 </article>
+            </div>
+
+            <!-- Investigator Notes (Extended Bottom Section) -->
+            <div class="glass p-10">
+                <h3 class="text-xs font-bold uppercase tracking-[0.2em] mb-6 text-white">Investigator Notes & Disposition</h3>
+                <textarea class="w-full h-32 bg-white/5 p-6 rounded-2xl text-sm text-gray-300 border-white/10 focus:border-cyan-400 focus:outline-none resize-none font-medium" placeholder="Enter session notes here...">Subject was visibly agitated during the second phase. Recommend re-interview with polygraph synchronization.</textarea>
+                <div class="mt-6 flex justify-end">
+                    <button class="px-10 py-4 bg-cyan-500 text-white text-xs font-bold uppercase rounded-xl shadow-lg shadow-cyan-500/30 transition-all cursor-pointer">
+                        Update Archive Notes
+                    </button>
                 </div>
             </div>
         </div>
@@ -433,6 +490,45 @@
             }
         });
 
+        // Radial Charts
+        const ctxRadialA = document.getElementById('radialMetricA').getContext('2d');
+        const radialChartA = new Chart(ctxRadialA, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [82, 18],
+                    backgroundColor: ['#06b6d4', body.classList.contains('light-mode') ? 'rgba(0,118,214,0.1)' : 'rgba(255,255,255,0.05)'],
+                    borderWidth: 0,
+                    cutout: '80%',
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        const ctxRadialB = document.getElementById('radialMetricB').getContext('2d');
+        const radialChartB = new Chart(ctxRadialB, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [65, 35],
+                    backgroundColor: ['#f43f5e', body.classList.contains('light-mode') ? 'rgba(0,118,214,0.1)' : 'rgba(255,255,255,0.05)'],
+                    borderWidth: 0,
+                    cutout: '80%',
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
         function toggleSidebar() {
             body.classList.toggle('sidebar-collapsed');
             localStorage.setItem('sidebarCollapsed', body.classList.contains('sidebar-collapsed'));
@@ -449,19 +545,30 @@
         }
 
         function updateThemeUI(isLight) {
-            themeIcon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
-            themeToggle.classList.toggle('bg-gray-200', isLight);
-            themeToggle.classList.toggle('text-gray-900', isLight);
-            themeToggle.classList.toggle('border-gray-300', isLight);
+            if (themeIcon) themeIcon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+            if (themeToggle) {
+                themeToggle.classList.toggle('bg-gray-200', isLight);
+                themeToggle.classList.toggle('text-gray-900', isLight);
+                themeToggle.classList.toggle('border-gray-300', isLight);
+            }
+
+            const dimColor = isLight ? 'rgba(0,118,214,0.1)' : 'rgba(255,255,255,0.05)';
+            [radialChartA, radialChartB].forEach(chart => {
+                if (chart) {
+                    chart.data.datasets[0].backgroundColor[1] = dimColor;
+                    chart.update();
+                }
+            });
         }
 
-        themeToggle.addEventListener('click', toggleTheme);
+        if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
 
         // Initial Load
         document.addEventListener('DOMContentLoaded', () => {
-            // Update Theme UI state (icons, buttons)
+            const body = document.body;
             updateThemeUI(body.classList.contains('light-mode'));
         });
+
         function closeApp() {
             if(confirm("Are you sure you want to logout?")) {
                 window.location.href = 'login.html';

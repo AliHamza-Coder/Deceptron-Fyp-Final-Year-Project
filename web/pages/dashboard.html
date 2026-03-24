@@ -338,6 +338,23 @@
             color: #334155 !important;
         }
 
+        /* --- Forensic Glow System --- */
+        .glow-cyan { box-shadow: 0 0 20px rgba(0, 219, 255, 0.15); border: 1px solid rgba(0, 219, 255, 0.3) !important; }
+        .glow-purple { box-shadow: 0 0 20px rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3) !important; }
+        .glow-blue { box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3) !important; }
+        .glow-emerald { box-shadow: 0 0 20px rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3) !important; }
+        .glow-amber { box-shadow: 0 0 20px rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3) !important; }
+        .glow-rose { box-shadow: 0 0 20px rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.3) !important; }
+        .glow-slate { box-shadow: 0 0 20px rgba(148, 163, 184, 0.1); border: 1px solid rgba(148, 163, 184, 0.2) !important; }
+
+        .group:hover .glow-cyan { box-shadow: 0 0 30px rgba(0, 219, 255, 0.4); background: rgba(0, 219, 255, 0.2) !important; color: white !important; }
+        .group:hover .glow-purple { box-shadow: 0 0 30px rgba(168, 85, 247, 0.4); background: rgba(168, 85, 247, 0.2) !important; color: white !important; }
+        .group:hover .glow-blue { box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); background: rgba(59, 130, 246, 0.2) !important; color: white !important; }
+        .group:hover .glow-emerald { box-shadow: 0 0 30px rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.2) !important; color: white !important; }
+        .group:hover .glow-amber { box-shadow: 0 0 30px rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.2) !important; color: white !important; }
+        .group:hover .glow-rose { box-shadow: 0 0 30px rgba(244, 63, 94, 0.4); background: rgba(244, 63, 94, 0.2) !important; color: white !important; }
+        .group:hover .glow-slate { box-shadow: 0 0 30px rgba(148, 163, 184, 0.3); background: rgba(148, 163, 184, 0.2) !important; color: white !important; }
+
 
     </style>
 </head>
@@ -413,10 +430,10 @@
 
         <section class="p-8 pt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Action Cards -->
-            <div class="card p-8 group cursor-pointer">
+            <div class="card p-8 group cursor-pointer" onclick="window.location.href='live-session.html'">
                 <div class="scanning-line"></div>
                 <div
-                    class="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 mb-6 group-hover:bg-blue-500 group-hover:text-white transition-all duration-300">
+                    class="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 mb-6 transition-all duration-300 glow-blue">
                     <i class="fas fa-video-camera text-xl"></i>
                 </div>
                 <h3 class="text-xl font-bold mb-2">Live Check</h3>
@@ -427,10 +444,10 @@
                 </a>
             </div>
 
-            <div class="card p-8 group cursor-pointer">
+            <div class="card p-8 group cursor-pointer" onclick="window.location.href='uploads.html'">
                 <div class="scanning-line"></div>
                 <div
-                    class="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 mb-6 group-hover:bg-purple-500 group-hover:text-white transition-all duration-300">
+                    class="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 mb-6 transition-all duration-300 glow-purple">
                     <i class="fas fa-cloud-arrow-up text-xl"></i>
                 </div>
                 <h3 class="text-xl font-bold mb-2">Batch Media</h3>
@@ -441,10 +458,10 @@
                 </a>
             </div>
 
-            <div class="card p-8 group cursor-pointer">
+            <div class="card p-8 group cursor-pointer" onclick="window.location.href='reports.html'">
                 <div class="scanning-line"></div>
                 <div
-                    class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-6 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
+                    class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-6 transition-all duration-300 glow-emerald">
                     <i class="fas fa-file-shield text-xl"></i>
                 </div>
                 <h3 class="text-xl font-bold mb-2">Case Reports</h3>
@@ -474,10 +491,10 @@
                     </div>
 
                     <!-- Rows -->
-                    <div class="analysis-row grid grid-cols-12 gap-4 items-center px-4 py-4 rounded-xl cursor-pointer">
+                    <div class="analysis-row grid grid-cols-12 gap-4 items-center px-4 py-4 rounded-xl cursor-pointer group" onclick="window.location.href='report-detail.html'">
                         <div class="col-span-5 flex items-center space-x-3">
                             <div
-                                class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs border border-white/5">
+                                class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-xs border border-white/5 glow-slate transition-all duration-300">
                                 <i class="fas fa-user-secret text-gray-500"></i>
                             </div>
                             <div>
@@ -500,10 +517,10 @@
                         </div>
                     </div>
 
-                    <div class="analysis-row grid grid-cols-12 gap-4 items-center px-4 py-3 rounded-xl">
+                    <div class="analysis-row grid grid-cols-12 gap-4 items-center px-4 py-3 rounded-xl cursor-pointer group" onclick="window.location.href='report-detail.html'">
                         <div class="col-span-5 flex items-center space-x-3">
                             <div
-                                class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs border border-white/5">
+                                class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-xs border border-white/5 glow-slate transition-all duration-300">
                                 <i class="fas fa-user text-gray-500"></i>
                             </div>
                             <div>
@@ -526,10 +543,10 @@
                         </div>
                     </div>
 
-                    <div class="analysis-row grid grid-cols-12 gap-4 items-center px-4 py-3 rounded-xl">
+                    <div class="analysis-row grid grid-cols-12 gap-4 items-center px-4 py-3 rounded-xl cursor-pointer group" onclick="window.location.href='report-detail.html'">
                         <div class="col-span-5 flex items-center space-x-3">
                             <div
-                                class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs border border-white/5">
+                                class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-xs border border-white/5 glow-slate transition-all duration-300">
                                 <i class="fas fa-mask text-gray-500"></i>
                             </div>
                             <div>
@@ -566,23 +583,23 @@
                 </div>
 
                 <div class="mt-8 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center px-3 py-1 bg-white/5 rounded-full">
-                            <span class="w-2 h-2 rounded-full bg-rose-500 mr-2"></span>
+                    <div class="flex items-center justify-between group">
+                        <div class="flex items-center px-3 py-1 bg-white/5 rounded-full glow-rose/10 group-hover:glow-rose/20 transition-all">
+                            <span class="w-2 h-2 rounded-full bg-rose-500 mr-2 glow-rose"></span>
                             <span class="text-xs text-gray-400">High Lying Risk</span>
                         </div>
                         <span class="text-xs font-bold text-white">35%</span>
                     </div>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center px-3 py-1 bg-white/5 rounded-full">
-                            <span class="w-2 h-2 rounded-full bg-amber-500 mr-2"></span>
+                    <div class="flex items-center justify-between group">
+                        <div class="flex items-center px-3 py-1 bg-white/5 rounded-full glow-amber/10 group-hover:glow-amber/20 transition-all">
+                            <span class="w-2 h-2 rounded-full bg-amber-500 mr-2 glow-amber"></span>
                             <span class="text-xs text-gray-400">Not Sure</span>
                         </div>
                         <span class="text-xs font-bold text-white">25%</span>
                     </div>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center px-3 py-1 bg-white/5 rounded-full">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>
+                    <div class="flex items-center justify-between group">
+                        <div class="flex items-center px-3 py-1 bg-white/5 rounded-full glow-emerald/10 group-hover:glow-emerald/20 transition-all">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 glow-emerald"></span>
                             <span class="text-xs text-gray-400">Trustworthy</span>
                         </div>
                         <span class="text-xs font-bold text-white">40%</span>

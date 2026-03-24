@@ -3,208 +3,349 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deceptron - Login</title>
-    <link rel="stylesheet" href="../styles/output.css">
+    <title>Deceptron — Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../vendor/font-awesome/css/all.min.css">
     <script type="text/javascript" src="/eel.js"></script>
     <style>
-        :root {
-            --primary-blue: #0076D6;
-            --accent-cyan: #00DBFF;
-            --bg-dark: #05080f;
-
-            /* Theme Tokens */
-            --bg-main: #05080f;
-            --text-main: #ffffff;
-            --text-dim: #94a3b8;
-            --card-glass: rgba(15, 23, 42, 0.4);
-            --border-subtle: rgba(255, 255, 255, 0.1);
-        }
-
-
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg-main);
-            color: var(--text-main);
-            min-height: 100vh;
-            margin: 0;
+            background: #05080f;
+            color: #fff;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
             overflow: hidden;
-            transition: none;
         }
 
-
-
-        .heading-font {
-            font-family: 'Orbitron', sans-serif;
-        }
-
-        .login-card {
-            background: var(--card-glass);
-            backdrop-filter: blur(25px) saturate(180%);
-            border: 1px solid var(--border-subtle);
-            border-radius: 2.5rem;
-            padding: 2.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-
-
-        .input-field {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: var(--text-main);
-            transition: all 0.3s ease;
-        }
-
-
-
-        .input-field:focus {
-            border-color: var(--accent-cyan);
-            background: rgba(0, 219, 255, 0.08);
-            box-shadow: 0 0 20px rgba(0, 219, 255, 0.3), inset 0 0 10px rgba(0, 219, 255, 0.1);
-            outline: none;
-            transform: translateY(-1px);
-        }
-
-
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-blue), var(--accent-cyan));
-            transition: all 0.4s ease;
+        /* ── BRAND PANEL ── */
+        .brand-panel {
+            width: 45%;
+            min-width: 340px;
+            height: 100%;
+            background: linear-gradient(145deg, #020c1a 0%, #061a30 60%, #020c1a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 219, 255, 0.2);
-            color: white;
+            flex-shrink: 0;
         }
 
-
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0, 219, 255, 0.4);
+        /* Subtle grid overlay */
+        .brand-panel::before {
+            content: '';
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(0,219,255,0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,219,255,0.035) 1px, transparent 1px);
+            background-size: 44px 44px;
         }
 
-        .side-image {
-            background: linear-gradient(45deg, rgba(0, 118, 214, 0.1), rgba(0, 219, 255, 0.05)),
-                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="g" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%23007BD6" stop-opacity="0.3"/><stop offset="100%" stop-color="%2300DBFF" stop-opacity="0.1"/></radialGradient></defs><circle cx="500" cy="500" r="400" fill="url(%23g)"/><circle cx="300" cy="300" r="100" fill="%23007BD6" opacity="0.2"/><circle cx="700" cy="700" r="150" fill="%2300DBFF" opacity="0.15"/></svg>');
-            background-size: cover;
-            background-position: center;
+        /* Radial glow */
+        .brand-panel::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 40% 35%, rgba(0,219,255,0.1) 0%, transparent 65%);
         }
 
-        .glow-text {
-            text-shadow: 0 0 20px rgba(0, 219, 255, 0.5);
+        .brand-body {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 3rem 2.5rem;
         }
 
-
-
-        @media (max-width: 1024px) {
-            .split-container {
-                flex-direction: column;
-            }
-            .side-image {
-                min-height: 300px;
-            }
+        .logo-wrap {
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 2rem;
+            border-radius: 2rem;
+            padding: 12px;
+            background: rgba(0, 219, 255, 0.05);
+            border: 1px solid rgba(0, 219, 255, 0.15);
+            box-shadow: 0 0 40px rgba(0, 219, 255, 0.12), inset 0 0 20px rgba(0, 219, 255, 0.04);
         }
-        @media (max-width: 768px) {
-            .side-image {
-                min-height: 250px;
-            }
-            .login-card {
-                margin: 1rem;
-                padding: 2rem 1.5rem;
-            }
-            .glow-text {
-                font-size: 1.5rem;
-            }
+
+        .logo-wrap img {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            animation: logo-glow 4s ease-in-out infinite;
         }
-        @media (max-width: 480px) {
-            .side-image {
-                min-height: 200px;
-            }
-            .login-card {
-                padding: 1.5rem 1rem;
-            }
+
+        @keyframes logo-glow {
+            0%, 100% { filter: drop-shadow(0 0 12px rgba(0,219,255,0.5)); }
+            50%       { filter: drop-shadow(0 0 28px rgba(0,219,255,0.9)); }
+        }
+
+        .brand-tagline {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.65rem;
+            letter-spacing: 0.45em;
+            color: rgba(0, 219, 255, 0.7);
+            text-transform: uppercase;
+            margin-bottom: 1.25rem;
+        }
+
+        .brand-divider {
+            width: 60px;
+            height: 1.5px;
+            background: linear-gradient(90deg, transparent, rgba(0,219,255,0.6), transparent);
+            margin: 0 auto 1.5rem;
+        }
+
+        .brand-desc {
+            font-size: 0.82rem;
+            color: rgba(148, 163, 184, 0.75);
+            line-height: 1.75;
+            max-width: 300px;
+            margin: 0 auto 2.25rem;
+        }
+
+        .badge-row {
+            display: flex;
+            gap: 0.6rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 0.35rem 0.9rem;
+            background: rgba(0,219,255,0.06);
+            border: 1px solid rgba(0,219,255,0.18);
+            border-radius: 999px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            color: rgba(0, 219, 255, 0.75);
+            text-transform: uppercase;
+        }
+
+        /* Floating dots */
+        .dot { position: absolute; border-radius: 50%; animation: pulse 3s ease-in-out infinite; }
+        .dot-1 { width: 6px; height: 6px; background: rgba(0,219,255,0.5); top: 18%; left: 15%; }
+        .dot-2 { width: 4px; height: 4px; background: rgba(0,118,214,0.6); bottom: 22%; right: 18%; animation-delay: 1.5s; }
+        .dot-3 { width: 5px; height: 5px; background: rgba(0,219,255,0.4); top: 65%; left: 8%; animation-delay: 3s; }
+        @keyframes pulse { 0%,100%{transform:scale(1);opacity:.5} 50%{transform:scale(1.5);opacity:1} }
+
+        /* ── FORM PANEL ── */
+        .form-panel {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 2rem;
+            background: rgba(5, 10, 22, 0.97);
+            border-left: 1px solid rgba(0, 219, 255, 0.06);
+            overflow-y: auto;
+        }
+
+        .form-box {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-top {
+            text-align: center;
+            margin-bottom: 2.25rem;
+        }
+
+        .form-top .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.58rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(0,219,255,0.8);
+            background: rgba(0,219,255,0.07);
+            border: 1px solid rgba(0,219,255,0.18);
+            padding: 0.3rem 0.9rem;
+            border-radius: 999px;
+            margin-bottom: 1.1rem;
+        }
+
+        .form-top h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: #fff;
+            margin-bottom: 0.45rem;
+        }
+
+        .form-top p {
+            font-size: 0.78rem;
+            color: rgba(148, 163, 184, 0.6);
+        }
+
+        /* Input */
+        .field {
+            position: relative;
+            margin-bottom: 0.9rem;
+        }
+
+        .field-icon {
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 48px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.72rem;
+            color: rgba(0, 219, 255, 0.45);
+            pointer-events: none;
+            transition: color 0.25s;
+        }
+
+        .field:focus-within .field-icon { color: rgba(0, 219, 255, 0.9); }
+
+        .field input {
+            width: 100%;
+            padding: 0.9rem 2.8rem 0.9rem 48px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 0.8rem;
+            color: #fff;
+            font-size: 0.82rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        .field input::placeholder { color: rgba(148,163,184,0.4); }
+        .field input:focus {
+            border-color: rgba(0,219,255,0.4);
+            box-shadow: 0 0 0 3px rgba(0,219,255,0.06);
+        }
+        .eye-btn { position: absolute; right: 4px; top: 10px; bottom: 10px; width: 40px; display: flex; align-items: center; justify-content: center; background: transparent !important; border: none; color: rgba(148,163,184,0.4); cursor: pointer; font-size: 0.85rem; transition: color 0.2s; outline: none !important; box-shadow: none !important; -webkit-appearance: none; appearance: none; }
+        .eye-btn:hover { color: rgba(0,219,255,0.8); background: transparent !important; }
+
+        .row-util {
+            display: flex; align-items: center; justify-content: space-between;
+            font-size: 0.75rem;
+            margin: 0.25rem 0 1.5rem;
+        }
+        .row-util label { display: flex; align-items: center; gap: 0.45rem; color: rgba(148,163,184,0.65); cursor: pointer; }
+        .row-util label input[type="checkbox"] { accent-color: #00dbff; }
+        .row-util a { color: rgba(0,219,255,0.8); text-decoration: none; transition: opacity .2s; }
+        .row-util a:hover { opacity: 0.7; }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #0076D6, #00dbff);
+            border: none;
+            border-radius: 0.8rem;
+            color: #05080f;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 20px rgba(0,219,255,0.2);
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,219,255,0.4); }
+
+        .form-footer {
+            margin-top: 1.75rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+            font-size: 0.78rem;
+            color: rgba(148,163,184,0.55);
+        }
+        .form-footer a { color: rgba(0,219,255,0.9); font-weight: 600; text-decoration: none; margin-left: 0.25rem; }
+        .form-footer a:hover { opacity: 0.75; }
+
+        /* Responsive */
+        @media (max-width: 820px) {
+            body { flex-direction: column; height: auto; overflow-y: auto; }
+            .brand-panel { width: 100%; min-height: 300px; height: auto; flex-shrink: 1; }
+            .form-panel { height: auto; overflow-y: visible; padding: 2.5rem 1.5rem; }
         }
     </style>
 </head>
 <body>
 
+    <!-- BRAND PANEL -->
+    <div class="brand-panel">
+        <div class="dot dot-1"></div>
+        <div class="dot dot-2"></div>
+        <div class="dot dot-3"></div>
 
-    <div class="flex min-h-screen split-container">
-        <!-- Left Side - Image/Visual Content -->
-        <div class="flex-1 side-image relative flex items-center justify-center">
-            <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-cyan-900/20"></div>
-            <div class="relative z-10 text-center p-8">
-                <img src="../assets/images/Logo1.png" alt="Deceptron Logo" class="w-40 h-40 lg:w-48 lg:h-48 mx-auto mb-6 object-contain drop-shadow-[0_0_30px_rgba(0,219,255,0.8)]">
-                <h1 class="heading-font text-3xl lg:text-4xl font-bold tracking-[0.3em] mb-4 glow-text">DECEPTRON</h1>
-                <p class="text-base lg:text-lg tracking-[0.5em] font-light text-cyan-300 opacity-90 uppercase mb-4">Truth Verification System</p>
-                <p class="text-sm text-gray-300 max-w-sm mx-auto leading-relaxed mb-8">Advanced neural analysis for truth verification and deception detection.</p>
-                <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-cyan-400 mx-auto rounded-full"></div>
+        <div class="brand-body">
+            <div class="logo-wrap">
+                <img src="../assets/images/Logo1.png" alt="Deceptron">
             </div>
-            
-            <!-- Floating Elements -->
-            <div class="absolute top-20 left-20 w-4 h-4 bg-cyan-400 rounded-full animate-pulse opacity-60"></div>
-            <div class="absolute bottom-32 right-16 w-6 h-6 bg-blue-500 rounded-full animate-pulse opacity-40" style="animation-delay: 1s;"></div>
-            <div class="absolute top-1/2 left-10 w-2 h-2 bg-cyan-300 rounded-full animate-pulse opacity-80" style="animation-delay: 2s;"></div>
-        </div>
 
-        <!-- Right Side - Login Form -->
-        <div class="flex-1 flex items-center justify-center p-8 bg-gradient-to-br from-slate-900/50 to-slate-800/30">
-            <div class="w-full max-w-md">
-                <div class="login-card">
-                    <div class="text-center mb-8">
-                        <div class="flex items-center justify-center space-x-4 mb-6">
-                            <div class="h-[1px] w-16 bg-gradient-to-r from-transparent to-cyan-400/50"></div>
-                            <h2 class="text-2xl font-light tracking-[0.3em] text-white uppercase glow-text">Login</h2>
-                            <div class="h-[1px] w-16 bg-gradient-to-l from-transparent to-cyan-400/50"></div>
-                        </div>
-                        <p class="text-gray-400 text-sm">Sign in to your account</p>
-                    </div>
-                    
-                    <form id="loginForm" class="space-y-6">
-                        <div>
-                            <input type="text" placeholder="Email or Username" required 
-                                class="input-field w-full px-6 py-4 rounded-2xl text-white placeholder-gray-500 text-sm font-light">
-                        </div>
-                        
-                        <div>
-                            <input type="password" placeholder="Password" required 
-                                class="input-field w-full px-6 py-4 rounded-2xl text-white placeholder-gray-500 text-sm font-light">
-                        </div>
+            <p class="brand-tagline">Truth Verification System</p>
+            <div class="brand-divider"></div>
 
-                        <div class="flex items-center justify-between text-sm">
-                            <label class="flex items-center cursor-pointer text-gray-400 hover:text-gray-300 transition-colors">
-                                <input type="checkbox" class="accent-cyan-500 rounded mr-3">
-                                <span>Remember me</span>
-                            </label>
-                            <a href="#" class="text-cyan-400 hover:text-cyan-300 transition-colors">Forgot password?</a>
-                        </div>
+            <p class="brand-desc">
+                Multi-modal deception detection using facial, voice, and behavioral analysis — built for accuracy you can trust.
+            </p>
 
-                        <button type="submit" class="btn-primary w-full py-4 rounded-2xl font-semibold tracking-[0.2em] text-sm uppercase">
-                            Sign In
-                        </button>
-                    </form>
-
-                    <div class="mt-8 pt-6 border-t border-white/10 text-center">
-                        <p class="text-gray-400 text-sm">
-                            New to Deceptron? 
-                            <a href="signup.html" class="text-cyan-400 font-semibold hover:text-cyan-300 transition-all ml-1">Create Account</a>
-                        </p>
-                    </div>
-                </div>
+            <div class="badge-row">
+                <span class="badge"><i class="fas fa-brain" style="margin-right:5px"></i>Neural</span>
+                <span class="badge"><i class="fas fa-microphone-alt" style="margin-right:5px"></i>Voice</span>
+                <span class="badge"><i class="fas fa-eye" style="margin-right:5px"></i>Facial</span>
             </div>
         </div>
     </div>
-    <!-- Common utilities -->
+
+    <!-- FORM PANEL -->
+    <div class="form-panel">
+        <div class="form-box">
+            <div class="form-top">
+                <div class="chip"><i class="fas fa-lock"></i> Secure Access</div>
+                <h2>Welcome Back</h2>
+                <p>Sign in to your account to continue</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="field">
+                    <div class="field-icon"><i class="fas fa-user-shield"></i></div>
+                    <input type="text" placeholder="Email or Username" required>
+                </div>
+
+                <div class="field">
+                    <div class="field-icon"><i class="fas fa-lock"></i></div>
+                    <input type="password" id="loginPwd" placeholder="Password" required>
+                    <button type="button" class="eye-btn" onclick="togglePwd('loginPwd',this)" tabindex="-1"><i class="fas fa-eye"></i></button>
+                </div>
+
+                <div class="row-util">
+                    <label><input type="checkbox"> Remember me</label>
+                    <a href="#">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn-submit">Sign In</button>
+            </form>
+
+            <div class="form-footer">
+                New here?<a href="signup.html">Create an account</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backend scripts — untouched -->
     <script src="../js/common/constants.js"></script>
     <script src="../js/common/utils.js"></script>
     <script src="../js/common/api.js"></script>
     <script src="../js/common/auth.js"></script>
-    
-    <!-- Page-specific logic -->
     <script src="../js/pages/login.js"></script>
-
+    <script>
+        function togglePwd(id, btn) {
+            const input = document.getElementById(id);
+            const isText = input.type === 'text';
+            input.type = isText ? 'password' : 'text';
+            btn.querySelector('i').className = isText ? 'fas fa-eye' : 'fas fa-eye-slash';
+        }
+    </script>
 </body>
 </html>

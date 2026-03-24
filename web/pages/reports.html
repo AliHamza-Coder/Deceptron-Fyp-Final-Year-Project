@@ -270,6 +270,20 @@
             color: #334155 !important;
         }
 
+        /* --- Forensic Glow System --- */
+        .glow-cyan { box-shadow: 0 0 20px rgba(0, 219, 255, 0.15); border: 1px solid rgba(0, 219, 255, 0.3) !important; }
+        .glow-purple { box-shadow: 0 0 20px rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3) !important; }
+        .glow-blue { box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3) !important; }
+        .glow-emerald { box-shadow: 0 0 20px rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3) !important; }
+        .glow-amber { box-shadow: 0 0 20px rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3) !important; }
+        .glow-rose { box-shadow: 0 0 20px rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.3) !important; }
+        .glow-slate { box-shadow: 0 0 20px rgba(148, 163, 184, 0.1); border: 1px solid rgba(148, 163, 184, 0.2) !important; }
+
+        .report-card:hover .glow-slate { box-shadow: 0 0 30px rgba(148, 163, 184, 0.3); background: rgba(148, 163, 184, 0.2) !important; color: white !important; }
+        .glass:hover .glow-cyan { box-shadow: 0 0 30px rgba(0, 219, 255, 0.4); background: rgba(0, 219, 255, 0.1) !important; }
+        .glass:hover .glow-rose { box-shadow: 0 0 30px rgba(244, 63, 94, 0.4); background: rgba(244, 63, 94, 0.1) !important; }
+        .glass:hover .glow-amber { box-shadow: 0 0 30px rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.1) !important; }
+
         body.light-mode .text-white,
         body.light-mode .text-gray-100,
         body.light-mode .text-gray-200,
@@ -372,7 +386,7 @@
             <!-- Report Items -->
             <div class="report-card p-6 flex flex-wrap lg:flex-nowrap items-center gap-8" onclick="window.location.href='report-detail.html'">
                 <div class="flex items-center space-x-4 lg:w-1/4">
-                    <div class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-xl text-gray-500 border border-white/5">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-xl text-gray-500 border border-white/5 glow-slate transition-all duration-300">
                         <i class="fas fa-user-secret"></i>
                     </div>
                     <div>
@@ -412,7 +426,7 @@
             <!-- Repeat for other cards with onclick -->
             <div class="report-card p-6 flex flex-wrap lg:flex-nowrap items-center gap-8" onclick="window.location.href='report-detail.html'">
                 <div class="flex items-center space-x-4 lg:w-1/4">
-                    <div class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-xl text-gray-500 border border-white/5">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-xl text-gray-500 border border-white/5 glow-slate transition-all duration-300">
                         <i class="fas fa-user"></i>
                     </div>
                     <div>
@@ -460,9 +474,9 @@
 
             <div class="flex items-center justify-between mb-12">
                 <div class="flex items-center space-x-6">
-                    <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-600 to-cyan-400 p-0.5 shadow-lg shadow-cyan-500/20">
-                        <div class="w-full h-full bg-[#070B14] rounded-3xl flex items-center justify-center forensic-bg-override">
-                            <i class="fas fa-user-shield text-3xl text-white"></i>
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-400 p-0.5 shadow-lg shadow-cyan-500/20 glow-cyan">
+                        <div class="w-full h-full bg-[#070B14] rounded-2xl flex items-center justify-center forensic-bg-override">
+                            <i class="fas fa-user-shield text-2xl text-white"></i>
                         </div>
                     </div>
                     <div>
@@ -486,95 +500,114 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Data Columns -->
-                <div class="col-span-2 space-y-8">
-                    <div class="glass p-8 rounded-3xl">
-                        <h3 class="text-sm font-bold heading-font uppercase tracking-widest mb-8 text-white flex items-center">
-                            <i class="fas fa-chart-line mr-3 text-cyan-400"></i> Truth Level Analysis
-                        </h3>
-                        <div class="h-64">
-                            <canvas id="detailChart"></canvas>
+            <!-- Standardized 3-Card Analysis Output Contract -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <article class="glass p-8 space-y-5 border-white/5 group">
+                    <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                        <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center mr-3 glow-cyan transition-all duration-300">
+                            <i class="fas fa-info-circle text-cyan-400"></i>
+                        </div>
+                        Output Context
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center text-[11px]">
+                            <span class="text-gray-400 font-medium">Capture Source</span>
+                            <span class="text-white font-mono bg-white/5 px-2 py-0.5 rounded">Forensic Unit #09</span>
+                        </div>
+                        <div class="flex justify-between items-center text-[11px]">
+                            <span class="text-gray-400 font-medium">Session Type</span>
+                            <span class="text-white font-mono">Behavioral Scan</span>
+                        </div>
+                        <div class="flex justify-between items-center text-[11px]">
+                            <span class="text-gray-400 font-medium">Encryption</span>
+                            <span class="text-emerald-400 font-bold">AES-256 Verified</span>
+                        </div>
+                        <div class="flex justify-between items-center text-[11px]">
+                            <span class="text-gray-400 font-medium">Metadata</span>
+                            <span class="text-white font-mono">CID: 4092-XQ-Y</span>
                         </div>
                     </div>
+                </article>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="glass p-6 rounded-2xl">
-                            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-4">Facial Micro-Expressions</p>
-                            <div class="space-y-4">
-                                <div>
-                                    <div class="flex justify-between text-[10px] mb-2 uppercase tracking-wide">
-                                        <span class="text-gray-300">Asymmetry Detection</span>
-                                        <span class="text-rose-500">88%</span>
-                                    </div>
-                                    <div class="h-1 bg-white/5 rounded-full overflow-hidden">
-                                        <div class="h-full bg-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" style="width: 88%"></div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-[10px] mb-2 uppercase tracking-wide">
-                                        <span class="text-gray-300">Micro-Stress Shifts</span>
-                                        <span class="text-amber-500">64%</span>
-                                    </div>
-                                    <div class="h-1 bg-white/5 rounded-full overflow-hidden">
-                                        <div class="h-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" style="width: 64%"></div>
-                                    </div>
-                                </div>
-                            </div>
+                <article class="glass p-8 space-y-5 border-rose-500/10 group">
+                    <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                        <div class="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center mr-3 glow-rose transition-all duration-300">
+                            <i class="fas fa-align-left text-rose-500"></i>
                         </div>
-
-                        <div class="glass p-6 rounded-2xl">
-                            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-4">Voice Stress Test</p>
-                            <div class="space-y-4">
-                                <div>
-                                    <div class="flex justify-between text-[10px] mb-2 uppercase tracking-wide">
-                                        <span class="text-gray-300">Pitch Instability</span>
-                                        <span class="text-cyan-500">22%</span>
-                                    </div>
-                                    <div class="h-1 bg-white/5 rounded-full overflow-hidden">
-                                        <div class="h-full bg-cyan-500 shadow-[0_0_8px_rgba(0,219,255,0.5)]" style="width: 22%"></div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-[10px] mb-2 uppercase tracking-wide">
-                                        <span class="text-gray-300">Jitter/Shimmer Ratio</span>
-                                        <span class="text-cyan-500">18%</span>
-                                    </div>
-                                    <div class="h-1 bg-white/5 rounded-full overflow-hidden">
-                                        <div class="h-full bg-cyan-500 shadow-[0_0_8px_rgba(0,219,255,0.5)]" style="width: 18%"></div>
-                                    </div>
-                                </div>
-                            </div>
+                        Description
+                    </h3>
+                    <div class="space-y-4">
+                        <p class="text-[11px] text-gray-300 leading-relaxed" id="modalDescription">
+                            Subject shows high-probability deceptive indicators during baseline interrogation. Neural engine identified concentrated micro-tremors during financial disclosure section.
+                        </p>
+                        <ul class="space-y-2 text-[10px] text-gray-400">
+                            <li class="flex items-center">
+                                <span class="w-1 h-1 bg-rose-500 rounded-full mr-2"></span> High-stress micro-tremors
+                            </li>
+                            <li class="flex items-center">
+                                <span class="w-1 h-1 bg-rose-500 rounded-full mr-2"></span> Zygomatic major contraction
+                            </li>
+                            <li class="flex items-center">
+                                <span class="w-1 h-1 bg-rose-500 rounded-full mr-2"></span> Baseline shift detected
+                            </li>
+                        </ul>
+                        <div class="pt-2">
+                            <span class="px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 text-rose-500 text-[9px] font-bold uppercase rounded-lg">
+                                Verdict: DECEPTIVE
+                            </span>
                         </div>
                     </div>
-                </div>
+                </article>
 
-                <!-- Summary Column -->
-                <div class="space-y-6">
-                    <div class="glass p-8 rounded-3xl border-l-4 border-rose-500">
-                        <h3 class="text-xs font-bold uppercase tracking-[0.2em] mb-4 text-rose-500">Final Summary Result</h3>
-                        <p class="text-sm text-gray-300 leading-relaxed font-medium">Subject shows high-probability deceptive indicators during baseline interrogation. Neural engine identified concentrated micro-tremors during financial disclosure section.</p>
-                        <div class="mt-8 p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl">
-                            <p class="text-[10px] text-rose-500 uppercase font-bold tracking-widest mb-1">Verdict Status</p>
-                            <p class="text-lg font-black heading-font text-white uppercase text-rose-500">DECEPTIVE</p>
+                <article class="glass p-8 space-y-8 border-cyan-500/10 group">
+                    <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                        <div class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center mr-3 glow-amber transition-all duration-300">
+                            <i class="fas fa-chart-pie text-amber-500"></i>
                         </div>
-                    </div>
-
-                    <div class="glass p-8 rounded-3xl">
-                        <h3 class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-6">Action Protocols</h3>
+                        Analysis %
+                    </h3>
+                    <div class="space-y-8">
                         <div class="space-y-3">
-                            <button class="w-full py-4 bg-white/5 border border-white/10 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-all text-white cursor-pointer">
-                                <i class="fas fa-file-pdf mr-2"></i> Export PDF Report
-                            </button>
-                            <button class="w-full py-4 bg-white/5 border border-white/10 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-all text-white cursor-pointer">
-                                <i class="fas fa-share-alt mr-2"></i> Share Intelligence
-                            </button>
-                            <button class="w-full py-4 bg-rose-500/10 border border-rose-500/20 rounded-xl text-[10px] font-bold uppercase tracking-widest text-rose-500 hover:bg-rose-500 hover:text-white transition-all cursor-pointer">
-                                <i class="fas fa-trash-alt mr-2"></i> Archive Case
-                            </button>
+                            <div class="flex justify-between text-[10px] font-bold uppercase tracking-wider">
+                                <span class="text-gray-400">Primary Truth Score</span>
+                                <span class="text-rose-500 text-sm">22%</span>
+                            </div>
+                            <div class="h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
+                                <div class="h-full bg-rose-500 rounded-full" style="width: 22%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 pt-2">
+                            <div class="text-center space-y-3">
+                                <div class="relative w-20 h-20 mx-auto group">
+                                    <canvas id="modalRadialA"></canvas>
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                        <span class="text-xs font-black text-white">88%</span>
+                                    </div>
+                                </div>
+                                <span class="text-[9px] text-gray-500 uppercase font-black tracking-widest">Facial</span>
+                            </div>
+                            <div class="text-center space-y-3">
+                                <div class="relative w-20 h-20 mx-auto group">
+                                    <canvas id="modalRadialB"></canvas>
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                        <span class="text-xs font-black text-white">22%</span>
+                                    </div>
+                                </div>
+                                <span class="text-[9px] text-gray-500 uppercase font-black tracking-widest">Voice</span>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </article>
+            </div>
+            
+            <div class="mt-8 flex justify-end space-x-4">
+                <button class="px-8 py-3 bg-white/5 border border-white/10 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-all text-white cursor-pointer">
+                    <i class="fas fa-file-pdf mr-2"></i> Export Report
+                </button>
+                <button class="px-8 py-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-[10px] font-bold uppercase tracking-widest text-rose-500 hover:bg-rose-500 hover:text-white transition-all cursor-pointer">
+                    <i class="fas fa-trash-alt mr-2"></i> Archive Case
+                </button>
             </div>
         </div>
     </div>
@@ -603,33 +636,46 @@
         }
         initMiniCharts();
 
-        // Detail Chart Global Instance
-        let detailChartInstance = null;
-        function initDetailChart() {
-            const ctx = document.getElementById('detailChart').getContext('2d');
-            detailChartInstance = new Chart(ctx, {
-                type: 'line',
+        // Modal Radial Charts
+        let modalRadialA = null;
+        let modalRadialB = null;
+
+        function initModalCharts() {
+            const ctxA = document.getElementById('modalRadialA').getContext('2d');
+            modalRadialA = new Chart(ctxA, {
+                type: 'doughnut',
                 data: {
-                    labels: ['0m', '10m', '20m', '30m', '40m', '50m'],
                     datasets: [{
-                        label: 'Deception Prob',
-                        data: [20, 35, 88, 70, 94, 98],
-                        borderColor: '#f87171',
-                        backgroundColor: 'rgba(248, 113, 113, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 3,
-                        pointBackgroundColor: '#f87171'
+                        data: [88, 12],
+                        backgroundColor: ['#06b6d4', body.classList.contains('light-mode') ? 'rgba(0,118,214,0.1)' : 'rgba(255,255,255,0.05)'],
+                        borderWidth: 0,
+                        cutout: '80%',
+                        borderRadius: 10
                     }]
                 },
                 options: {
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
                     responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: body.classList.contains('light-mode') ? 'rgba(0,118,214,0.1)' : 'rgba(255,255,255,0.05)' }, ticks: { color: body.classList.contains('light-mode') ? '#475569' : '#666' } },
-                        x: { grid: { display: false }, ticks: { color: body.classList.contains('light-mode') ? '#475569' : '#666' } }
-                    }
+                    maintainAspectRatio: false
+                }
+            });
+
+            const ctxB = document.getElementById('modalRadialB').getContext('2d');
+            modalRadialB = new Chart(ctxB, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [22, 78],
+                        backgroundColor: ['#f43f5e', body.classList.contains('light-mode') ? 'rgba(0,118,214,0.1)' : 'rgba(255,255,255,0.05)'],
+                        borderWidth: 0,
+                        cutout: '80%',
+                        borderRadius: 10
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    responsive: true,
+                    maintainAspectRatio: false
                 }
             });
         }
@@ -639,8 +685,8 @@
             document.getElementById('modalSubject').innerText = subject;
             document.getElementById('modalRef').innerText = "Ref: " + ref;
             document.getElementById('reportModal').classList.remove('hidden');
-            if(!detailChartInstance) {
-                initDetailChart();
+            if(!modalRadialA) {
+                initModalCharts();
             }
         }
 
@@ -678,12 +724,21 @@
             themeToggle.classList.toggle('bg-gray-200', isLight);
             themeToggle.classList.toggle('text-gray-900', isLight);
             themeToggle.classList.toggle('border-gray-300', isLight);
+
+            const dimColor = isLight ? 'rgba(0,118,214,0.1)' : 'rgba(255,255,255,0.05)';
+            [modalRadialA, modalRadialB].forEach(chart => {
+                if (chart) {
+                    chart.data.datasets[0].backgroundColor[1] = dimColor;
+                    chart.update();
+                }
+            });
         }
 
         themeToggle.addEventListener('click', toggleTheme);
 
         // Initial Load
         document.addEventListener('DOMContentLoaded', () => {
+            const body = document.body;
             // Update Theme UI state (icons, buttons)
             updateThemeUI(body.classList.contains('light-mode'));
         });
