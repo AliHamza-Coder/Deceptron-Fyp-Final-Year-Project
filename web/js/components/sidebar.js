@@ -10,7 +10,7 @@
 const NAV_ITEMS = {
     main: [
         { id: 'dashboard', label: 'Dashboard Hub', icon: 'fas fa-th-large', link: 'dashboard.html' },
-        { id: 'live-session', label: 'Live Session', icon: 'fas fa-video', link: 'live-session.html' },
+        { id: 'start-session', label: 'Start Session', icon: 'fas fa-video', link: 'start-session.html' },
         { id: 'reports', label: 'Reports', icon: 'fas fa-file-alt', link: 'reports.html' },
         { id: 'uploads', label: 'Uploads', icon: 'fas fa-upload', link: 'uploads.html' }
     ],
@@ -104,7 +104,7 @@ function initSidebar() {
     // Map filename to page ID
     const pageMap = {
         'dashboard.html': 'dashboard',
-        'live-session.html': 'live-session',
+        'start-session.html': 'start-session',
         'reports.html': 'reports',
         'uploads.html': 'uploads',
         'facial-expression.html': 'facial-expression',

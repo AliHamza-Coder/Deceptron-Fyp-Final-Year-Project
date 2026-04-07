@@ -1,7 +1,7 @@
 // ========================================
 // DECEPTRON - MEDIA RECORDER MANAGER
 // Centralised recording logic shared by
-// live-session, voice-analysis, facial-expression
+// start-session, voice-analysis, facial-expression
 // ========================================
 
 class MediaRecorderManager {
