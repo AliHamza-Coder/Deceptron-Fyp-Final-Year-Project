@@ -490,6 +490,14 @@
         transform: translateX(5px);
       }
 
+      body.light-mode .metric-item p {
+        color: #475569 !important;
+      }
+      
+      body.light-mode .metric-item span {
+        color: #1e293b !important;
+      }
+
       ::-webkit-scrollbar {
         width: 4px;
       }
@@ -582,6 +590,130 @@
       video[style*="scaleX(-1)"]::-webkit-media-controls {
         transform: scaleX(-1);
       }
+
+      /* Table Styling */
+      .frame-table-container {
+        max-height: 250px;
+        overflow-y: auto;
+        border-radius: 0.75rem;
+        border: 1px solid var(--border-subtle);
+      }
+      .frame-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .frame-table th {
+        background: rgba(15, 23, 42, 0.95);
+        color: var(--accent-cyan);
+        font-size: 9px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        padding: 1rem;
+        text-align: left;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 2px solid rgba(0, 219, 255, 0.2);
+        backdrop-filter: blur(8px);
+      }
+
+      body.light-mode .frame-table th {
+        background: #f1f5f9;
+        color: #1e293b;
+        border-bottom: 2px solid rgba(0, 219, 255, 0.2);
+      }
+
+      .frame-table td {
+        padding: 1rem;
+        font-size: 11px;
+        color: var(--text-dim);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        transition: all 0.2s ease;
+      }
+
+      body.light-mode .frame-table {
+        background: white;
+      }
+
+      body.light-mode .frame-table td {
+        padding: 1rem;
+        color: #334155;
+        border-bottom: 1px solid #f1f5f9;
+      }
+      
+      .frame-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .frame-table tr:hover td {
+        background: rgba(0, 219, 255, 0.05);
+        color: white;
+      }
+
+      body.light-mode .frame-table tr:hover td {
+        background: rgba(0, 219, 255, 0.05);
+        color: #0076D6;
+        border-bottom-color: rgba(0, 118, 214, 0.05) !important;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(0, 219, 255, 0.3);
+        border-radius: 3px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 219, 255, 0.5);
+      }
+
+      /* Circular Chart Container */
+      .chart-container {
+        position: relative;
+        width: 100%;
+        height: 180px;
+      }
+
+      body.light-mode .chart-container canvas {
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.05));
+      }
+
+      /* Table Row Animation */
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      tbody tr {
+        animation: slideIn 0.3s ease forwards;
+      }
+
+      tbody tr:nth-child(1) { animation-delay: 0.05s; }
+      tbody tr:nth-child(2) { animation-delay: 0.1s; }
+      tbody tr:nth-child(3) { animation-delay: 0.15s; }
+      tbody tr:nth-child(4) { animation-delay: 0.2s; }
+      tbody tr:nth-child(5) { animation-delay: 0.25s; }
+
+      /* Emotion Badge Colors */
+      .badge-neutral { background: rgba(52, 211, 153, 0.1); color: #34d399; }
+      .badge-anger { background: rgba(251, 191, 36, 0.1); color: #fbbf24; }
+      .badge-fear { background: rgba(248, 113, 113, 0.1); color: #f87171; }
+      .badge-surprise { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+
+      body.light-mode .badge-neutral { background: rgba(52, 211, 153, 0.15); color: #059669; }
+      body.light-mode .badge-anger { background: rgba(251, 191, 36, 0.15); color: #d97706; }
+      body.light-mode .badge-fear { background: rgba(248, 113, 113, 0.15); color: #dc2626; }
+      body.light-mode .badge-surprise { background: rgba(168, 85, 247, 0.15); color: #7c3aed; }
     </style>
   </head>
   <body>
@@ -753,37 +885,24 @@
             </button>
           </div>
         </div>
-          </div>
-        </div>
       </div>
 
       <div class="h-[1px] bg-white/5"></div>
 
-      <!-- Overlays Section -->
+      <!-- Module Testing - Facial Expression Toggles -->
       <div class="space-y-4">
         <label
           class="text-[9px] text-gray-500 font-bold uppercase tracking-widest block"
-          >Targeted Scanning Modules</label
+          >Module Testing</label
         >
 
         <div class="metric-item">
           <div class="flex items-center gap-3">
-            <i class="fas fa-user-circle text-[10px] text-cyan-400"></i>
-            <span class="text-xs font-bold text-gray-300">Face Detection</span>
+            <i class="fas fa-network-wired text-[10px] text-purple-400"></i>
+            <span class="text-xs font-bold text-gray-300">Show Face Mesh</span>
           </div>
           <label class="switch">
-            <input type="checkbox" id="toggleFace" checked />
-            <span class="slider"></span>
-          </label>
-        </div>
-
-        <div class="metric-item">
-          <div class="flex items-center gap-3">
-            <i class="fas fa-smile text-[10px] text-emerald-400"></i>
-            <span class="text-xs font-bold text-gray-300">Emotion Detection</span>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="toggleEmotion" checked />
+            <input type="checkbox" id="toggleFaceMesh" />
             <span class="slider"></span>
           </label>
         </div>
@@ -791,76 +910,32 @@
         <div class="metric-item">
           <div class="flex items-center gap-3">
             <i class="fas fa-eye text-[10px] text-cyan-400"></i>
-            <span class="text-xs font-bold text-gray-300">Eye Movement</span>
+            <span class="text-xs font-bold text-gray-300">Track Eyes & Gaze</span>
           </div>
           <label class="switch">
-            <input type="checkbox" id="toggleEyeMove" checked />
+            <input type="checkbox" id="toggleEyeGaze" />
             <span class="slider"></span>
           </label>
         </div>
 
         <div class="metric-item">
           <div class="flex items-center gap-3">
-            <i class="fas fa-arrows-to-eye text-[10px] text-cyan-400"></i>
-            <span class="text-xs font-bold text-gray-300">Eye Jumps</span>
+            <i class="fas fa-grip-lines text-[10px] text-amber-500"></i>
+            <span class="text-xs font-bold text-gray-300">Track Lips & Jaw</span>
           </div>
           <label class="switch">
-            <input type="checkbox" id="toggleEyeJumps" checked />
+            <input type="checkbox" id="toggleLipsJaw" />
             <span class="slider"></span>
           </label>
         </div>
 
         <div class="metric-item">
           <div class="flex items-center gap-3">
-            <i class="fas fa-wave-square text-[10px] text-amber-500"></i>
-            <span class="text-xs font-bold text-gray-300">Small Muscle Twitch</span>
+            <i class="fas fa-smile text-[10px] text-emerald-400"></i>
+            <span class="text-xs font-bold text-gray-300">Emotions Detection</span>
           </div>
           <label class="switch">
-            <input type="checkbox" id="toggleMuscleTwitch" checked />
-            <span class="slider"></span>
-          </label>
-        </div>
-
-        <div class="metric-item">
-          <div class="flex items-center gap-3">
-            <i class="fas fa-wind text-[10px] text-rose-500"></i>
-            <span class="text-xs font-bold text-gray-300">Nasal Dilation</span>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="toggleNasal" />
-            <span class="slider"></span>
-          </label>
-        </div>
-
-        <div class="metric-item">
-          <div class="flex items-center gap-3">
-            <i class="fas fa-smile-beam text-[10px] text-emerald-500"></i>
-            <span class="text-xs font-bold text-gray-300">Cheeks Analysis</span>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="toggleCheeks" checked />
-            <span class="slider"></span>
-          </label>
-        </div>
-
-        <div class="metric-item">
-          <div class="flex items-center gap-3">
-            <i class="fas fa-grip-lines text-[10px] text-cyan-400"></i>
-            <span class="text-xs font-bold text-gray-300">Jaw Micro-Twitch</span>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="toggleJaw" />
-            <span class="slider"></span>
-          </label>
-        </div>
-
-        <div class="metric-item">
-          <div class="flex items-center gap-3">
-            <i class="fas fa-network-wired text-[10px] text-purple-400"></i>
-            <span class="text-xs font-bold text-gray-300">Facial Mesh</span>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="toggleMesh" />
+            <input type="checkbox" id="toggleEmotions" checked />
             <span class="slider"></span>
           </label>
         </div>
@@ -1026,7 +1101,7 @@
           </div>
         </div>
       </section>
-      <!-- Bottom Row: Standardized 3-Card Analysis Output -->
+      <!-- AI Analysis Results Section -->
       <section class="px-4 pb-8 space-y-6">
         <div class="flex items-center space-x-3 text-cyan-400">
           <div class="h-[1px] flex-1 bg-cyan-500/20"></div>
@@ -1038,133 +1113,205 @@
           <div class="h-[1px] flex-1 bg-cyan-500/20"></div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Card 1: Output Context -->
-          <article class="glass p-8 space-y-5 border-white/5">
-            <h3
-              class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center"
-            >
-              <i class="fas fa-info-circle mr-2 text-cyan-400"></i> Output
-              Context
+        <!-- Emotions Detection Analysis -->
+        <article class="glass p-6 border-white/5">
+          <h3
+            class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4"
+          >
+            <i class="fas fa-smile mr-2 text-emerald-400"></i> Emotions Detection Analysis
+          </h3>
+          <div class="frame-table-container custom-scrollbar">
+            <table class="frame-table">
+              <thead>
+                <tr>
+                  <th>Frame #</th>
+                  <th>Timestamp</th>
+                  <th>Dominant Emotion</th>
+                  <th>Micro-Expression</th>
+                  <th>Confidence Score</th>
+                </tr>
+              </thead>
+              <tbody id="emotionTableBody">
+                <!-- Mock data will be injected here -->
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <!-- Eye Tracking Analysis -->
+        <article class="glass p-6 border-white/5">
+          <h3
+            class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4"
+          >
+            <i class="fas fa-eye mr-2 text-cyan-400"></i> Eye Tracking Analysis
+          </h3>
+          <div class="frame-table-container custom-scrollbar">
+            <table class="frame-table">
+              <thead>
+                <tr>
+                  <th>Frame #</th>
+                  <th>Timestamp</th>
+                  <th>Pupil Size</th>
+                  <th>Blink Rate</th>
+                  <th>Fixation Score</th>
+                </tr>
+              </thead>
+              <tbody id="eyeTrackTableBody">
+                <!-- Mock data will be injected here -->
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <!-- Gaze Tracking Analysis -->
+        <article class="glass p-6 border-white/5">
+          <h3
+            class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4"
+          >
+            <i class="fas fa-bullseye mr-2 text-purple-400"></i> Gaze Movement Analysis
+          </h3>
+          <div class="frame-table-container custom-scrollbar">
+            <table class="frame-table">
+              <thead>
+                <tr>
+                  <th>Frame #</th>
+                  <th>Timestamp</th>
+                  <th>Gaze vector</th>
+                  <th>Focus Area</th>
+                  <th>Gaze Stability</th>
+                </tr>
+              </thead>
+              <tbody id="gazeTrackTableBody">
+                <!-- Mock data will be injected here -->
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <!-- Lips Forensic tracking -->
+        <article class="glass p-6 border-white/5">
+          <h3
+            class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4"
+          >
+            <i class="fas fa-lips mr-2 text-rose-400"></i> Lips Forensic Tracking
+          </h3>
+          <div class="frame-table-container custom-scrollbar">
+            <table class="frame-table">
+              <thead>
+                <tr>
+                  <th>Frame #</th>
+                  <th>Timestamp</th>
+                  <th>Lip Tension</th>
+                  <th>Aperture (%)</th>
+                  <th>Compression</th>
+                </tr>
+              </thead>
+              <tbody id="lipsTableBody">
+                <!-- Mock data will be injected here -->
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <!-- Jaw Movement Analysis -->
+        <article class="glass p-6 border-white/5">
+          <h3
+            class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4"
+          >
+            <i class="fas fa-grip-lines mr-2 text-amber-400"></i> Jaw Movement Dynamics
+          </h3>
+          <div class="frame-table-container custom-scrollbar">
+            <table class="frame-table">
+              <thead>
+                <tr>
+                  <th>Frame #</th>
+                  <th>Timestamp</th>
+                  <th>Jaw Rotation</th>
+                  <th>Opening Index</th>
+                  <th>Muscle Strain</th>
+                </tr>
+              </thead>
+              <tbody id="jawTableBody">
+                <!-- Mock data will be injected here -->
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <!-- Visual Circular Graphs Section -->
+        <div id="circularGraphsSection" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Graph 1: Overall Emotion Distribution -->
+          <article class="glass p-6 border-cyan-500/10">
+            <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4">
+              <i class="fas fa-chart-pie mr-2 text-cyan-400"></i> Overall Emotion Distribution
             </h3>
-            <div class="space-y-4">
-              <div class="flex justify-between items-center text-[11px]">
-                <span class="text-gray-400 font-medium">Source</span>
-                <span class="text-white font-mono bg-white/5 px-2 py-0.5 rounded" id="ctxSource"
-                  >Facial Scan #02</span
-                >
+            <div class="relative h-48 flex items-center justify-center">
+              <canvas id="emotionDistributionChart" width="180" height="180"></canvas>
+              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span class="text-2xl font-bold text-emerald-400">60%</span>
+                <span class="text-[8px] text-gray-500 uppercase tracking-tighter">Neutrality</span>
               </div>
-              <div class="flex justify-between items-center text-[11px]">
-                <span class="text-gray-400 font-medium">Resolution</span>
-                <span class="text-white font-mono" id="ctxResolution"
-                  >1920x1080 (FHD)</span
-                >
+            </div>
+            <div class="mt-4 space-y-2 text-[10px]">
+              <div class="flex justify-between items-center">
+                <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400"></span>Neutral</span>
+                <span class="text-emerald-400 font-bold">60%</span>
               </div>
-              <div class="flex justify-between items-center text-[11px]">
-                <span class="text-gray-400 font-medium">Mesh Nodes</span>
-                <span class="text-emerald-400 font-bold" id="ctxMesh"
-                  >468 Active</span
-                >
+              <div class="flex justify-between items-center">
+                <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400"></span>Anger</span>
+                <span class="text-amber-400 font-bold">25%</span>
               </div>
-              <div class="flex justify-between items-center text-[11px]">
-                <span class="text-gray-400 font-medium">Sample Rate</span>
-                <span class="text-white font-mono" id="ctxStats"
-                  >60 Hz • High Precision</span
-                >
+              <div class="flex justify-between items-center">
+                <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-rose-400"></span>Fear</span>
+                <span class="text-rose-400 font-bold">15%</span>
               </div>
             </div>
           </article>
 
-          <!-- Card 2: Description -->
-          <article class="glass p-8 space-y-5 border-rose-500/10">
-            <h3
-              class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center"
-            >
-              <i class="fas fa-align-left mr-2 text-rose-500"></i> Description
+          <!-- Graph 2: Eye Movement Tracking -->
+          <article class="glass p-6 border-purple-500/10">
+            <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4">
+              <i class="fas fa-eye mr-2 text-purple-400"></i> Eye Movement Tracking
             </h3>
-            <div class="space-y-4">
-              <p class="text-[11px] text-gray-300 leading-relaxed" id="descSummary">
-                Subject exhibits micro-asymmetry in zygomatic major contraction
-                synchronous with eyelid compression. Pattern matches involuntary
-                suppression of social embarrassment or deception.
-              </p>
-              <ul
-                class="space-y-2 text-[10px] text-gray-400"
-                id="descBullets"
-              >
-                <li class="flex items-center">
-                   <span class="w-1 h-1 bg-rose-500 rounded-full mr-2"></span>
-                   Targeted micro-expression suppression
-                </li>
-                <li class="flex items-center">
-                   <span class="w-1 h-1 bg-rose-500 rounded-full mr-2"></span>
-                   Gaze aversion cluster detected
-                </li>
-                <li class="flex items-center">
-                   <span class="w-1 h-1 bg-rose-500 rounded-full mr-2"></span>
-                   Incongruent emotion signature
-                </li>
-              </ul>
-              <div class="pt-2">
-                <span
-                  class="px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 text-rose-500 text-[9px] font-bold uppercase rounded-lg shadow-[0_0_15px_rgba(244,63,94,0.1)]"
-                  id="descVerdictBadge"
-                >
-                  Verdict: High Stress Deviation
-                </span>
+            <div class="relative h-48 flex items-center justify-center">
+              <canvas id="eyeMovementChart" width="180" height="180"></canvas>
+              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span class="text-2xl font-bold text-cyan-400">70%</span>
+                <span class="text-[8px] text-gray-500 uppercase tracking-tighter">Steady Gaze</span>
+              </div>
+            </div>
+            <div class="mt-4 space-y-2 text-[10px]">
+              <div class="flex justify-between items-center">
+                <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-cyan-400"></span>Steady Gaze</span>
+                <span class="text-cyan-400 font-bold">70%</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400"></span>Rapid Blinking</span>
+                <span class="text-amber-400 font-bold">30%</span>
               </div>
             </div>
           </article>
 
-          <!-- Card 3: Analysis % -->
-          <article class="glass p-8 space-y-8 border-cyan-500/10">
-            <h3
-              class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center"
-            >
-              <i class="fas fa-chart-pie mr-2 text-cyan-400"></i> Analysis %
+          <!-- Graph 3: Lips & Jaw Anomalies -->
+          <article class="glass p-6 border-amber-500/10">
+            <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4">
+              <i class="fas fa-grip-lines mr-2 text-amber-400"></i> Lips & Jaw Anomalies
             </h3>
-            <div class="space-y-8">
-              <div class="space-y-3">
-                <div
-                  class="flex justify-between text-[10px] font-bold uppercase tracking-wider"
-                >
-                  <span class="text-gray-400">Total Deviation</span>
-                  <span class="text-rose-500 text-sm" id="analysisPrimaryVal"
-                    >74%</span
-                  >
-                </div>
-                <div class="h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
-                  <div
-                    class="h-full bg-rose-500 rounded-full shadow-[0_0_12px_rgba(244,63,94,0.4)] transition-all duration-1000"
-                    style="width: 74%"
-                    id="analysisPrimaryBar"
-                  ></div>
-                </div>
+            <div class="relative h-48 flex items-center justify-center">
+              <canvas id="lipsJawChart" width="180" height="180"></canvas>
+              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span class="text-2xl font-bold text-emerald-400">85%</span>
+                <span class="text-[8px] text-gray-500 uppercase tracking-tighter">Normal Activity</span>
               </div>
-              
-              <div class="grid grid-cols-2 gap-4 pt-2">
-                <div class="text-center space-y-3">
-                  <div class="relative w-20 h-20 mx-auto group">
-                    <canvas id="radialMetricA"></canvas>
-                    <div
-                      class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
-                    >
-                      <span class="text-xs font-black text-white" id="valMetricA">65%</span>
-                    </div>
-                  </div>
-                  <span class="text-[9px] text-gray-500 uppercase font-black tracking-widest">Pupil Change</span>
-                </div>
-                <div class="text-center space-y-3">
-                  <div class="relative w-20 h-20 mx-auto group">
-                    <canvas id="radialMetricB"></canvas>
-                    <div
-                      class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
-                    >
-                      <span class="text-xs font-black text-white" id="valMetricB">52%</span>
-                    </div>
-                  </div>
-                  <span class="text-[9px] text-gray-500 uppercase font-black tracking-widest">Muscle Drift</span>
-                </div>
+            </div>
+            <div class="mt-4 space-y-2 text-[10px]">
+              <div class="flex justify-between items-center">
+                <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400"></span>Normal</span>
+                <span class="text-emerald-400 font-bold">85%</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-rose-400"></span>Tensed</span>
+                <span class="text-rose-400 font-bold">15%</span>
               </div>
             </div>
           </article>
@@ -1176,7 +1323,6 @@
     <!-- Media Player Modal -->
     <div id="playerModal" class="fixed inset-0 z-[110] hidden items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closePlayer()"></div>
-        </div>
     </div>
 
     <!-- Modal for Saving Session -->
@@ -1250,6 +1396,7 @@
         localStorage.setItem("theme", isLight ? "light" : "dark");
         updateThemeUI(isLight);
         if (typeof updateChartsTheme === 'function') updateChartsTheme(isLight);
+        if (typeof updateCircularChartsTheme === 'function') updateCircularChartsTheme(isLight);
       }
 
       function updateThemeUI(isLight) {
@@ -1329,67 +1476,11 @@
       }
 
       // --- Radial Metrics Initialization ---
-      const ctxRadialA = document.getElementById("radialMetricA").getContext("2d");
-      const radialChartA = new Chart(ctxRadialA, {
-        type: "doughnut",
-        data: {
-          labels: ["Value", "Remaining"],
-          datasets: [
-            {
-              data: [65, 35],
-              backgroundColor: [
-                "#06b6d4",
-                body.classList.contains("light-mode")
-                  ? "rgba(0, 118, 214, 0.1)"
-                  : "rgba(255, 255, 255, 0.05)",
-              ],
-              borderWidth: 0,
-              cutout: "80%",
-              borderRadius: 20,
-            },
-          ],
-        },
-        options: {
-          plugins: { legend: { display: false }, tooltip: { enabled: false } },
-          responsive: true,
-          maintainAspectRatio: false,
-          circumference: 360,
-          rotation: 0,
-        },
-      });
-
-      const ctxRadialB = document.getElementById("radialMetricB").getContext("2d");
-      const radialChartB = new Chart(ctxRadialB, {
-        type: "doughnut",
-        data: {
-          labels: ["Value", "Remaining"],
-          datasets: [
-            {
-              data: [52, 48],
-              backgroundColor: [
-                "#f43f5e",
-                body.classList.contains("light-mode")
-                  ? "rgba(0, 118, 214, 0.1)"
-                  : "rgba(255, 255, 255, 0.05)",
-              ],
-              borderWidth: 0,
-              cutout: "80%",
-              borderRadius: 20,
-            },
-          ],
-        },
-        options: {
-          plugins: { legend: { display: false }, tooltip: { enabled: false } },
-          responsive: true,
-          maintainAspectRatio: false,
-          circumference: 360,
-          rotation: 0,
-        },
-      });
+      function initRadialMetrics() {
+        // Removed as per request
+      }
 
       function updateChartsTheme(isLight) {
-        const dimColor = isLight ? "rgba(0, 118, 214, 0.1)" : "rgba(255, 255, 255, 0.05)";
-
         // Update Radial Charts
         [radialChartA, radialChartB].forEach((chart) => {
             if (chart) {
@@ -1729,7 +1820,111 @@
           setTimeout(() => {
               Loader.hide();
               showToast("Analysis Complete", "success");
+              populateMockTables();
           }, 2500);
+      }
+
+      function populateMockTables() {
+          const timestamps = ["00:15", "00:17", "00:19", "00:21", "00:23"];
+          
+          // 1. Emotion Table
+          const emotionMarkup = [
+              ['#1', '00:15', 'Neutral', 'Blink', '87%'],
+              ['#2', '00:17', 'Fear', 'Eye Widen', '92%'],
+              ['#3', '00:19', 'Anger', 'Brow Lower', '78%'],
+              ['#4', '00:21', 'Surprise', 'Mouth Open', '85%'],
+              ['#5', '00:23', 'Neutral', 'None', '91%']
+          ].map((row, i) => `
+              <tr class="border-t border-white/5 hover:bg-white/5 transition-all">
+                  <td class="p-3 text-white font-mono">${row[0]}</td>
+                  <td class="p-3 text-gray-400">${row[1]}</td>
+                  <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${getBadgeStyle(row[2])}">${row[2]}</span></td>
+                  <td class="p-3 text-gray-300 italic">${row[3]}</td>
+                  <td class="p-3 font-bold text-cyan-400">${row[4]}</td>
+              </tr>
+          `).join('');
+          document.getElementById('emotionTableBody').innerHTML = emotionMarkup;
+
+          // 2. Eye Tracking Table
+          const eyeMarkup = timestamps.map((ts, i) => `
+              <tr class="border-t border-white/5 hover:bg-white/5 transition-all">
+                  <td class="p-3 text-white font-mono">#${i+1}</td>
+                  <td class="p-3 text-gray-400">${ts}</td>
+                  <td class="p-3 text-gray-300">4.${Math.floor(Math.random()*9)}mm</td>
+                  <td class="p-3 text-gray-300">${(Math.random()*15).toFixed(1)}/min</td>
+                  <td class="p-3 font-bold text-cyan-400">${80 + Math.floor(Math.random()*15)}%</td>
+              </tr>
+          `).join('');
+          document.getElementById('eyeTrackTableBody').innerHTML = eyeMarkup;
+
+          // 3. Gaze Table
+          const gazeMarkup = timestamps.map((ts, i) => `
+              <tr class="border-t border-white/5 hover:bg-white/5 transition-all">
+                  <td class="p-3 text-white font-mono">#${i+1}</td>
+                  <td class="p-3 text-gray-400">${ts}</td>
+                  <td class="p-3 text-gray-300">[${Math.floor(Math.random()*100)}, ${Math.floor(Math.random()*100)}]</td>
+                  <td class="p-3 text-gray-300">${['Center', 'Top Left', 'Bottom Right', 'Center', 'Top Right'][i]}</td>
+                  <td class="p-3 font-bold text-purple-400">${75 + Math.floor(Math.random()*20)}%</td>
+              </tr>
+          `).join('');
+          document.getElementById('gazeTrackTableBody').innerHTML = gazeMarkup;
+
+          // 4. Lips Table
+          const lipsMarkup = timestamps.map((ts, i) => `
+              <tr class="border-t border-white/5 hover:bg-white/5 transition-all">
+                  <td class="p-3 text-white font-mono">#${i+1}</td>
+                  <td class="p-3 text-gray-400">${ts}</td>
+                  <td class="p-3 text-gray-300">${(Math.random()*10).toFixed(1)} N/cm²</td>
+                  <td class="p-3 text-gray-300">${(Math.random()*30).toFixed(1)}%</td>
+                  <td class="p-3 font-bold text-rose-400">${(Math.random()*100).toFixed(1)}%</td>
+              </tr>
+          `).join('');
+          document.getElementById('lipsTableBody').innerHTML = lipsMarkup;
+
+          // 5. Jaw Table
+          const jawMarkup = timestamps.map((ts, i) => `
+              <tr class="border-t border-white/5 hover:bg-white/5 transition-all">
+                  <td class="p-3 text-white font-mono">#${i+1}</td>
+                  <td class="p-3 text-gray-400">${ts}</td>
+                  <td class="p-3 text-gray-300">${(Math.random()*5).toFixed(1)}°</td>
+                  <td class="p-3 text-gray-300">${(Math.random()*40).toFixed(1)}%</td>
+                  <td class="p-3 font-bold text-amber-500">${(Math.random()*100).toFixed(1)}%</td>
+              </tr>
+          `).join('');
+          document.getElementById('jawTableBody').innerHTML = jawMarkup;
+
+          // Update Circular Charts with fresh mock data
+          if (emotionChart) {
+              const d = [50 + Math.random()*20, 15 + Math.random()*15, 5 + Math.random()*10];
+              emotionChart.data.datasets[0].data = d;
+              emotionChart.update();
+              const label = document.querySelector('#emotionDistributionChart + div span:first-child');
+              if (label) label.innerText = Math.round(d[0]) + '%';
+          }
+          if (eyeChart) {
+              const d = [60 + Math.random()*30, 10 + Math.random()*20];
+              eyeChart.data.datasets[0].data = d;
+              eyeChart.update();
+              const label = document.querySelector('#eyeMovementChart + div span:first-child');
+              if (label) label.innerText = Math.round(d[0]) + '%';
+          }
+          if (jawChart) {
+              const d = [70 + Math.random()*20, 10 + Math.random()*15];
+              jawChart.data.datasets[0].data = d;
+              jawChart.update();
+              const label = document.querySelector('#lipsJawChart + div span:first-child');
+              if (label) label.innerText = Math.round(d[0]) + '%';
+          }
+      }
+
+      function getBadgeStyle(emotion) {
+          switch(emotion.toLowerCase()) {
+              case 'neutral': return 'bg-emerald-500/10 text-emerald-400';
+              case 'anger': return 'bg-amber-500/10 text-amber-400';
+              case 'fear': return 'bg-rose-500/10 text-rose-400';
+              case 'surprise': return 'bg-purple-500/10 text-purple-400';
+              default: return 'bg-gray-500/10 text-gray-400';
+          }
       }
 
       // --- UI Utilities ---
@@ -1752,10 +1947,10 @@
       }
 
       function resetConfigurations() {
-        const modules = ["toggleFace", "toggleEmotion", "toggleEyeMove", "toggleEyeJumps", "toggleMuscleTwitch", "toggleNasal", "toggleCheeks", "toggleJaw", "toggleMesh"];
+        const modules = ["toggleFaceMesh", "toggleEyeGaze", "toggleLipsJaw", "toggleEmotions"];
         modules.forEach(id => {
           const el = document.getElementById(id);
-          if (el) el.checked = (id === "toggleEmotion" || id === "toggleFace");
+          if (el) el.checked = (id === "toggleEmotions");
         });
       }
 
@@ -1800,6 +1995,138 @@
         }
       }, 2000);
 
+      // --- Circular Charts Initialization ---
+      let emotionChart, eyeChart, jawChart;
+
+      function initCircularCharts() {
+        const isLight = document.body.classList.contains('light-mode');
+        const labelColor = isLight ? '#1e293b' : '#94a3b8';
+        const gridColor = isLight ? 'rgba(0, 118, 214, 0.1)' : 'rgba(255, 255, 255, 0.05)';
+
+        // Graph 1: Overall Emotion Distribution
+        const emotionCtx = document.getElementById('emotionDistributionChart').getContext('2d');
+        emotionChart = new Chart(emotionCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Neutral', 'Anger', 'Fear'],
+            datasets: [{
+              data: [60, 25, 15],
+              backgroundColor: ['#34d399', '#fbbf24', '#f87171'],
+              borderWidth: 0,
+              cutout: '82%',
+              borderRadius: 8,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: 'rgba(10, 17, 32, 0.9)',
+                borderColor: 'rgba(0, 219, 255, 0.3)',
+                borderWidth: 1,
+                titleColor: '#00dbff',
+                bodyColor: '#e2e8f0',
+                padding: 10,
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ': ' + context.parsed + '%';
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        // Graph 2: Eye Movement Tracking
+        const eyeCtx = document.getElementById('eyeMovementChart').getContext('2d');
+        eyeChart = new Chart(eyeCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Steady Gaze', 'Rapid Blinking'],
+            datasets: [{
+              data: [70, 30],
+              backgroundColor: ['#22d3ee', '#fbbf24'],
+              borderWidth: 0,
+              cutout: '82%',
+              borderRadius: 8,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: 'rgba(10, 17, 32, 0.9)',
+                borderColor: 'rgba(168, 85, 247, 0.3)',
+                borderWidth: 1,
+                titleColor: '#a855f7',
+                bodyColor: '#e2e8f0',
+                padding: 10,
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ': ' + context.parsed + '%';
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        // Graph 3: Lips & Jaw Anomalies
+        const jawCtx = document.getElementById('lipsJawChart').getContext('2d');
+        jawChart = new Chart(jawCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Normal', 'Tensed'],
+            datasets: [{
+              data: [85, 15],
+              backgroundColor: ['#34d399', '#f43f5e'],
+              borderWidth: 0,
+              cutout: '82%',
+              borderRadius: 8,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: 'rgba(10, 17, 32, 0.9)',
+                borderColor: 'rgba(245, 158, 11, 0.3)',
+                borderWidth: 1,
+                titleColor: '#f59e0b',
+                bodyColor: '#e2e8f0',
+                padding: 10,
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ': ' + context.parsed + '%';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // --- Update Charts Theme ---
+      function updateCircularChartsTheme(isLight) {
+        const labelColor = isLight ? '#1e293b' : '#94a3b8';
+        
+        [emotionChart, eyeChart, jawChart].forEach(chart => {
+          if (chart) {
+            chart.options.plugins.tooltip.backgroundColor = isLight ? 'rgba(255, 255, 255, 0.95)' : 'rgba(10, 17, 32, 0.9)';
+            chart.options.plugins.tooltip.borderColor = isLight ? 'rgba(0, 118, 214, 0.3)' : 'rgba(0, 219, 255, 0.3)';
+            chart.options.plugins.tooltip.titleColor = isLight ? '#0076d6' : '#00dbff';
+            chart.options.plugins.tooltip.bodyColor = isLight ? '#1e293b' : '#e2e8f0';
+            chart.update();
+          }
+        });
+      }
+
       // Initial Load
       document.addEventListener("DOMContentLoaded", async () => {
         // Check session
@@ -1818,10 +2145,16 @@
 
         populateDevices();
 
+        // Initialize Circular Charts
+        initCircularCharts();
+
+        // Populate initial mock data
+        populateMockTables();
+
         // Update Theme UI state (icons, buttons, charts)
         const isLight = document.body.classList.contains('light-mode');
         // Update charts theme
-        if (typeof updateChartsTheme === 'function') updateChartsTheme(isLight);
+        if (typeof updateCircularChartsTheme === 'function') updateCircularChartsTheme(isLight);
         if (typeof updateThemeUI === 'function') updateThemeUI(isLight);
 
         // Check for file parameter in URL for seamless analysis

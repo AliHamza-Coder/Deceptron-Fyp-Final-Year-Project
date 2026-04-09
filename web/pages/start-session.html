@@ -517,11 +517,134 @@
         box-shadow: 0 0 20px rgba(244, 63, 94, 0.2), inset 0 0 10px rgba(244, 63, 94, 0.1);
         filter: drop-shadow(0 0 5px rgba(244, 63, 94, 0.2));
       }
+      .glow-anger {
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.3), inset 0 0 10px rgba(239, 68, 68, 0.15);
+        filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.3));
+      }
+      .glow-sadness {
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), inset 0 0 10px rgba(59, 130, 246, 0.15);
+        filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.3));
+      }
+      .glow-disgust {
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.3), inset 0 0 10px rgba(34, 197, 94, 0.15);
+        filter: drop-shadow(0 0 5px rgba(34, 197, 94, 0.3));
+      }
 
-      body.light-mode .glow-cyan, body.light-mode .glow-purple, 
-      body.light-mode .glow-amber, body.light-mode .glow-rose {
+      body.light-mode .glow-cyan, body.light-mode .glow-purple,
+      body.light-mode .glow-amber, body.light-mode .glow-rose,
+      body.light-mode .glow-anger, body.light-mode .glow-sadness,
+      body.light-mode .glow-disgust {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         filter: none;
+      }
+
+      /* Emotion Timeline Styles */
+      .emotion-timeline {
+        display: flex;
+        height: 40px;
+        border-radius: 8px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .emotion-segment {
+        height: 100%;
+        position: relative;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+      .emotion-segment:hover {
+        opacity: 0.8;
+      }
+      .emotion-segment.anger { background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%); }
+      .emotion-segment.sadness { background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%); }
+      .emotion-segment.disgust { background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%); }
+      .emotion-segment.neutral { background: linear-gradient(180deg, #94a3b8 0%, #64748b 100%); }
+
+      /* Frame Table Styles */
+      .frame-table-container {
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      .frame-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .frame-table th {
+        background: #0f172a;
+        color: #00dbff;
+        font-size: 9px;
+        font-weight: bold;
+        text-transform: uppercase;
+        padding: 12px 10px;
+        text-align: left;
+        border-bottom: 1px solid rgba(0, 219, 255, 0.2);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+      body.light-mode .frame-table th {
+        background: #f8fafc !important;
+        color: #0076d6 !important;
+        border-bottom-color: rgba(0, 118, 214, 0.2) !important;
+      }
+      .frame-table td {
+        padding: 8px;
+        font-size: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .frame-table tr:hover {
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .emotion-confidence {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .confidence-bar {
+        width: 60px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .confidence-fill {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.3s ease;
+      }
+
+      /* Frame Overlay */
+      .frame-overlay {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        z-index: 20;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-family: 'JetBrains Mono', monospace;
+      }
+      .frame-counter {
+        font-size: 11px;
+        font-weight: bold;
+        color: #00dbff;
+      }
+      .frame-emotion {
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 2px;
+      }
+
+      body.light-mode .frame-overlay {
+        background: rgba(255, 255, 255, 0.9);
+        border-color: rgba(0, 118, 214, 0.2);
+      }
+      body.light-mode .frame-counter {
+        color: #0076d6;
       }
 
       /* Light Mode Visibility Overrides */
@@ -590,6 +713,19 @@
       .animate-spin-slow {
         animation: spin-slow 8s linear infinite;
       }
+      body.light-mode .text-\[10px\].text-gray-500, 
+      body.light-mode .text-\[9px\].text-gray-500 {
+        color: #475569 !important;
+      }
+      body.light-mode .frame-table { background: white; }
+      body.light-mode .frame-table th {
+        background: #f1f5f9;
+        color: #1e293b;
+        border-bottom: 2px solid rgba(0, 118, 214, 0.2);
+        backdrop-filter: blur(8px);
+      }
+      body.light-mode .frame-table td { color: #334155; }
+      body.light-mode .frame-table tr:hover { background: rgba(0, 118, 214, 0.05); }
     </style>
   </head>
   <body>
@@ -734,7 +870,15 @@
             </div>
           </div>
 
-          <!-- Controls Bar -->
+            <!-- Frame Overlay -->
+            <div class="frame-overlay" id="frameOverlay" style="display: none;">
+              <div class="frame-counter">Frame <span id="currentFrameNum">0001</span> / 0144</div>
+              <div class="frame-emotion text-red-400" id="currentFrameEmotion">
+                <i class="fas fa-fire-alt mr-1"></i> Anger: 88.4%
+              </div>
+            </div>
+
+            <!-- Controls Bar -->
           <div class="glass p-4 flex justify-between items-center px-6">
             <div class="flex items-center space-x-4">
               <button class="btn-action" id="camBtn" onclick="toggleCamera()">
@@ -846,67 +990,137 @@
 
             <div class="pt-6 border-t border-white/5 flex-1 flex flex-col">
               <h3
-                class="text-xs font-bold uppercase tracking-widest text-purple-400 mb-6 flex items-center"
+                class="text-xs font-bold uppercase tracking-widest text-purple-400 mb-4 flex items-center"
               >
                 <i class="fas fa-smile mr-2"></i> Emotional Analysis
               </h3>
 
-              <div class="relative h-48 mb-6">
-                <canvas id="emotionChart"></canvas>
-                <div
-                  class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
-                >
-                  <span class="text-2xl font-extrabold heading-font text-white"
-                    >45%</span
-                  >
-                  <span
-                    class="text-[8px] text-gray-500 uppercase tracking-widest font-bold"
-                    >Neutral</span
-                  >
+              <!-- Total Frames Summary -->
+              <div class="glass p-3 mb-4 rounded-xl border border-white/5">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-[9px] text-gray-500 uppercase font-bold">Total Frames</span>
+                  <span class="text-sm font-bold text-cyan-400">145</span>
+                </div>
+                <div class="text-[9px] text-emerald-400 font-bold flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Analysis Complete</div>
+              </div>
+
+              <!-- Emotion Distribution -->
+              <div class="space-y-3 mb-5">
+                <!-- Anger -->
+                <div class="space-y-1.5">
+                  <div class="flex justify-between text-[9px] uppercase font-bold tracking-wider">
+                    <span class="text-red-400 flex items-center gap-1.5">
+                      <i class="fas fa-fire-alt text-[10px]"></i> Anger
+                    </span>
+                    <span class="text-red-400">52.8%</span>
+                  </div>
+                  <div class="flex justify-between text-[10px] text-gray-500 mb-1">
+                    <span>76 frames</span>
+                    <span>Dominant</span>
+                  </div>
+                  <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-red-500 to-red-600 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.5)]" style="width: 52.8%"></div>
+                  </div>
+                </div>
+
+                <!-- Sadness -->
+                <div class="space-y-1.5">
+                  <div class="flex justify-between text-[9px] uppercase font-bold tracking-wider">
+                    <span class="text-blue-400 flex items-center gap-1.5">
+                      <i class="fas fa-sad-tear text-[10px]"></i> Sadness
+                    </span>
+                    <span class="text-blue-400">36.8%</span>
+                  </div>
+                  <div class="flex justify-between text-[10px] text-gray-500 mb-1">
+                    <span>53 frames</span>
+                    <span>Secondary</span>
+                  </div>
+                  <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.5)]" style="width: 36.8%"></div>
+                  </div>
+                </div>
+
+                <!-- Disgust -->
+                <div class="space-y-1.5">
+                  <div class="flex justify-between text-[9px] uppercase font-bold tracking-wider">
+                    <span class="text-green-400 flex items-center gap-1.5">
+                      <i class="fas fa-meh text-[10px]"></i> Disgust
+                    </span>
+                    <span class="text-green-400">9.7%</span>
+                  </div>
+                  <div class="flex justify-between text-[10px] text-gray-500 mb-1">
+                    <span>14 frames</span>
+                    <span>Low</span>
+                  </div>
+                  <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-green-500 to-green-600 rounded-full shadow-[0_0_8px_rgba(34,197,94,0.5)]" style="width: 9.7%"></div>
+                  </div>
+                </div>
+
+                <!-- Neutral -->
+                <div class="space-y-1.5">
+                  <div class="flex justify-between text-[9px] uppercase font-bold tracking-wider">
+                    <span class="text-gray-400 flex items-center gap-1.5">
+                      <i class="fas fa-minus text-[8px]"></i> Neutral
+                    </span>
+                    <span class="text-gray-400">0.7%</span>
+                  </div>
+                  <div class="flex justify-between text-[8px] text-gray-500 mb-1">
+                    <span>1 frame</span>
+                    <span>Minimal</span>
+                  </div>
+                  <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-gray-400 to-gray-500 rounded-full" style="width: 0.7%"></div>
+                  </div>
                 </div>
               </div>
 
-              <div class="space-y-5 px-2">
-                <div class="space-y-2">
-                  <div
-                    class="flex justify-between text-[9px] uppercase font-bold tracking-widest"
-                  >
-                    <span class="text-gray-400">Neutral</span>
-                    <span class="text-cyan-400">45%</span>
-                  </div>
-                  <div class="h-1 bg-white/5 rounded-full overflow-hidden">
-                    <div
-                      class="h-full bg-cyan-500 rounded-full shadow-[0_0_8px_rgba(6,182,212,0.5)]"
-                      style="width: 45%"
-                    ></div>
-                  </div>
+              <!-- Emotion Timeline -->
+              <div class="mb-4">
+                <h4 class="text-[9px] text-gray-500 uppercase font-bold tracking-wider mb-2 flex items-center gap-2">
+                  <i class="fas fa-stream text-[8px]"></i> Emotion Timeline
+                </h4>
+                <div class="emotion-timeline" id="emotionTimeline" title="Click segments to see details">
+                  <div class="emotion-segment sadness" style="width: 8.28%" data-range="0001-0012" data-emotion="Sadness" data-frames="12"></div>
+                  <div class="emotion-segment anger" style="width: 2.07%" data-range="0013-0015" data-emotion="Anger" data-frames="3"></div>
+                  <div class="emotion-segment disgust" style="width: 2.76%" data-range="0016-0019" data-emotion="Disgust" data-frames="4"></div>
+                  <div class="emotion-segment sadness" style="width: 28.28%" data-range="0020-0060" data-emotion="Sadness" data-frames="41"></div>
+                  <div class="emotion-segment anger" style="width: 33.79%" data-range="0061-0109" data-emotion="Anger" data-frames="49"></div>
+                  <div class="emotion-segment neutral" style="width: 0.69%" data-range="0110" data-emotion="Neutral" data-frames="1"></div>
+                  <div class="emotion-segment anger" style="width: 2.07%" data-range="0111-0113" data-emotion="Anger" data-frames="3"></div>
+                  <div class="emotion-segment disgust" style="width: 6.90%" data-range="0114-0123" data-emotion="Disgust" data-frames="10"></div>
+                  <div class="emotion-segment anger" style="width: 14.48%" data-range="0124-0144" data-emotion="Anger" data-frames="21"></div>
                 </div>
-                <div class="space-y-2">
-                  <div
-                    class="flex justify-between text-[9px] uppercase font-bold tracking-widest"
-                  >
-                    <span class="text-gray-400">Nervous</span>
-                    <span class="text-rose-400">32%</span>
-                  </div>
-                  <div class="h-1 bg-white/5 rounded-full overflow-hidden">
-                    <div
-                      class="h-full bg-rose-500 rounded-full shadow-[0_0_8px_rgba(244,63,94,0.5)]"
-                      style="width: 32%"
-                    ></div>
-                  </div>
+                <div class="flex justify-between text-[8px] text-gray-600 mt-1">
+                  <span>Frame 0001</span>
+                  <span>Frame 0144</span>
                 </div>
+              </div>
+
+              <!-- Timeline Details -->
+              <div class="glass p-3 rounded-lg border border-white/5 mb-4">
+                <div id="timelineDetail" class="text-[10px]">
+                  <div class="text-gray-600 font-medium text-center italic">Hover over timeline for forensic details</div>
+                </div>
+              </div>
+
+              <!-- Peak Intensity -->
+              <div class="glass p-3 rounded-lg border border-white/5 mb-4">
+                <h4 class="text-[9px] text-gray-500 uppercase font-bold tracking-wider mb-2">
+                  <i class="fas fa-chart-line text-cyan-400"></i> Peak Intensity
+                </h4>
                 <div class="space-y-2">
-                  <div
-                    class="flex justify-between text-[9px] uppercase font-bold tracking-widest"
-                  >
-                    <span class="text-gray-400">Fear</span>
-                    <span class="text-amber-400">12%</span>
+                  <div class="flex items-center justify-between">
+                    <span class="text-[10px] text-red-400">Anger Peak</span>
+                    <span class="text-[10px] font-mono text-white">Frame 0137 • 99.1%</span>
                   </div>
-                  <div class="h-1 bg-white/5 rounded-full overflow-hidden">
-                    <div
-                      class="h-full bg-amber-500 rounded-full shadow-[0_0_8px_rgba(245,158,11,0.5)]"
-                      style="width: 12%"
-                    ></div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-[10px] text-blue-400">Sadness Peak</span>
+                    <span class="text-[10px] font-mono text-white">Frame 0054 • 96.4%</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-[10px] text-green-400">Disgust Peak</span>
+                    <span class="text-[10px] font-mono text-white">Frame 0115 • 75.6%</span>
                   </div>
                 </div>
               </div>
@@ -976,6 +1190,37 @@
                 </div>
               </div>
               <div class="h-24"><canvas id="stabilityChart"></canvas></div>
+            </div>
+          </div>
+          <!-- Frame Data Table -->
+          <div class="col-span-12 glass flex flex-col overflow-hidden mt-4">
+            <div class="p-4 border-b border-white/5 flex justify-between items-center bg-white/5">
+              <h3 class="text-xs font-bold uppercase tracking-widest text-white flex items-center gap-2">
+                <i class="fas fa-table"></i> Frame-by-Frame Analysis
+              </h3>
+              <div class="flex items-center gap-2">
+                <button onclick="downloadFrameData()" class="text-[9px] bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 px-3 py-1.5 rounded-lg border border-cyan-500/20 transition-all flex items-center gap-1">
+                  <i class="fas fa-download"></i> Export CSV
+                </button>
+                <button onclick="toggleFrameTable()" class="text-[9px] bg-white/5 hover:bg-white/10 text-gray-400 px-3 py-1.5 rounded-lg border border-white/10 transition-all">
+                  <i class="fas fa-chevron-up" id="tableToggleIcon"></i>
+                </button>
+              </div>
+            </div>
+            <div id="frameTableWrapper" class="frame-table-container">
+              <table class="frame-table">
+                <thead>
+                  <tr>
+                    <th>Frame #</th>
+                    <th>Detected Emotion</th>
+                    <th>Confidence</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="frameTableBody">
+                  <!-- Frame data will be populated by JavaScript -->
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -1128,25 +1373,25 @@
               <div class="grid grid-cols-2 gap-4 pt-2">
                 <div class="text-center space-y-3">
                   <div class="relative w-20 h-20 mx-auto group">
-                    <canvas id="radialMetricA"></canvas>
+                    <canvas id="radialMetricA" width="80" height="80"></canvas>
                     <div
                       class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
                     >
                       <span class="text-xs font-black text-white" id="valMetricA">45%</span>
                     </div>
                   </div>
-                  <span class="text-[9px] text-gray-500 uppercase font-black tracking-widest">Vocal Jitter</span>
+                  <span class="text-[9px] text-gray-500 uppercase font-black tracking-[0.2em] group-hover:text-cyan-400 transition-colors">Vocal Jitter</span>
                 </div>
                 <div class="text-center space-y-3">
                   <div class="relative w-20 h-20 mx-auto group">
-                    <canvas id="radialMetricB"></canvas>
+                    <canvas id="radialMetricB" width="80" height="80"></canvas>
                     <div
                       class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
                     >
                       <span class="text-xs font-black text-white" id="valMetricB">32%</span>
                     </div>
                   </div>
-                  <span class="text-[9px] text-gray-500 uppercase font-black tracking-widest">Neural Stress</span>
+                  <span class="text-[9px] text-gray-500 uppercase font-black tracking-[0.2em] group-hover:text-rose-500 transition-colors">Neural Stress</span>
                 </div>
               </div>
             </div>
@@ -1284,8 +1529,10 @@
       });
 
       // 2. Radial Metrics for Analysis % Card
-      const ctxRadialA = document.getElementById("radialMetricA").getContext("2d");
-      const radialChartA = new Chart(ctxRadialA, {
+      let radialChartA, radialChartB;
+      function initAnalysisCharts() {
+        const ctxRadialA = document.getElementById("radialMetricA").getContext("2d");
+      radialChartA = new Chart(ctxRadialA, {
         type: "doughnut",
         data: {
           labels: ["Value", "Remaining"],
@@ -1314,7 +1561,7 @@
       });
 
       const ctxRadialB = document.getElementById("radialMetricB").getContext("2d");
-      const radialChartB = new Chart(ctxRadialB, {
+      radialChartB = new Chart(ctxRadialB, {
         type: "doughnut",
         data: {
           labels: ["Value", "Remaining"],
@@ -1341,6 +1588,7 @@
           rotation: 0,
         },
       });
+      }
 
       const ctxStability = document.getElementById('stabilityChart').getContext('2d');
       const stabilityChart = new Chart(ctxStability, {
@@ -1931,6 +2179,297 @@
       }
     </script>
     <script>
+      // ============================================
+      // EMOTION ANALYSIS MOCK DATA & FUNCTIONS
+      // ============================================
+      
+      // Mock frame data (subset of 145 frames)
+      const mockFrameData = [
+        { frame: "0001", emotion: "Sadness", confidence: 88.4, color: "blue" },
+        { frame: "0002", emotion: "Sadness", confidence: 91.2, color: "blue" },
+        { frame: "0003", emotion: "Sadness", confidence: 91.0, color: "blue" },
+        { frame: "0004", emotion: "Sadness", confidence: 90.1, color: "blue" },
+        { frame: "0005", emotion: "Sadness", confidence: 88.2, color: "blue" },
+        { frame: "0006", emotion: "Sadness", confidence: 92.4, color: "blue" },
+        { frame: "0007", emotion: "Sadness", confidence: 92.4, color: "blue" },
+        { frame: "0008", emotion: "Sadness", confidence: 91.0, color: "blue" },
+        { frame: "0009", emotion: "Sadness", confidence: 86.2, color: "blue" },
+        { frame: "0010", emotion: "Sadness", confidence: 84.2, color: "blue" },
+        { frame: "0011", emotion: "Sadness", confidence: 84.4, color: "blue" },
+        { frame: "0012", emotion: "Sadness", confidence: 55.3, color: "blue" },
+        { frame: "0013", emotion: "Anger", confidence: 36.0, color: "red" },
+        { frame: "0014", emotion: "Anger", confidence: 34.9, color: "red" },
+        { frame: "0015", emotion: "Anger", confidence: 31.8, color: "red" },
+        { frame: "0016", emotion: "Disgust", confidence: 41.1, color: "green" },
+        { frame: "0017", emotion: "Disgust", confidence: 49.4, color: "green" },
+        { frame: "0018", emotion: "Disgust", confidence: 33.5, color: "green" },
+        { frame: "0019", emotion: "Disgust", confidence: 40.3, color: "green" },
+        { frame: "0020", emotion: "Sadness", confidence: 70.1, color: "blue" },
+        { frame: "0025", emotion: "Sadness", confidence: 86.2, color: "blue" },
+        { frame: "0030", emotion: "Sadness", confidence: 58.1, color: "blue" },
+        { frame: "0035", emotion: "Sadness", confidence: 43.0, color: "blue" },
+        { frame: "0040", emotion: "Sadness", confidence: 68.4, color: "blue" },
+        { frame: "0045", emotion: "Sadness", confidence: 65.4, color: "blue" },
+        { frame: "0050", emotion: "Sadness", confidence: 72.4, color: "blue" },
+        { frame: "0054", emotion: "Sadness", confidence: 96.4, color: "blue", peak: true },
+        { frame: "0060", emotion: "Sadness", confidence: 54.5, color: "blue" },
+        { frame: "0065", emotion: "Anger", confidence: 63.7, color: "red" },
+        { frame: "0070", emotion: "Anger", confidence: 70.2, color: "red" },
+        { frame: "0075", emotion: "Anger", confidence: 63.2, color: "red" },
+        { frame: "0080", emotion: "Anger", confidence: 71.6, color: "red" },
+        { frame: "0085", emotion: "Anger", confidence: 92.1, color: "red" },
+        { frame: "0090", emotion: "Anger", confidence: 82.5, color: "red" },
+        { frame: "0095", emotion: "Anger", confidence: 74.2, color: "red" },
+        { frame: "0100", emotion: "Anger", confidence: 65.2, color: "red" },
+        { frame: "0105", emotion: "Anger", confidence: 52.8, color: "red" },
+        { frame: "0110", emotion: "Neutral", confidence: 40.1, color: "gray" },
+        { frame: "0115", emotion: "Disgust", confidence: 75.6, color: "green", peak: true },
+        { frame: "0120", emotion: "Disgust", confidence: 49.2, color: "green" },
+        { frame: "0125", emotion: "Anger", confidence: 73.1, color: "red" },
+        { frame: "0130", emotion: "Anger", confidence: 96.6, color: "red" },
+        { frame: "0135", emotion: "Anger", confidence: 98.0, color: "red" },
+        { frame: "0137", emotion: "Anger", confidence: 99.1, color: "red", peak: true },
+        { frame: "0140", emotion: "Anger", confidence: 89.7, color: "red" },
+        { frame: "0144", emotion: "Anger", confidence: 97.5, color: "red" },
+      ];
+
+      // Generate full dataset with interpolation
+      function generateFullFrameData() {
+        const fullData = [];
+        const emotions = ["Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness",
+                         "Anger", "Anger", "Anger",
+                         "Disgust", "Disgust", "Disgust", "Disgust",
+                         "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness", "Sadness",
+                         "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger",
+                         "Neutral",
+                         "Anger", "Anger", "Anger",
+                         "Disgust", "Disgust", "Disgust", "Disgust", "Disgust", "Disgust", "Disgust", "Disgust", "Disgust", "Disgust",
+                         "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger", "Anger"];
+        
+        const confidences = [88.4, 91.2, 91.0, 90.1, 88.2, 92.4, 92.4, 91.0, 86.2, 84.2, 84.4, 55.3,
+                            36.0, 34.9, 31.8,
+                            41.1, 49.4, 33.5, 40.3,
+                            70.1, 78.7, 64.8, 47.9, 76.5, 86.2, 89.0, 79.2, 58.5, 57.7, 58.1, 54.7, 55.9, 55.0, 47.2, 43.0, 37.0, 35.9, 38.9, 49.4, 68.4, 87.4, 92.3, 90.1, 76.7, 65.4, 65.5, 61.0, 68.9, 78.5, 72.4, 81.6, 91.4, 95.5, 96.4, 95.9, 87.2, 81.4, 74.9, 71.7, 54.5,
+                            56.9, 64.5, 67.7, 69.4, 63.7, 71.6, 73.3, 67.7, 74.5, 70.2, 67.1, 63.5, 53.8, 72.2, 63.2, 72.1, 73.7, 76.6, 78.6, 71.6, 66.8, 69.1, 72.3, 89.4, 92.1, 90.1, 90.2, 88.4, 89.2, 82.5, 79.4, 77.9, 71.6, 69.9, 74.2, 75.3, 74.3, 68.0, 65.1, 65.2, 46.0, 47.2, 53.8, 53.6, 52.8, 53.0, 57.5, 56.2, 44.5,
+                            40.1,
+                            50.3, 58.0, 53.8,
+                            72.3, 75.6, 69.0, 69.7, 70.4, 65.7, 49.2, 53.6, 64.1, 52.7,
+                            50.7, 62.4, 73.1, 84.1, 88.6, 96.8, 96.6, 96.1, 93.8, 97.7, 97.9, 98.0, 98.2, 99.1, 98.8, 97.7, 89.7, 94.4, 94.6, 97.3, 97.5];
+        
+        for (let i = 0; i < 145; i++) {
+          const emotion = emotions[i] || "Anger";
+          const confidence = confidences[i] || 70;
+          let color = "gray";
+          if (emotion === "Anger") color = "red";
+          else if (emotion === "Sadness") color = "blue";
+          else if (emotion === "Disgust") color = "green";
+          
+          fullData.push({
+            frame: String(i + 1).padStart(4, '0'),
+            emotion: emotion,
+            confidence: confidence,
+            color: color
+          });
+        }
+        return fullData;
+      }
+
+      const fullFrameData = generateFullFrameData();
+      let currentFrameIndex = 0;
+      let frameInterval = null;
+
+      // Populate frame table
+      function populateFrameTable() {
+        const tbody = document.getElementById('frameTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = mockFrameData.map(data => {
+          const emotionColors = {
+            "Anger": "text-red-400",
+            "Sadness": "text-blue-400",
+            "Disgust": "text-green-400",
+            "Neutral": "text-gray-400"
+          };
+          const barColors = {
+            "Anger": "bg-red-500",
+            "Sadness": "bg-blue-500",
+            "Disgust": "bg-green-500",
+            "Neutral": "bg-gray-500"
+          };
+          const status = data.peak ? '<span class="text-amber-400 text-[8px]"><i class="fas fa-star"></i> Peak</span>' : '<span class="text-gray-600 text-[8px]">Normal</span>';
+          
+          return `
+            <tr class="frame-row" data-frame="${data.frame}">
+              <td class="font-mono">${data.frame}</td>
+              <td class="${emotionColors[data.emotion]} font-medium">${data.emotion}</td>
+              <td>
+                <div class="emotion-confidence">
+                  <span>${data.confidence}%</span>
+                  <div class="confidence-bar">
+                    <div class="confidence-fill ${barColors[data.emotion]}" style="width: ${data.confidence}%"></div>
+                  </div>
+                </div>
+              </td>
+              <td>${status}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // Timeline hover interaction
+      function initTimelineInteractions() {
+        const segments = document.querySelectorAll('.emotion-segment');
+        const detailDiv = document.getElementById('timelineDetail');
+        
+        segments.forEach(segment => {
+          segment.addEventListener('mouseenter', (e) => {
+            const emotion = e.target.dataset.emotion;
+            const range = e.target.dataset.range;
+            const frames = e.target.dataset.frames;
+            
+            const emotionIcons = {
+              "Anger": "fa-fire-alt",
+              "Sadness": "fa-sad-tear",
+              "Disgust": "fa-meh",
+              "Neutral": "fa-minus"
+            };
+            
+            const emotionColors = {
+              "Anger": "text-red-400",
+              "Sadness": "text-blue-400",
+              "Disgust": "text-green-400",
+              "Neutral": "text-gray-400"
+            };
+            
+            detailDiv.innerHTML = `
+              <div class="flex items-center gap-2 mb-1">
+                <i class="fas ${emotionIcons[emotion]} ${emotionColors[emotion]}"></i>
+                <span class="font-bold ${emotionColors[emotion]}">${emotion}</span>
+              </div>
+              <div class="text-gray-400">Frames: ${range} • ${frames} frames</div>
+            `;
+          });
+          
+          segment.addEventListener('mouseleave', () => {
+            detailDiv.innerHTML = '<div class="text-gray-500">Hover over timeline for details</div>';
+          });
+        });
+      }
+
+      // Frame overlay animation
+      function startFrameSimulation() {
+        const overlay = document.getElementById('frameOverlay');
+        const frameNum = document.getElementById('currentFrameNum');
+        const frameEmotion = document.getElementById('currentFrameEmotion');
+        
+        if (!overlay || !frameNum || !frameEmotion) return;
+        
+        if (frameInterval) clearInterval(frameInterval);
+        
+        currentFrameIndex = 0;
+        overlay.style.display = 'block';
+        
+        frameInterval = setInterval(() => {
+          if (currentFrameIndex >= fullFrameData.length) {
+            currentFrameIndex = 0;
+          }
+          
+          const data = fullFrameData[currentFrameIndex];
+          frameNum.textContent = data.frame;
+          
+          const emotionIcons = {
+            "Anger": "fa-fire-alt",
+            "Sadness": "fa-sad-tear",
+            "Disgust": "fa-meh",
+            "Neutral": "fa-minus"
+          };
+          
+          const emotionColors = {
+            "Anger": "text-red-400",
+            "Sadness": "text-blue-400",
+            "Disgust": "text-green-400",
+            "Neutral": "text-gray-400"
+          };
+          
+          frameEmotion.className = `frame-emotion ${emotionColors[data.emotion]}`;
+          frameEmotion.innerHTML = `<i class="fas ${emotionIcons[data.emotion]} mr-1"></i> ${data.emotion}: ${data.confidence}%
+          `;
+          
+          // Highlight current row in table
+          document.querySelectorAll('.frame-row').forEach(row => {
+            row.style.background = '';
+          });
+          const currentRow = document.querySelector(`.frame-row[data-frame="${data.frame}"]`);
+          if (currentRow) {
+            currentRow.style.background = 'rgba(0, 219, 255, 0.1)';
+            currentRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          
+          currentFrameIndex++;
+        }, 500); // Change every 500ms
+      }
+
+      function stopFrameSimulation() {
+        const overlay = document.getElementById('frameOverlay');
+        if (overlay) overlay.style.display = 'none';
+        if (frameInterval) {
+          clearInterval(frameInterval);
+          frameInterval = null;
+        }
+      }
+
+      // Toggle frame table
+      let isTableCollapsed = false;
+      function toggleFrameTable() {
+        const wrapper = document.getElementById('frameTableWrapper');
+        const icon = document.getElementById('tableToggleIcon');
+        if (!wrapper || !icon) return;
+        isTableCollapsed = !isTableCollapsed;
+        
+        if (isTableCollapsed) {
+          wrapper.style.maxHeight = '0';
+          wrapper.style.overflow = 'hidden';
+          icon.className = 'fas fa-chevron-down';
+        } else {
+          wrapper.style.maxHeight = '300px';
+          wrapper.style.overflow = 'auto';
+          icon.className = 'fas fa-chevron-up';
+        }
+      }
+
+      // Download frame data as CSV
+      function downloadFrameData() {
+        const csvContent = [
+          ['Frame #', 'Emotion', 'Confidence (%)'],
+          ...fullFrameData.map(d => [d.frame, d.emotion, d.confidence])
+        ].map(e => e.join(',')).join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'emotion_analysis_frames.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        // Show toast
+        const toast = document.getElementById("videoToast");
+        if (toast) {
+          toast.querySelector("div").innerText = "Frame Data Exported";
+          toast.querySelector("div").className = "px-6 py-2 bg-emerald-500 text-white text-[10px] font-bold uppercase rounded-full shadow-lg shadow-emerald-500/40";
+          toast.classList.remove("opacity-0", "translate-y-4");
+          toast.classList.add("opacity-1", "translate-y-0");
+          setTimeout(() => toast.classList.add("opacity-0", "translate-y-4"), 2000);
+        }
+      }
+
+      // Initialize emotion analysis components
+      function initEmotionAnalysis() {
+        populateFrameTable();
+        initTimelineInteractions();
+      }
+
       function toggleSidebar() {
         body.classList.toggle("sidebar-collapsed");
         localStorage.setItem(
@@ -2149,6 +2688,10 @@
 
         // Populate device sources
         populateDevices();
+        initAnalysisCharts();
+
+        // Initialize emotion analysis components
+        initEmotionAnalysis();
 
         // Update Theme UI state (icons, buttons, charts)
         const isLight = document.body.classList.contains("light-mode");
