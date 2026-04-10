@@ -1683,9 +1683,9 @@
       }
 
       // UI Interactions
-      // Camera Logic
-      let mediaStream = null;
-      let emotionDetectionInterval = null;
+      // Global State
+      var mediaStream = null;
+      var emotionDetectionInterval = null;
 
       function updateStatusUI(status, label) {
         const tag = document.getElementById("statusTag");
@@ -1719,46 +1719,60 @@
           try {
             videoElement.removeAttribute("controls");
 
-            // Get selected devices
-            const cameraId = cameraSelect.value;
-            const micId = micSelect.value;
-            // Fast camera opening: request only what's needed
-            const constraints = {
-              video: cameraId ? { deviceId: { exact: cameraId }, width: { ideal: 1280 }, height: { ideal: 720 } } : true,
-              audio: micId && micId.trim() ? { deviceId: { exact: micId } } : true,
-            };
-
-            mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-
-            // FIX: Ensure audio track exists - if mic failed, try to get audio separately
-            const audioTracks = mediaStream.getAudioTracks();
-            if (audioTracks.length === 0 && micId) {
-              console.warn(
-                "⚠️ Audio track missing with selected mic, trying default...",
-              );
-              try {
-                const audioStream = await navigator.mediaDevices.getUserMedia({
-                  audio: true,
+            // 0. Robust Cleanup of any existing stream before starting
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => {
+                    track.stop();
+                    console.log(`🛑 Stopped existing ${track.kind} track`);
                 });
-                audioStream
-                  .getAudioTracks()
-                  .forEach((track) => mediaStream.addTrack(track));
-                console.log("✅ Audio track added successfully");
-              } catch (e) {
-                console.warn("⚠️ Could not get audio:", e);
-              }
+                mediaStream = null;
             }
 
-            // Debug: Log track info
-            console.log(
-              "📹 Stream tracks - Video:",
-              mediaStream.getVideoTracks().length,
-              ", Audio:",
-              mediaStream.getAudioTracks().length,
-            );
+            // 1. Attempt Video Access with Strict ID Validation
+            let cameraId = cameraSelect.value;
+            const isValidCam = cameraId && cameraId.length > 10 && !cameraId.includes("Loading") && !cameraId.includes("Permission");
+            
+            const primaryConstraints = isValidCam ? 
+                { deviceId: { exact: cameraId }, width: { ideal: 1280 }, height: { ideal: 720 } } : 
+                { width: { ideal: 1280 }, height: { ideal: 720 } };
 
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia({ video: primaryConstraints });
+                console.log("✅ Video track acquired (Primary choice)");
+            } catch (vErr) {
+                console.warn("⚠️ Primary video access failed, trying fallback...", vErr);
+                try {
+                    mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    console.log("✅ Video track acquired (Fallback mode)");
+                } catch (fallbackErr) {
+                    console.error("❌ All video access attempts failed:", fallbackErr);
+                    throw new Error("Camera access denied. Please ensure your camera is not in use by another app.");
+                }
+            }
+
+            // 2. Attempt Microphone Access (Explicitly exclude video here)
+            try {
+                let micId = micSelect.value;
+                const isValidMic = micId && micId.length > 10 && !micId.includes("Loading") && !micId.includes("Permission");
+                
+                // Only request if we don't have audio tracks yet
+                if (mediaStream.getAudioTracks().length === 0) {
+                    const audioConstraints = isValidMic ? { deviceId: { exact: micId } } : true;
+                    // FIX: Explicitly set video: false to prevent a second camera from turning on
+                    const audioStream = await navigator.mediaDevices.getUserMedia({ 
+                        audio: audioConstraints,
+                        video: false 
+                    });
+                    audioStream.getAudioTracks().forEach(track => mediaStream.addTrack(track));
+                    console.log("✅ Audio track added to stream");
+                }
+            } catch (aErr) {
+                console.warn("⚠️ Microphone access failed. Continuing with video only:", aErr);
+            }
+
+            // Final Setup
             videoElement.srcObject = mediaStream;
-            videoElement.src = ""; // Clear vault source
+            videoElement.src = "";
             videoElement.play();
 
             off.style.opacity = "0";
@@ -1768,8 +1782,8 @@
               btn.classList.add("active");
               on.style.opacity = "1";
 
-              // Show Toast
-              toast.querySelector("div").innerText = "Scanner & Voice Online";
+              const hasAudio = mediaStream.getAudioTracks().length > 0;
+              toast.querySelector("div").innerText = hasAudio ? "Scanner & Voice Online" : "Scanner Online (Mic Offline)";
               toast.classList.remove("opacity-0", "translate-y-4");
               toast.classList.add("opacity-1", "translate-y-0");
               setTimeout(() => {
@@ -1779,8 +1793,8 @@
 
             updateStatusUI("live", "Live Feed");
           } catch (err) {
-            console.error("Error accessing webcam/mic:", err);
-            alert("Could not access camera/mic. Please check permissions.");
+            console.error("Critical hardware access error:", err);
+            alert(err.message || "Could not access hardware.");
           }
         } else {
           // Turning OFF

@@ -1138,12 +1138,12 @@
           </div>
         </article>
 
-        <!-- Eye Tracking Analysis -->
+        <!-- Visual Focus & Eye Dynamics -->
         <article class="glass p-6 border-white/5">
           <h3
             class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4"
           >
-            <i class="fas fa-eye mr-2 text-cyan-400"></i> Eye Tracking Analysis
+            <i class="fas fa-eye mr-2 text-cyan-400"></i> Visual Focus & Eye Dynamics
           </h3>
           <div class="frame-table-container custom-scrollbar">
             <table class="frame-table">
@@ -1151,49 +1151,25 @@
                 <tr>
                   <th>Frame #</th>
                   <th>Timestamp</th>
-                  <th>Pupil Size</th>
-                  <th>Blink Rate</th>
-                  <th>Fixation Score</th>
-                </tr>
-              </thead>
-              <tbody id="eyeTrackTableBody">
-                <!-- Mock data will be injected here -->
-              </tbody>
-            </table>
-          </div>
-        </article>
-
-        <!-- Gaze Tracking Analysis -->
-        <article class="glass p-6 border-white/5">
-          <h3
-            class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4"
-          >
-            <i class="fas fa-bullseye mr-2 text-purple-400"></i> Gaze Movement Analysis
-          </h3>
-          <div class="frame-table-container custom-scrollbar">
-            <table class="frame-table">
-              <thead>
-                <tr>
-                  <th>Frame #</th>
-                  <th>Timestamp</th>
-                  <th>Gaze vector</th>
+                  <th>Blink Activity</th>
                   <th>Focus Area</th>
+                  <th>Fixation Score</th>
                   <th>Gaze Stability</th>
                 </tr>
               </thead>
-              <tbody id="gazeTrackTableBody">
-                <!-- Mock data will be injected here -->
+              <tbody id="eyeTrackTableBody">
+                <!-- Combined mock data will be injected here -->
               </tbody>
             </table>
           </div>
         </article>
-
-        <!-- Lips Forensic tracking -->
+ 
+        <!-- Oral & Jaw Activity -->
         <article class="glass p-6 border-white/5">
           <h3
             class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4"
           >
-            <i class="fas fa-lips mr-2 text-rose-400"></i> Lips Forensic Tracking
+            <i class="fas fa-comment-dots mr-2 text-rose-400"></i> Oral & Jaw Activity
           </h3>
           <div class="frame-table-container custom-scrollbar">
             <table class="frame-table">
@@ -1201,38 +1177,13 @@
                 <tr>
                   <th>Frame #</th>
                   <th>Timestamp</th>
-                  <th>Lip Tension</th>
-                  <th>Aperture (%)</th>
-                  <th>Compression</th>
+                  <th>Jaw Tightness</th>
+                  <th>Oral Stress</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody id="lipsTableBody">
-                <!-- Mock data will be injected here -->
-              </tbody>
-            </table>
-          </div>
-        </article>
-
-        <!-- Jaw Movement Analysis -->
-        <article class="glass p-6 border-white/5">
-          <h3
-            class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4"
-          >
-            <i class="fas fa-grip-lines mr-2 text-amber-400"></i> Jaw Movement Dynamics
-          </h3>
-          <div class="frame-table-container custom-scrollbar">
-            <table class="frame-table">
-              <thead>
-                <tr>
-                  <th>Frame #</th>
-                  <th>Timestamp</th>
-                  <th>Jaw Rotation</th>
-                  <th>Opening Index</th>
-                  <th>Muscle Strain</th>
-                </tr>
-              </thead>
-              <tbody id="jawTableBody">
-                <!-- Mock data will be injected here -->
+                <!-- Simplified Oral and Jaw mock data will be injected here -->
               </tbody>
             </table>
           </div>
@@ -1835,63 +1786,55 @@
               ['#4', '00:21', 'Surprise', 'Mouth Open', '85%'],
               ['#5', '00:23', 'Neutral', 'None', '91%']
           ].map((row, i) => `
-              <tr class="border-t border-white/5 hover:bg-white/5 transition-all">
-                  <td class="p-3 text-white font-mono">${row[0]}</td>
-                  <td class="p-3 text-gray-400">${row[1]}</td>
-                  <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${getBadgeStyle(row[2])}">${row[2]}</span></td>
-                  <td class="p-3 text-gray-300 italic">${row[3]}</td>
-                  <td class="p-3 font-bold text-cyan-400">${row[4]}</td>
+              <tr class="border-t border-white/5 hover:bg-cyan-500/5 transition-all">
+                  <td class="p-4 text-white font-mono text-[10px]">${row[0]}</td>
+                  <td class="p-4 text-gray-400 font-mono text-[10px]">${row[1]}</td>
+                  <td class="p-4"><span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider ${getBadgeStyle(row[2])}">${row[2]}</span></td>
+                  <td class="p-4 text-gray-300 italic text-[10px]">${row[3]}</td>
+                  <td class="p-4"><div class="flex items-center gap-2"><div class="flex-1 h-1 bg-white/5 rounded-full overflow-hidden w-12"><div class="h-full bg-cyan-400" style="width: ${row[4]}"></div></div><span class="font-bold text-cyan-400 text-[10px]">${row[4]}</span></div></td>
               </tr>
           `).join('');
           document.getElementById('emotionTableBody').innerHTML = emotionMarkup;
-
-          // 2. Eye Tracking Table
-          const eyeMarkup = timestamps.map((ts, i) => `
-              <tr class="border-t border-white/5 hover:bg-white/5 transition-all">
-                  <td class="p-3 text-white font-mono">#${i+1}</td>
-                  <td class="p-3 text-gray-400">${ts}</td>
-                  <td class="p-3 text-gray-300">4.${Math.floor(Math.random()*9)}mm</td>
-                  <td class="p-3 text-gray-300">${(Math.random()*15).toFixed(1)}/min</td>
-                  <td class="p-3 font-bold text-cyan-400">${80 + Math.floor(Math.random()*15)}%</td>
-              </tr>
-          `).join('');
+ 
+          // 2. Combined Visual Focus & Eye Dynamics Table
+          const eyeMarkup = timestamps.map((ts, i) => {
+              const blinkScore = 20 + Math.floor(Math.random()*60);
+              const focusArea = ['Center', 'Top Left', 'Bottom Right', 'Center', 'Top Right'][i];
+              const fixationScore = 80 + Math.floor(Math.random()*15);
+              const gazeStability = 75 + Math.floor(Math.random()*20);
+ 
+              return `
+                <tr class="border-t border-white/5 hover:bg-cyan-500/5 transition-all">
+                    <td class="p-4 text-white font-mono text-[10px]">#${i+1}</td>
+                    <td class="p-4 text-gray-400 font-mono text-[10px]">${ts}</td>
+                    <td class="p-4"><span class="font-bold text-cyan-400 text-[10px]">${blinkScore}</span></td>
+                    <td class="p-4 text-gray-300 font-bold text-[10px]">${focusArea}</td>
+                    <td class="p-4 font-bold text-cyan-400 text-[10px]">${fixationScore}</td>
+                    <td class="p-4 font-bold text-purple-400 text-[10px]">${gazeStability}</td>
+                </tr>
+              `;
+          }).join('');
           document.getElementById('eyeTrackTableBody').innerHTML = eyeMarkup;
+  
+          // 4. Simplified Oral & Jaw Activity Table
+          const oralMarkup = timestamps.map((ts, i) => {
+              const tightness = (40 + Math.random()*50).toFixed(0);
+              const stress = (20 + Math.random()*40).toFixed(0);
+              const status = tightness > 75 ? 
+                  `<span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-rose-500/20 text-rose-400 border border-rose-500/30">CLENCHED</span>` : 
+                  `<span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-white/5 text-gray-500 border border-white/5">NORMAL</span>`;
 
-          // 3. Gaze Table
-          const gazeMarkup = timestamps.map((ts, i) => `
-              <tr class="border-t border-white/5 hover:bg-white/5 transition-all">
-                  <td class="p-3 text-white font-mono">#${i+1}</td>
-                  <td class="p-3 text-gray-400">${ts}</td>
-                  <td class="p-3 text-gray-300">[${Math.floor(Math.random()*100)}, ${Math.floor(Math.random()*100)}]</td>
-                  <td class="p-3 text-gray-300">${['Center', 'Top Left', 'Bottom Right', 'Center', 'Top Right'][i]}</td>
-                  <td class="p-3 font-bold text-purple-400">${75 + Math.floor(Math.random()*20)}%</td>
-              </tr>
-          `).join('');
-          document.getElementById('gazeTrackTableBody').innerHTML = gazeMarkup;
-
-          // 4. Lips Table
-          const lipsMarkup = timestamps.map((ts, i) => `
-              <tr class="border-t border-white/5 hover:bg-white/5 transition-all">
-                  <td class="p-3 text-white font-mono">#${i+1}</td>
-                  <td class="p-3 text-gray-400">${ts}</td>
-                  <td class="p-3 text-gray-300">${(Math.random()*10).toFixed(1)} N/cm²</td>
-                  <td class="p-3 text-gray-300">${(Math.random()*30).toFixed(1)}%</td>
-                  <td class="p-3 font-bold text-rose-400">${(Math.random()*100).toFixed(1)}%</td>
-              </tr>
-          `).join('');
-          document.getElementById('lipsTableBody').innerHTML = lipsMarkup;
-
-          // 5. Jaw Table
-          const jawMarkup = timestamps.map((ts, i) => `
-              <tr class="border-t border-white/5 hover:bg-white/5 transition-all">
-                  <td class="p-3 text-white font-mono">#${i+1}</td>
-                  <td class="p-3 text-gray-400">${ts}</td>
-                  <td class="p-3 text-gray-300">${(Math.random()*5).toFixed(1)}°</td>
-                  <td class="p-3 text-gray-300">${(Math.random()*40).toFixed(1)}%</td>
-                  <td class="p-3 font-bold text-amber-500">${(Math.random()*100).toFixed(1)}%</td>
-              </tr>
-          `).join('');
-          document.getElementById('jawTableBody').innerHTML = jawMarkup;
+              return `
+                <tr class="border-t border-white/5 hover:bg-rose-500/5 transition-all">
+                    <td class="p-4 text-white font-mono text-[10px]">#${i+1}</td>
+                    <td class="p-4 text-gray-400 font-mono text-[10px]">${ts}</td>
+                    <td class="p-4 text-gray-300 font-bold text-[10px]">${tightness}</td>
+                    <td class="p-4 text-gray-300 font-bold text-[10px]">${stress}</td>
+                    <td class="p-4">${status}</td>
+                </tr>
+              `;
+          }).join('');
+          document.getElementById('lipsTableBody').innerHTML = oralMarkup;
 
           // Update Circular Charts with fresh mock data
           if (emotionChart) {

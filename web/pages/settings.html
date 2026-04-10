@@ -430,6 +430,32 @@
                     </div>
                 </div>
 
+                <!-- System Permissions -->
+                <div class="setting-card">
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-emerald-400 mb-6 flex items-center">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center mr-3 glow-emerald transition-all duration-300">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        System Permissions
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
+                            <div>
+                                <p class="text-xs font-bold text-gray-300 uppercase">Camera Access</p>
+                                <p class="text-[9px] text-gray-500">Request browser camera permission.</p>
+                            </div>
+                            <button onclick="requestPermission('video')" class="px-4 py-1.5 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[9px] font-bold uppercase rounded-lg hover:bg-cyan-500 hover:text-black transition-all">Allow</button>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
+                            <div>
+                                <p class="text-xs font-bold text-gray-300 uppercase">Microphone Access</p>
+                                <p class="text-[9px] text-gray-500">Request browser microphone permission.</p>
+                            </div>
+                            <button onclick="requestPermission('audio')" class="px-4 py-1.5 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[9px] font-bold uppercase rounded-lg hover:bg-cyan-500 hover:text-black transition-all">Allow</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="flex space-x-4">
                     <button onclick="saveCameraConfiguration(this)" class="flex-1 py-4 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold uppercase rounded-xl shadow-[0_4px_15px_rgba(0,219,255,0.1)] hover:bg-cyan-500 hover:text-black transition-all duration-300">Apply Configuration</button>
                     <button onclick="resetSettings()" class="flex-1 py-4 bg-white/5 border border-white/10 text-white text-[10px] font-bold uppercase rounded-xl hover:bg-white/10 transition-all cursor-pointer">Reset Default</button>
@@ -650,6 +676,20 @@
                 toggleBtn.innerHTML = '<i class="fas fa-power-off"></i>';
                 toggleBtn.classList.add('bg-rose-500/20', 'text-rose-500', 'glow-rose');
                 toggleBtn.classList.remove('bg-emerald-500/20', 'text-emerald-500', 'glow-emerald');
+            }
+        }
+
+        async function requestPermission(type) {
+            try {
+                const constraints = type === 'video' ? { video: true } : { audio: true };
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                // Immediately stop the stream as we only wanted to trigger the permission prompt
+                stream.getTracks().forEach(track => track.stop());
+                alert(`${type.charAt(0).toUpperCase() + type.slice(1)} permission granted!`);
+                if (type === 'video') populateCameras();
+            } catch (err) {
+                console.error(`Permission denied for ${type}:`, err);
+                alert(`Could not get ${type} permission: ${err.message}`);
             }
         }
 
