@@ -30,9 +30,6 @@ UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 RECORDINGS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Import our custom modules
-# REMOVED: device_functions - JavaScript handles device enumeration directly
-# REMOVED: camera_functions - No longer used
-# REMOVED: emotion_functions - No longer using emotion detection
 from modules import database
 
 # ========================================
@@ -55,22 +52,11 @@ print("="*60 + "\n")
 # ========================================
 # LOAD EMOTION MODEL AT STARTUP
 # ========================================
-# REMOVED: Emotion detection disabled
-# print("📦 Loading AI models...")
-# emotion_model = emotion_functions.load_emotion_model()
-# print("✅ All models loaded successfully!\n")
+# Emotion detection is currently disabled and no model is loaded at startup.
 
 # ========================================
 # EEL EXPOSED FUNCTIONS (callable from JavaScript)
 # ========================================
-
-
-# ========================================
-# REMOVED: Emotion detection and device functions
-# ========================================
-# - process_frame() - Emotion detection disabled
-# - get_available_cameras() - JavaScript handles device enumeration
-# - get_available_microphones() - JavaScript handles device enumeration
 
 
 # ========================================
@@ -122,13 +108,6 @@ def logout():
         print(f"🚪 User logged out: {current_user['username']}")
     current_user = None
     return response()
-
-# ========================================
-# REMOVED: Device enumeration functions
-# ========================================
-# JavaScript handles device enumeration directly via navigator.mediaDevices.enumerateDevices()
-# - get_available_cameras() - REMOVED
-# - get_available_microphones() - REMOVED
 
 @eel.expose
 def get_current_user():
@@ -246,7 +225,7 @@ def finalize_upload(upload_id):
 @eel.expose
 def save_recording(filename, base64_data, category):
     """
-    Save a recorded session (video/audio) to the web/recordings directory.
+    Save a recorded session (video/audio) to the persistent recordings directory.
     """
     try:
         if not current_user:
