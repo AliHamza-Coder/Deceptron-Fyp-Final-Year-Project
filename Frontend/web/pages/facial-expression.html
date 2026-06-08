@@ -106,8 +106,26 @@
       transition: all 0.4s ease;
     }
 
+    video[style*="scaleX(-1)"]::-webkit-media-controls {
+      transform: scaleX(-1);
+    }
+
     .video-container:hover {
       border-color: var(--primary-blue);
+    }
+
+    .video-inner-wrap {
+      min-height: 350px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+    }
+    
+    .video-inner-wrap video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
 
     .status-dot {
@@ -323,6 +341,9 @@
       border: 1px solid var(--border-subtle);
       box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
       position: relative;
+      transform: scale(0.9);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .btn-primary {
       background: rgba(37, 99, 235, 0.1);
@@ -377,71 +398,7 @@
     initSidebar();
   </script>
 
-  <!-- Evidence Vault Modal -->
-  <div id="vaultModal" class="modal-backdrop">
-    <div class="modal-content">
-      <div class="flex justify-between items-center mb-8">
-        <div>
-          <h2 class="text-xl font-bold heading-font text-white uppercase tracking-wider">Recording Library</h2>
-          <p class="text-[10px] text-dim uppercase font-bold tracking-widest mt-1">Select video file for deep scan</p>
-        </div>
-        <button onclick="VaultComponent.close()"
-          class="text-slate-400 hover:text-primary-blue transition-colors text-xl">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
 
-      <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-        <div class="vault-item group" onclick="VaultComponent.selectMock('suspect_interview_01.mp4')">
-          <div class="flex items-center space-x-4">
-            <div
-              class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center">
-              <i class="fas fa-video text-lg"></i>
-            </div>
-            <div>
-              <p class="text-sm font-bold text-white">suspect_interview_01.mp4</p>
-              <p class="text-[9px] text-dim font-mono">124.5 MB • 14:20 • RAW_AV</p>
-            </div>
-          </div>
-          <i class="fas fa-chevron-right text-slate-200 group-hover:text-primary-blue transition-colors"></i>
-        </div>
-
-        <div class="vault-item group" onclick="VaultComponent.selectMock('debrief_session_cam1.mp4')">
-          <div class="flex items-center space-x-4">
-            <div
-              class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center">
-              <i class="fas fa-video text-lg"></i>
-            </div>
-            <div>
-              <p class="text-sm font-bold text-white">debrief_session_cam1.mp4</p>
-              <p class="text-[9px] text-dim font-mono">110.2 MB • 08:30 • RAW_AV</p>
-            </div>
-          </div>
-          <i class="fas fa-chevron-right text-slate-200 group-hover:text-primary-blue transition-colors"></i>
-        </div>
-
-        <div class="vault-item group opacity-50 cursor-not-allowed">
-          <div class="flex items-center space-x-4">
-            <div
-              class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center">
-              <i class="fas fa-microphone text-lg"></i>
-            </div>
-            <div>
-              <p class="text-sm font-bold text-white">witness_call_log.wav</p>
-              <p class="text-[9px] text-dim font-mono italic">Audio-only (Switch to Voice Analysis)</p>
-            </div>
-          </div>
-          <i class="fas fa-lock text-slate-200"></i>
-        </div>
-      </div>
-
-      <div class="mt-8 pt-6 border-t border-slate-100 flex justify-end">
-        <p class="text-[9px] text-slate-400 uppercase tracking-widest">Showing locally stored evidence records</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Configuration Panel -->
   <aside class="config-panel flex flex-col gap-6">
     <div class="flex items-center justify-between mb-2">
       <h3 class="text-xs font-bold uppercase tracking-widest text-primary-blue flex items-center">
@@ -475,62 +432,70 @@
 
     <div class="h-[1px] bg-slate-100"></div>
 
-    <!-- Module Testing -->
+    <!-- Forensic Module Selection -->
     <div class="space-y-4">
-      <label class="text-[9px] text-dim font-bold uppercase tracking-widest block">Module Testing</label>
-
-      <div class="metric-item">
-        <div class="flex items-center gap-3">
-          <i class="fas fa-network-wired text-[10px] text-purple-400"></i>
-          <span class="text-xs font-bold text-white">Show Face Mesh</span>
-        </div>
-        <label class="switch">
-          <input type="checkbox" id="toggleFaceMesh" />
-          <span class="slider"></span>
-        </label>
+      <label class="text-[9px] text-dim font-bold uppercase tracking-widest block">Forensic Modules</label>
+      
+      <div class="space-y-2 mb-4">
+        <label class="text-[8px] text-primary-blue font-bold uppercase tracking-widest">Analysis Mode</label>
+        <select id="analysisMode" class="w-full text-[10px]" onchange="toggleModuleControls()">
+          <option value="pipeline">Full Pipeline (Combined)</option>
+          <option value="alone">Alone Module (Specific)</option>
+        </select>
       </div>
 
-      <div class="metric-item">
-        <div class="flex items-center gap-3">
-          <i class="fas fa-eye text-[10px] text-cyan-400"></i>
-          <span class="text-xs font-bold text-white">Track Eyes & Gaze</span>
+      <div id="aloneModuleList" class="space-y-3 opacity-50 pointer-events-none transition-all">
+        <div class="metric-item">
+          <div class="flex items-center gap-3">
+            <i class="fas fa-smile text-[10px] text-emerald-400"></i>
+            <span class="text-xs font-bold text-white">Emotion Detection</span>
+          </div>
+          <input type="radio" name="aloneModule" value="emotion" class="w-4 h-4 accent-emerald-500" />
         </div>
-        <label class="switch">
-          <input type="checkbox" id="toggleEyeGaze" />
-          <span class="slider"></span>
-        </label>
-      </div>
 
-      <div class="metric-item">
-        <div class="flex items-center gap-3">
-          <i class="fas fa-grip-lines text-[10px] text-amber-500"></i>
-          <span class="text-xs font-bold text-white">Track Lips & Jaw</span>
+        <div class="metric-item">
+          <div class="flex items-center gap-3">
+            <i class="fas fa-eye text-[10px] text-cyan-400"></i>
+            <span class="text-xs font-bold text-white">Eye Gaze Tracking</span>
+          </div>
+          <input type="radio" name="aloneModule" value="gaze" class="w-4 h-4 accent-cyan-500" />
         </div>
-        <label class="switch">
-          <input type="checkbox" id="toggleLipsJaw" />
-          <span class="slider"></span>
-        </label>
-      </div>
 
-      <div class="metric-item">
-        <div class="flex items-center gap-3">
-          <i class="fas fa-smile text-[10px] text-emerald-400"></i>
-          <span class="text-xs font-bold text-white">Emotions Detection</span>
+        <div class="metric-item">
+          <div class="flex items-center gap-3">
+            <i class="fas fa-user-check text-[10px] text-purple-400"></i>
+            <span class="text-xs font-bold text-white">Head Pose Analysis</span>
+          </div>
+          <input type="radio" name="aloneModule" value="pose" class="w-4 h-4 accent-purple-500" />
         </div>
-        <label class="switch">
-          <input type="checkbox" id="toggleEmotions" checked />
-          <span class="slider"></span>
-        </label>
+
+        <div class="metric-item">
+          <div class="flex items-center gap-3">
+            <i class="fas fa-hand-paper text-[10px] text-amber-500"></i>
+            <span class="text-xs font-bold text-white">Touch Detection</span>
+          </div>
+          <input type="radio" name="aloneModule" value="touch" class="w-4 h-4 accent-amber-500" />
+        </div>
+
+        <div class="metric-item">
+          <div class="flex items-center gap-3">
+            <i class="fas fa-comment-dots text-[10px] text-pink-400"></i>
+            <span class="text-xs font-bold text-white">Lips & Jaw Analysis</span>
+          </div>
+          <input type="radio" name="aloneModule" value="lips" class="w-4 h-4 accent-pink-500" />
+        </div>
+
+        <div class="metric-item">
+          <div class="flex items-center gap-3">
+            <i class="fas fa-balance-scale text-[10px] text-emerald-400"></i>
+            <span class="text-xs font-bold text-white">Facial Asymmetry</span>
+          </div>
+          <input type="radio" name="aloneModule" value="asymmetry" class="w-4 h-4 accent-emerald-500" />
+        </div>
       </div>
     </div>
 
-    <div class="mt-auto pt-6">
-      <button
-        class="w-full py-3 btn-outline text-[9px]"
-        onclick="resetConfigurations()">
-        <i class="fas fa-sync-alt"></i> Reset to Default
-      </button>
-    </div>
+
   </aside>
 
   <!-- Main Content -->
@@ -621,6 +586,11 @@
             onclick="finalizeAnalysis()">
             <i class="fas fa-brain"></i> Analyse
           </button>
+          <button id="saveReportBtn"
+            class="px-4 py-3 text-xs hidden bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-bold uppercase rounded-xl hover:bg-cyan-500 hover:text-white transition-all"
+            onclick="saveFacialReport()">
+            <i class="fas fa-save"></i> Save Report
+          </button>
         </div>
       </div>
     </div>
@@ -638,19 +608,20 @@
               <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-white">Video Output</h3>
             </div>
             <div class="flex items-center space-x-3">
-              <button title="Maximize"
-                class="text-dim hover:text-blue-400 transition-all transform hover:scale-110 p-1.5"><i
-                  class="fas fa-expand-arrows-alt text-xs"></i></button>
-              <button title="Download Clip"
-                class="text-dim hover:text-blue-400 transition-all transform hover:scale-110 p-1.5"><i
-                  class="fas fa-download text-xs"></i></button>
+              <button title="Toggle Layout" onclick="toggleAnalysisLayout()"
+                class="text-dim hover:text-blue-400 transition-all transform hover:scale-110 p-1.5">
+                <i class="fas fa-columns text-xs"></i>
+              </button>
             </div>
           </div>
         </div>
 
-        <div
-          class="flex-1 relative video-inner-wrap bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden group shadow-2xl">
-          <canvas id="analysisOutputCanvas" class="w-full h-full object-cover opacity-90"></canvas>
+        <div id="videoOutputGrid" class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-fr overflow-y-auto p-2 bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl">
+          <!-- Main Output (Canvas or Single Video) -->
+          <div id="mainVideoWrap" class="relative video-inner-wrap rounded-xl overflow-hidden bg-black col-span-full">
+            <canvas id="analysisOutputCanvas" class="w-full h-full object-cover opacity-90"></canvas>
+            <video id="outputVideoSingle" class="hidden w-full h-full object-cover" controls></video>
+          </div>
         </div>
       </div>
     </section>
@@ -663,10 +634,72 @@
         <div class="h-[1px] flex-1 bg-white/5"></div>
       </div>
 
-      <!-- Emotions Detection Analysis -->
-      <article class="glass p-6 border-slate-100/50">
+       <!-- Emotions Detection Analysis -->
+       <article class="glass p-6 border-slate-100/50">
+         <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
+           <i class="fas fa-smile mr-2 text-emerald-400"></i> Emotion Detection
+         </h3>
+         <div class="frame-table-container">
+           <table class="frame-table">
+             <thead>
+               <tr>
+                 <th>Frame #</th>
+                 <th>Timestamp</th>
+                 <th>Dominant Emotion</th>
+                 <th>Confidence Score</th>
+               </tr>
+             </thead>
+             <tbody id="emotionTableBody"></tbody>
+           </table>
+         </div>
+       </article>
+
+       <!-- Visual Focus & Eye Dynamics -->
+       <article class="glass p-6 border-slate-100">
+         <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
+           <i class="fas fa-eye mr-2 text-blue-400"></i> Eye Gaze Tracking
+         </h3>
+         <div class="frame-table-container">
+           <table class="frame-table">
+             <thead>
+               <tr>
+                 <th>Frame #</th>
+                 <th>Timestamp</th>
+                 <th>Blink Activity</th>
+                 <th>Focus Area</th>
+                 <th>EAR Score</th>
+               </tr>
+             </thead>
+             <tbody id="eyeGazeTableBody"></tbody>
+           </table>
+         </div>
+       </article>
+
+       <!-- Oral & Jaw Activity -->
+       <article class="glass p-6 border-slate-100">
+         <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
+           <i class="fas fa-comment-dots mr-2 text-rose-400"></i> Lip & Jaw Analysis
+         </h3>
+         <div class="frame-table-container">
+           <table class="frame-table">
+             <thead>
+               <tr>
+                 <th>Frame #</th>
+                 <th>Timestamp</th>
+                 <th>Lip Status</th>
+                 <th>Jaw Tightness</th>
+                 <th>Chin Tremor</th>
+               </tr>
+             </thead>
+             <tbody id="lipJawTableBody"></tbody>
+           </table>
+         </div>
+       </article>
+
+      <!-- Head Pose & Stiffness -->
+      <article class="glass p-6 border-slate-100">
         <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
-          <i class="fas fa-smile mr-2 text-emerald-400"></i> Emotions Detection Analysis
+          <i class="fas fa-user-check mr-2 text-purple-400"></i> Head Pose Analysis
         </h3>
         <div class="frame-table-container">
           <table class="frame-table">
@@ -674,136 +707,144 @@
               <tr>
                 <th>Frame #</th>
                 <th>Timestamp</th>
-                <th>Dominant Emotion</th>
-                <th>Micro-Expression</th>
-                <th>Confidence Score</th>
+                <th>Pitch Angle</th>
+                <th>Yaw Angle</th>
+                <th>Stiffness</th>
+                <th>Movement Status</th>
               </tr>
             </thead>
-            <tbody id="emotionTableBody"></tbody>
+            <tbody id="headPoseTableBody"></tbody>
           </table>
         </div>
       </article>
 
-      <!-- Visual Focus & Eye Dynamics -->
-      <article class="glass p-6 border-slate-100">
-        <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
-          <i class="fas fa-eye mr-2 text-blue-400"></i> Visual Focus & Eye Dynamics
-        </h3>
-        <div class="frame-table-container">
-          <table class="frame-table">
-            <thead>
-              <tr>
-                <th>Frame #</th>
-                <th>Timestamp</th>
-                <th>Blink Activity</th>
-                <th>Focus Area</th>
-                <th>Fixation Score</th>
-                <th>Gaze Stability</th>
-              </tr>
-            </thead>
-            <tbody id="eyeTrackTableBody"></tbody>
-          </table>
-        </div>
-      </article>
+       <!-- Facial Asymmetry & Micro-Tremors -->
+       <article class="glass p-6 border-slate-100">
+         <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
+           <i class="fas fa-balance-scale mr-2 text-cyan-400"></i> Facial Asymmetry
+         </h3>
+         <div class="frame-table-container">
+           <table class="frame-table">
+             <thead>
+               <tr>
+                 <th>Frame #</th>
+                 <th>Timestamp</th>
+                 <th>Mouth Asym</th>
+                 <th>Brow Asym</th>
+                 <th>Eye Asym</th>
+                 <th>Total Score</th>
+               </tr>
+             </thead>
+             <tbody id="asymmetryTableBody"></tbody>
+           </table>
+         </div>
+       </article>
 
-      <!-- Oral & Jaw Activity -->
-      <article class="glass p-6 border-slate-100">
-        <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
-          <i class="fas fa-comment-dots mr-2 text-rose-400"></i> Oral & Jaw Activity
-        </h3>
-        <div class="frame-table-container">
-          <table class="frame-table">
-            <thead>
-              <tr>
-                <th>Frame #</th>
-                <th>Timestamp</th>
-                <th>Jaw Tightness</th>
-                <th>Oral Stress</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="lipsTableBody"></tbody>
-          </table>
-        </div>
-      </article>
+       <!-- Hand-to-Face Touch Detection -->
+       <article class="glass p-6 border-slate-100">
+         <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
+           <i class="fas fa-hand-paper mr-2 text-amber-400"></i> Touch Detection
+         </h3>
+         <div class="frame-table-container">
+           <table class="frame-table">
+             <thead>
+               <tr>
+                 <th>Frame #</th>
+                 <th>Timestamp</th>
+                 <th>Activity Description</th>
+                 <th>Detection Status</th>
+                 <th>Confidence Score</th>
+               </tr>
+             </thead>
+             <tbody id="touchTableBody"></tbody>
+           </table>
+         </div>
+       </article>
 
       <!-- Visual Circular Graphs Section -->
       <div id="circularGraphsSection" class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <article class="glass p-6">
           <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
-            <i class="fas fa-chart-pie mr-2 text-blue-400"></i> Overall Emotion Distribution
+            <i class="fas fa-chart-pie mr-2 text-blue-400"></i> Emotion Distribution
           </h3>
           <div class="relative h-48 flex items-center justify-center">
             <canvas id="emotionDistributionChart" width="180" height="180"></canvas>
             <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span class="text-2xl font-bold text-emerald-400">60%</span>
-              <span class="text-[8px] text-dim uppercase tracking-tighter">Neutrality</span>
+              <span id="dominantEmotionPercent" class="text-2xl font-bold text-emerald-400">0%</span>
+              <span id="dominantEmotionLabel" class="text-[8px] text-dim uppercase tracking-tighter">Neutral</span>
             </div>
           </div>
-          <div class="mt-4 space-y-2 text-[10px]">
-            <div class="flex justify-between items-center">
-              <span class="flex items-center gap-2"><span
-                  class="w-2 h-2 rounded-full bg-emerald-400"></span>Neutral</span>
-              <span class="text-emerald-400 font-bold">60%</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400"></span>Anger</span>
-              <span class="text-amber-400 font-bold">25%</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-rose-400"></span>Fear</span>
-              <span class="text-rose-400 font-bold">15%</span>
-            </div>
-          </div>
+          <div id="emotionLegend" class="mt-4 space-y-2 text-[10px]"></div>
         </article>
 
         <article class="glass p-6">
           <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
-            <i class="fas fa-eye mr-2 text-purple-400"></i> Eye Movement Tracking
+            <i class="fas fa-eye mr-2 text-purple-400"></i> Gaze Stability
           </h3>
           <div class="relative h-48 flex items-center justify-center">
             <canvas id="eyeMovementChart" width="180" height="180"></canvas>
             <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span class="text-2xl font-bold text-blue-400">70%</span>
-              <span class="text-[8px] text-dim uppercase tracking-tighter">Steady Gaze</span>
+              <span id="gazeScorePercent" class="text-2xl font-bold text-blue-400">0%</span>
+              <span id="gazeScoreLabel" class="text-[8px] text-dim uppercase tracking-tighter">Steady Gaze</span>
             </div>
           </div>
-          <div class="mt-4 space-y-2 text-[10px]">
-            <div class="flex justify-between items-center">
-              <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-cyan-400"></span>Steady
-                Gaze</span>
-              <span class="text-cyan-400 font-bold">70%</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400"></span>Rapid
-                Blinking</span>
-              <span class="text-amber-400 font-bold">30%</span>
-            </div>
-          </div>
+          <div id="gazeLegend" class="mt-4 space-y-2 text-[10px]"></div>
         </article>
 
         <article class="glass p-6">
           <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
-            <i class="fas fa-grip-lines mr-2 text-amber-400"></i> Lips & Jaw Anomalies
+            <i class="fas fa-grip-lines mr-2 text-amber-400"></i> Lip & Jaw Stress
           </h3>
           <div class="relative h-48 flex items-center justify-center">
             <canvas id="lipsJawChart" width="180" height="180"></canvas>
             <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span class="text-2xl font-bold text-emerald-400">85%</span>
-              <span class="text-[8px] text-dim uppercase tracking-tighter">Normal Activity</span>
+              <span id="oralScorePercent" class="text-2xl font-bold text-emerald-400">0%</span>
+              <span id="oralScoreLabel" class="text-[8px] text-dim uppercase tracking-tighter">Activity</span>
             </div>
           </div>
-          <div class="mt-4 space-y-2 text-[10px]">
-            <div class="flex justify-between items-center">
-              <span class="flex items-center gap-2"><span
-                  class="w-2 h-2 rounded-full bg-emerald-400"></span>Normal</span>
-              <span class="text-emerald-400 font-bold">85%</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-rose-400"></span>Tensed</span>
-              <span class="text-rose-400 font-bold">15%</span>
+          <div id="oralLegend" class="mt-4 space-y-2 text-[10px]"></div>
+        </article>
+
+        <article class="glass p-6">
+          <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
+            <i class="fas fa-user mr-2 text-purple-400"></i> Head Pose Analysis
+          </h3>
+          <div class="relative h-48 flex items-center justify-center">
+            <canvas id="poseDynamicsChart" width="180" height="180"></canvas>
+            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <i id="poseStatusIcon" class="fas fa-user-check text-2xl text-purple-500/80 mb-1 transition-all duration-500"></i>
+                <span id="poseScoreLabel" class="text-[8px] text-dim uppercase tracking-tighter">Dynamics</span>
             </div>
           </div>
+          <div id="poseLegend" class="mt-4 space-y-2 text-[10px]"></div>
+        </article>
+
+        <article class="glass p-6">
+          <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
+            <i class="fas fa-balance-scale mr-2 text-cyan-400"></i> Facial Asymmetry
+          </h3>
+          <div class="relative h-48 flex items-center justify-center">
+            <canvas id="asymmetryChart" width="180" height="180"></canvas>
+            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span id="asymScorePercent" class="text-2xl font-bold text-cyan-400">0%</span>
+                <span id="asymScoreLabel" class="text-[8px] text-dim uppercase tracking-tighter">Balance</span>
+            </div>
+          </div>
+          <div id="asymLegend" class="mt-4 space-y-2 text-[10px]"></div>
+        </article>
+
+        <article class="glass p-6">
+          <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
+            <i class="fas fa-hand-paper mr-2 text-rose-400"></i> Touch Detection
+          </h3>
+          <div class="relative h-48 flex items-center justify-center">
+            <canvas id="stressChart" width="180" height="180"></canvas>
+            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span id="touchScorePercent" class="text-2xl font-bold text-rose-500">0%</span>
+                <span id="touchScoreLabel" class="text-[8px] text-dim uppercase tracking-tighter">Incidents</span>
+            </div>
+          </div>
+          <div id="stressLegend" class="mt-4 space-y-2 text-[10px]"></div>
         </article>
       </div>
     </section>
@@ -811,29 +852,29 @@
 
   <!-- Modal for Saving Session -->
   <div id="saveModal"
-    class="fixed inset-0 bg-slate-900/40 backdrop-blur-xl z-[999] hidden flex items-center justify-center opacity-0 transition-all duration-300">
+    class="fixed inset-0 bg-slate-950/10 backdrop-blur-md z-[999] hidden flex items-center justify-center opacity-0 transition-all duration-300">
     <div
-      class="bg-card-bg border border-border-subtle p-10 rounded-3xl w-full max-w-lg transform scale-95 transition-all duration-300 shadow-2xl">
-      <h2 class="text-2xl font-bold heading-font text-white mb-2 uppercase">Save Recording</h2>
-      <p class="text-[10px] text-dim mb-8 uppercase tracking-widest font-bold">Finalize the analysis record</p>
+      class="bg-[#0b121f] border border-white/10 p-10 rounded-3xl w-full max-w-lg transform scale-95 transition-all duration-300 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+      <h2 class="text-2xl font-bold heading-font text-white mb-2 uppercase tracking-tight">Save Forensic Record</h2>
+      <p class="text-[10px] text-cyan-400 mb-8 uppercase tracking-[0.2em] font-black opacity-80">Finalizing analysis for evidence vault</p>
 
       <div class="space-y-5">
-        <div class="space-y-2">
-          <label class="text-[10px] font-bold text-dim uppercase tracking-widest">Subject Identifier</label>
+        <div class="space-y-3">
+          <label class="text-[10px] font-bold text-dim uppercase tracking-widest ml-1">Subject Identifier</label>
           <input id="subjectIdInput" type="text" placeholder="Enter name or ID..."
-            class="w-full bg-black/20 border border-border-subtle rounded-xl px-4 py-4 text-sm text-white focus:border-primary-blue focus:outline-none transition-all" />
+            class="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-sm text-white focus:border-primary-blue focus:ring-1 focus:ring-primary-blue/50 outline-none transition-all placeholder:text-dim/50" />
         </div>
       </div>
 
       <div class="mt-10 flex flex-col space-y-3">
         <button
-          class="w-full py-4 bg-primary-blue text-white text-[10px] font-bold uppercase rounded-xl shadow-lg transition-all"
+          class="w-full py-4 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[11px] font-black uppercase rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)] transform hover:-translate-y-0.5 transition-all"
           onclick="saveData()">
-          Save Record
+          Save to Forensic Vault
         </button>
         <div class="flex space-x-3">
           <button
-            class="flex-1 py-4 bg-white/5 hover:bg-white/10 text-[10px] font-bold uppercase rounded-xl transition-all text-dim border border-border-subtle"
+            class="flex-1 py-4 bg-white/5 hover:bg-white/10 text-[10px] font-bold uppercase rounded-xl transition-all text-dim border border-white/5"
             onclick="closeSaveModal()">
             Continue Session
           </button>
@@ -878,13 +919,36 @@
         const centerY = analysisCanvas.height / 2;
 
         if (!window.isAnalysisRunning) {
-          analysisCtx.fillStyle = '#05080f';
+          // Premium No Signal Look
+          const grad = analysisCtx.createRadialGradient(centerX, centerY, 0, centerX, centerY, analysisCanvas.width / 1.5);
+          grad.addColorStop(0, '#1e293b');
+          grad.addColorStop(1, '#0f172a');
+          analysisCtx.fillStyle = grad;
           analysisCtx.fillRect(0, 0, analysisCanvas.width, analysisCanvas.height);
-          analysisCtx.fillStyle = '#6b7280';
-          analysisCtx.font = '16px Inter, sans-serif';
+          
+          // Scanning Line effect
+          analysisCtx.beginPath();
+          analysisCtx.strokeStyle = 'rgba(37, 99, 235, 0.1)';
+          analysisCtx.lineWidth = 2;
+          const time = Date.now() / 1000;
+          const scanLineY = (time % 2) / 2 * analysisCanvas.height;
+          analysisCtx.moveTo(0, scanLineY);
+          analysisCtx.lineTo(analysisCanvas.width, scanLineY);
+          analysisCtx.stroke();
+
+          analysisCtx.fillStyle = '#60a5fa';
+          analysisCtx.font = 'bold 12px Orbitron, sans-serif';
           analysisCtx.textAlign = 'center';
           analysisCtx.textBaseline = 'middle';
-          analysisCtx.fillText("AWAITING SIGNAL...", centerX, centerY);
+          analysisCtx.letterSpacing = '4px';
+          analysisCtx.fillText("AWAITING FORENSIC DATA", centerX, centerY);
+          
+          // Subtle Pulsing Dot
+          const opacity = 0.3 + Math.sin(time * 3) * 0.2;
+          analysisCtx.fillStyle = `rgba(37, 99, 235, ${opacity})`;
+          analysisCtx.beginPath();
+          analysisCtx.arc(centerX, centerY + 30, 4, 0, Math.PI * 2);
+          analysisCtx.fill();
 
           requestAnimationFrame(processFrame);
           return;
@@ -1037,6 +1101,8 @@
       }
     }
 
+    let currentFilePath = null;
+    let lastFacialResult = null;
     let isRecording = false;
     let mediaRecorder;
     let recordedChunks = [];
@@ -1053,7 +1119,7 @@
       document.getElementById("recordingTimer").innerText = `${h}:${m}:${s}`;
     }
 
-    function handleSessionToggle() {
+    async function handleSessionToggle() {
       const btn = document.getElementById("sessionBtn");
       const pauseBtn = document.getElementById("pauseBtn");
       const recIndicator = document.getElementById("recIndicator");
@@ -1061,7 +1127,7 @@
 
       if (!isRecording) {
         if (!mediaStream) {
-          alert("Please turn on the camera first.");
+          showToast("Please turn on the camera first.", "error");
           return;
         }
 
@@ -1076,7 +1142,8 @@
         };
         mediaRecorder.start(1000);
         isRecording = true;
-        toast.innerHTML = "<i class='fas fa-check-circle mr-2'></i> Session Data Saved Successfully";
+        
+        btn.innerHTML = '<i class="fas fa-stop mr-2"></i> Stop Recording';
         btn.classList.remove("bg-cyan-600", "shadow-cyan-500/20");
         btn.classList.add("bg-red-600", "shadow-red-500/20");
 
@@ -1086,17 +1153,9 @@
         startTime = new Date();
         timerInterval = setInterval(updateTimer, 1000);
         updateStatusUI('live', 'Recording Active');
-
-        toast.querySelector("div").innerText = "Recording Started";
-        toast.classList.remove("opacity-0", "translate-y-4");
-        toast.classList.add("opacity-1", "translate-y-0");
-        setTimeout(() => toast.classList.add("opacity-0", "translate-y-4"), 1500);
+        showToast("Recording Started", "info");
       } else {
         mediaRecorder.stop();
-        if (mediaStream) {
-          mediaStream.getTracks().forEach(track => track.stop());
-          mediaStream = null;
-        }
         if (pauseBtn) pauseBtn.classList.add("hidden");
         if (recIndicator) recIndicator.classList.add("hidden");
         clearInterval(timerInterval);
@@ -1109,13 +1168,13 @@
       if (mediaRecorder.state === "recording") {
         mediaRecorder.pause();
         pauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-        pauseBtn.classList.remove("text-amber-500", "border-amber-500/20");
         pauseBtn.classList.add("bg-amber-500", "text-white");
+        clearInterval(timerInterval);
       } else if (mediaRecorder.state === "paused") {
         mediaRecorder.resume();
         pauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        pauseBtn.classList.add("text-amber-500", "border-amber-500/20");
         pauseBtn.classList.remove("bg-amber-500", "text-white");
+        timerInterval = setInterval(updateTimer, 1000);
       }
     }
 
@@ -1125,7 +1184,6 @@
       setTimeout(() => {
         m.classList.remove("opacity-0");
         m.querySelector("div").classList.remove("scale-95");
-        m.querySelector("div").classList.add("scale-100");
       }, 10);
     }
 
@@ -1138,88 +1196,73 @@
 
     async function saveData() {
       const subjectId = document.getElementById('subjectIdInput').value || "Unknown_Subject";
-      const filename = `facial_${subjectId}_${new Date().getTime()}.webm`;
+      const filename = `facial_${subjectId}_${new Date().getTime()}.mp4`;
 
       const saveBtn = document.querySelector('#saveModal button[onclick="saveData()"]');
       const originalText = saveBtn.innerText;
       saveBtn.disabled = true;
-      saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving... <span id="saveProgress">0%</span>';
 
+      Loader.show("Securing Forensic Data...");
       try {
-        const blob = new Blob(recordedChunks, { type: 'video/webm' });
-        const size = blob.size;
-        const sizeMB = (size / (1024 * 1024)).toFixed(1) + " MB";
-
-        const initResult = await eel.initiate_upload(filename, sizeMB, 'video', true)();
-        if (!initResult.success) throw new Error(initResult.message);
-
-        const uploadId = initResult.data.upload_id;
-        const CHUNK_SIZE = 1024 * 1024;
-        let offset = 0;
-
-        while (offset < size) {
-          const chunk = blob.slice(offset, offset + CHUNK_SIZE);
-          const reader = new FileReader();
-
-          await new Promise((resolve, reject) => {
-            reader.onload = async (e) => {
-              try {
-                const result = await eel.append_upload_chunk(uploadId, e.target.result)();
-                if (!result.success) reject(new Error(result.message));
-                resolve();
-              } catch (err) { reject(err); }
-            };
-            reader.onerror = reject;
-            reader.readAsDataURL(chunk);
-          });
-
-          offset += CHUNK_SIZE;
-          const progress = Math.min(100, Math.round((offset / size) * 100));
-          document.getElementById('saveProgress').innerText = progress + "%";
-        }
-
-        const finalResult = await eel.finalize_upload(uploadId)();
+        const blob = new Blob(recordedChunks, { type: 'video/mp4' });
+        
+        // Use the progress callback to update UI if needed
+        const finalResult = await uploadFile(new File([blob], filename, { type: 'video/mp4' }), true, (progress) => {
+            Loader.show(`Securing Forensic Data... ${progress}%`);
+        });
+        
         if (finalResult.success) {
           closeSaveModal();
+          currentFilePath = finalResult.data.filepath;
+          
           const video = document.getElementById("webcam");
+          if (mediaStream) { mediaStream.getTracks().forEach(track => track.stop()); mediaStream = null; }
           video.srcObject = null;
-          video.src = (finalResult.data && finalResult.data.filepath) ? finalResult.data.filepath : `../recordings/${filename}`;
+          video.src = currentFilePath;
           video.setAttribute('controls', 'true');
-          video.style.transform = "scaleX(-1)";
-          const off = document.getElementById("camOffState");
-          const on = document.getElementById("camOnState");
-          off.classList.add("hidden");
-          on.classList.remove("hidden");
-
+          video.muted = true;
+          // Respect Mirror Preference from Advanced Tools
+          const prefs = await eel.load_preferences()();
+          if (prefs.success && prefs.preferences) {
+            const mirror = prefs.preferences.mirror_camera || false;
+            video.style.transform = mirror ? 'scaleX(-1)' : 'scaleX(1)';
+          } else {
+            video.style.transform = "none";
+          }
+           video.oncanplay = () => {
+            video.play();
+           }
+          document.getElementById("camOffState").classList.add("hidden");
+          document.getElementById("camOnState").classList.remove("hidden");
           document.getElementById('analyseBtn').classList.remove('hidden');
+          
           updateStatusUI('ready', 'Session Saved');
+          showToast("Video stored in recordings vault", "success");
         } else {
           throw new Error(finalResult.message);
         }
         resetUIState();
       } catch (e) {
         console.error(e);
-        alert("Error saving recording: " + e.message);
+        showToast("Error saving: " + e.message, "error");
         saveBtn.disabled = false;
         saveBtn.innerText = originalText;
-      }
+      } finally { Loader.hide(); }
     }
 
     function discardSession() {
-      if (confirm("Discard recording?")) {
+      if (confirm("Permanently discard this recording?")) {
         closeSaveModal();
         recordedChunks = [];
-        if (mediaStream) {
-          mediaStream.getTracks().forEach(track => track.stop());
-          mediaStream = null;
-        }
         resetUIState();
       }
     }
 
     function resetUIState() {
-      window.isAnalysisRunning = false;
+      lastFacialResult = null;
+      document.getElementById('saveReportBtn')?.classList.add('hidden');
       isRecording = false;
+      window.isAnalysisRunning = false;
       const btn = document.getElementById("sessionBtn");
       btn.innerHTML = '<i class="fas fa-play mr-2"></i> Start Recording';
       btn.classList.add("bg-cyan-600");
@@ -1227,119 +1270,263 @@
       document.getElementById("recordingTimer").innerText = "00:00:00";
       if (timerInterval) clearInterval(timerInterval);
       document.getElementById("recIndicator").classList.add("hidden");
-      cameraOn = (mediaStream !== null);
+      
+      // Clear Tables
+      ['emotion', 'eyeGaze', 'lipJaw', 'headPose', 'asymmetry', 'touch'].forEach(id => {
+          const el = document.getElementById(id + 'TableBody');
+          if (el) el.innerHTML = '';
+      });
+      
+      // Clear Video Grid to default canvas
+      const grid = document.getElementById('videoOutputGrid');
+      grid.innerHTML = `
+          <div id="mainVideoWrap" class="relative video-inner-wrap rounded-xl overflow-hidden bg-black col-span-full">
+            <canvas id="analysisOutputCanvas" class="w-full h-full object-cover opacity-90"></canvas>
+            <video id="outputVideoSingle" class="hidden w-full h-full object-cover" controls></video>
+          </div>
+      `;
+      // Re-link canvas context if needed
+      const canvas = document.getElementById("analysisOutputCanvas");
+      if (canvas) {
+          const ctx = canvas.getContext("2d");
+          // The startAnalysisProcessing loop is already running and will pick up the new canvas if we use global reference
+      }
     }
 
-    function finalizeAnalysis() {
-      window.isAnalysisRunning = true;
-      Loader.show("Analyzing Patterns");
-      setTimeout(() => {
-        Loader.hide();
-        showToast("Analysis Complete", "success");
-        populateMockTables();
-      }, 2500);
+
+    function getEmotionColor(emo) {
+      const colors = {
+        'Happy': 'bg-emerald-400',
+        'Sad': 'bg-blue-400',
+        'Angry': 'bg-rose-500',
+        'Fear': 'bg-purple-400',
+        'Surprise': 'bg-amber-400',
+        'Neutral': 'bg-slate-400',
+        'Disgust': 'bg-orange-400'
+      };
+      return colors[emo] || 'bg-cyan-400';
     }
 
-    function showToast(message, type) {
-      const toast = document.getElementById("videoToast");
-      toast.querySelector("div").innerText = message;
-      toast.querySelector("div").className = type === 'success'
-        ? "px-6 py-2 bg-emerald-500 text-white text-[10px] font-bold uppercase rounded-full shadow-lg shadow-emerald-500/40"
-        : "px-6 py-2 bg-cyan-500 text-white text-[10px] font-bold uppercase rounded-full shadow-lg shadow-cyan-500/40";
-      toast.classList.remove("opacity-0", "translate-y-4");
-      toast.classList.add("opacity-1", "translate-y-0");
-      setTimeout(() => toast.classList.add("opacity-0", "translate-y-4"), 2000);
-    }
+    function updateEmotionUI(summary) {
+      if (!summary) return;
+      
+      // Update Table (use frames if available)
+      const frames = summary.frames || [];
+      const tbody = document.getElementById('emotionTableBody');
+      if (frames.length > 0) {
+          tbody.innerHTML = frames.filter((_, i) => i % 10 === 0).map(f => `
+        <tr class="group cursor-pointer hover:bg-white/5 transition-all" onclick="jumpToTimestamp(${f.timestamp || 0})">
+          <td class="font-mono text-cyan-500">#${f.frame_num}</td>
+          <td class="text-dim">${(f.timestamp || 0).toFixed(2)}s</td>
+          <td class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full ${getEmotionColor(f.emotion)}"></span>
+            <span class="text-white">${f.emotion}</span>
+          </td>
+          <td class="text-right text-cyan-400 font-mono text-xs">
+            ${(f.confidence || 0).toFixed(2)}%
+          </td>
+        </tr>
+      `).join('');
+      }
 
-    function populateMockTables() {
-      const timestamps = ["00:15", "00:17", "00:19", "00:21", "00:23"];
-
-      const emotionMarkup = [
-        ['#1', '00:15', 'Neutral', 'Blink', '87%'],
-        ['#2', '00:17', 'Fear', 'Eye Widen', '92%'],
-        ['#3', '00:19', 'Anger', 'Brow Lower', '78%'],
-        ['#4', '00:21', 'Surprise', 'Mouth Open', '85%'],
-        ['#5', '00:23', 'Neutral', 'None', '91%']
-      ].map((row) => `
-              <tr class="border-t border-slate-100 hover:bg-slate-50 transition-all">
-                  <td class="p-4 text-slate-800 font-mono text-[10px]">${row[0]}</td>
-                  <td class="p-4 text-slate-500 font-mono text-[10px]">${row[1]}</td>
-                  <td class="p-4"><span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider ${getBadgeStyle(row[2])}">${row[2]}</span></td>
-                  <td class="p-4 text-slate-600 italic text-[10px]">${row[3]}</td>
-                  <td class="p-4"><div class="flex items-center gap-2"><div class="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden w-12"><div class="h-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.3)]" style="width: ${row[4]}"></div></div><span class="font-bold text-cyan-600 text-[10px]">${row[4]}</span></div></td>
-              </tr>
-          `).join('');
-      document.getElementById('emotionTableBody').innerHTML = emotionMarkup;
-
-      const eyeMarkup = timestamps.map((ts, i) => {
-        const blinkScore = 20 + Math.floor(Math.random() * 60);
-        const focusArea = ['Center', 'Top Left', 'Bottom Right', 'Center', 'Top Right'][i];
-        const fixationScore = 80 + Math.floor(Math.random() * 15);
-        const gazeStability = 75 + Math.floor(Math.random() * 20);
-
-        return `
-                <tr class="border-t border-slate-100 hover:bg-slate-50 transition-all">
-                    <td class="p-4 text-slate-800 font-mono text-[10px]">#${i + 1}</td>
-                    <td class="p-4 text-slate-500 font-mono text-[10px]">${ts}</td>
-                    <td class="p-4"><span class="font-bold text-cyan-600 text-[10px]">${blinkScore}</span></td>
-                    <td class="p-4 text-slate-700 font-bold text-[10px]">${focusArea}</td>
-                    <td class="p-4 font-bold text-cyan-600 text-[10px]">${fixationScore}</td>
-                    <td class="p-4 font-bold text-purple-600 text-[10px]">${gazeStability}</td>
-                </tr>
-              `;
-      }).join('');
-      document.getElementById('eyeTrackTableBody').innerHTML = eyeMarkup;
-
-      const oralMarkup = timestamps.map((ts, i) => {
-        const tightness = (40 + Math.random() * 50).toFixed(0);
-        const stress = (20 + Math.random() * 40).toFixed(0);
-        const status = tightness > 75 ?
-          `<span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-rose-50 text-rose-600 border border-rose-100">CLENCHED</span>` :
-          `<span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-50 text-slate-500 border border-slate-100">NORMAL</span>`;
-
-        return `
-                <tr class="border-t border-slate-100 hover:bg-rose-50 transition-all">
-                    <td class="p-4 text-slate-800 font-mono text-[10px]">#${i + 1}</td>
-                    <td class="p-4 text-slate-500 font-mono text-[10px]">${ts}</td>
-                    <td class="p-4 text-slate-700 font-bold text-[10px]">${tightness}</td>
-                    <td class="p-4 text-slate-700 font-bold text-[10px]">${stress}</td>
-                    <td class="p-4">${status}</td>
-                </tr>
-              `;
-      }).join('');
-      document.getElementById('lipsTableBody').innerHTML = oralMarkup;
-
-      if (emotionChart) {
-        const d = [50 + Math.random() * 20, 15 + Math.random() * 15, 5 + Math.random() * 10];
-        emotionChart.data.datasets[0].data = d;
+      // Update Circular Chart & Distribution
+      if (emotionChart && summary.distribution) {
+        const labels = Object.keys(summary.distribution);
+        const values = labels.map(l => summary.distribution[l].percentage);
+        
+        emotionChart.data.labels = labels;
+        emotionChart.data.datasets[0].data = values;
         emotionChart.update();
-        const label = document.querySelector('#emotionDistributionChart + div span:first-child');
-        if (label) label.innerText = Math.round(d[0]) + '%';
-      }
-      if (eyeChart) {
-        const d = [60 + Math.random() * 30, 10 + Math.random() * 20];
-        eyeChart.data.datasets[0].data = d;
-        eyeChart.update();
-        const label = document.querySelector('#eyeMovementChart + div span:first-child');
-        if (label) label.innerText = Math.round(d[0]) + '%';
-      }
-      if (jawChart) {
-        const d = [70 + Math.random() * 20, 10 + Math.random() * 15];
-        jawChart.data.datasets[0].data = d;
-        jawChart.update();
-        const label = document.querySelector('#lipsJawChart + div span:first-child');
-        if (label) label.innerText = Math.round(d[0]) + '%';
+        
+        // Find dominant
+        let dominant = labels[0];
+        labels.forEach(l => {
+            if (summary.distribution[l].percentage > summary.distribution[dominant].percentage) dominant = l;
+        });
+        
+        document.getElementById('dominantEmotionPercent').innerText = `${summary.distribution[dominant].percentage.toFixed(0)}%`;
+        document.getElementById('dominantEmotionLabel').innerText = dominant;
+        
+        // Update Legend with vibrant markers
+        const colors = ['#10b981', '#f59e0b', '#ef4444', '#6366f1', '#ec4899', '#06b6d4', '#8b5cf6'];
+        document.getElementById('emotionLegend').innerHTML = labels.map((l, i) => `
+            <div class="flex justify-between items-center bg-white/5 px-3 py-2 rounded-lg border border-white/5">
+              <span class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full shadow-[0_0_8px_currentColor]" style="background-color: ${colors[i % colors.length]}; color: ${colors[i % colors.length]}"></span>
+                <span class="text-white font-medium">${l}</span>
+              </span>
+              <span class="font-bold text-xs" style="color: ${colors[i % colors.length]}">${summary.distribution[l].percentage.toFixed(1)}%</span>
+            </div>
+        `).join('');
       }
     }
 
-    function getBadgeStyle(emotion) {
-      switch (emotion.toLowerCase()) {
-        case 'neutral': return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
-        case 'anger': return 'bg-amber-50 text-amber-600 border border-amber-100';
-        case 'fear': return 'bg-rose-50 text-rose-600 border border-rose-100';
-        case 'surprise': return 'bg-purple-50 text-purple-600 border border-purple-100';
-        default: return 'bg-slate-50 text-slate-600 border border-slate-100';
+    function updateFaceUI(summary, type) {
+      if (!summary) return;
+      const frames = summary.frames || [];
+      
+      if (type === 'gaze') {
+          const gazeTbody = document.getElementById('eyeGazeTableBody');
+          gazeTbody.innerHTML = frames.filter((_, i) => i % 10 === 0).map(f => `
+            <tr class="group cursor-pointer hover:bg-white/5 transition-all" onclick="jumpToTimestamp(${f.timestamp || 0})">
+              <td class="font-mono text-cyan-500">#${f.frame_num}</td>
+              <td class="text-dim">${(f.timestamp || 0).toFixed(2)}s</td>
+              <td class="text-white">${f.blink_count > 0 ? 'Active' : 'Steady'}</td>
+              <td class="text-cyan-400">${f.gaze || f.focus_area || 'Center'}</td>
+              <td class="text-rose-400 font-mono text-[10px]">${(f.ear || 0).toFixed(3)}</td>
+            </tr>
+          `).join('');
+          
+          if (eyeChart) {
+              const dist = summary.distribution || { "CENTER": 100 };
+              updateModuleChart(eyeChart, dist, 'gazeLegend', ['#22d3ee', '#818cf8', '#34d399']);
+              
+              const steadyPercent = dist["CENTER"] || dist["Forward"] || dist["Center"] || 0;
+              document.getElementById('gazeScorePercent').innerText = `${steadyPercent.toFixed(0)}%`;
+              document.getElementById('gazeScoreLabel').innerText = 'Steady Gaze';
+          }
       }
+
+      if (type === 'pose') {
+          const poseTbody = document.getElementById('headPoseTableBody');
+          poseTbody.innerHTML = frames.filter((_, i) => i % 10 === 0).map(f => `
+            <tr class="group cursor-pointer hover:bg-white/5 transition-all" onclick="jumpToTimestamp(${f.timestamp || 0})">
+              <td class="font-mono text-cyan-500">#${f.frame_num}</td>
+              <td class="text-dim">${(f.timestamp || 0).toFixed(2)}s</td>
+              <td class="text-white">P:${(f.pitch || 0).toFixed(1)}°</td>
+              <td class="text-white">Y:${(f.yaw || 0).toFixed(1)}°</td>
+              <td class="text-cyan-400 font-bold">${(f.stiffness_score || 0).toFixed(1)}</td>
+              <td class="${f.is_nodding ? 'text-amber-400' : f.is_shaking ? 'text-rose-400' : 'text-emerald-400'} font-bold">${f.is_nodding ? 'Nodding' : f.is_shaking ? 'Shaking' : 'Stable'}</td>
+            </tr>
+          `).join('');
+          
+          if (poseChart) {
+              const dyn = summary.dynamics || {};
+              const nod = dyn.nodding_percent || 0;
+              const shake = dyn.shaking_percent || 0;
+              const stable = Math.max(0, 100 - (nod + shake));
+              
+              const dynamics = { "Stable": stable, "Nodding": nod, "Shaking": shake };
+              updateModuleChart(poseChart, dynamics, 'poseLegend', ['#10b981', '#f59e0b', '#ef4444']);
+              
+              const iconEl = document.getElementById('poseStatusIcon');
+              const labelEl = document.getElementById('poseScoreLabel');
+              
+              if (stable > 70) {
+                  iconEl.className = 'fas fa-user-check text-2xl text-emerald-400 mb-1 transition-all';
+                  labelEl.innerText = 'STABLE';
+              } else if (nod > shake) {
+                  iconEl.className = 'fas fa-arrow-up-down text-2xl text-amber-400 mb-1 transition-all';
+                  labelEl.innerText = 'NODDING';
+              } else if (shake > 0) {
+                  iconEl.className = 'fas fa-arrows-left-right text-2xl text-rose-400 mb-1 transition-all';
+                  labelEl.innerText = 'SHAKING';
+              } else {
+                  iconEl.className = 'fas fa-user-shield text-2xl text-purple-400 mb-1 transition-all';
+                  labelEl.innerText = 'ACTIVE';
+              }
+          }
+      }
+
+      if (type === 'lipjaw') {
+          const lipsTbody = document.getElementById('lipJawTableBody');
+          lipsTbody.innerHTML = frames.filter((_, i) => i % 10 === 0).map(f => `
+            <tr class="group cursor-pointer hover:bg-white/5 transition-all" onclick="jumpToTimestamp(${f.timestamp || 0})">
+              <td class="font-mono text-cyan-500">#${f.frame_num}</td>
+              <td class="text-dim">${(f.timestamp || 0).toFixed(2)}s</td>
+              <td class="text-amber-400">${f.lip_status === 'TENSED' ? 'Stress' : 'Neutral'}</td>
+              <td class="text-white">${(f.jaw_tightness || 0).toFixed(1)}%</td>
+              <td class="text-white">${(f.chin_tremor || 0).toFixed(1)}%</td>
+            </tr>
+          `).join('');
+          
+          if (jawChart) {
+              const dist = summary.durations ? {
+                  "Lip Stress": summary.durations.lip_tensed_percent || 0,
+                  "Jaw Stress": summary.durations.jaw_tensed_percent || 0,
+                  "Normal": 100 - ((summary.durations.lip_tensed_percent || 0) + (summary.durations.jaw_tensed_percent || 0))
+              } : (summary.distribution || { "Normal": 100 });
+              updateModuleChart(jawChart, dist, 'oralLegend', ['#818cf8', '#f43f5e', '#fbbf24']);
+              
+              const stressVal = (summary.durations?.lip_tensed_percent || 0) + (summary.durations?.jaw_tensed_percent || 0);
+              document.getElementById('oralScorePercent').innerText = `${(100 - stressVal).toFixed(0)}%`;
+          }
+      }
+
+       if (type === 'asymmetry') {
+           const asymTbody = document.getElementById('asymmetryTableBody');
+           asymTbody.innerHTML = frames.filter((_, i) => i % 10 === 0).map(f => `
+             <tr class="group cursor-pointer hover:bg-white/5 transition-all" onclick="jumpToTimestamp(${f.timestamp || 0})">
+               <td class="font-mono text-cyan-500">#${f.frame_num}</td>
+               <td class="text-dim">${(f.timestamp || 0).toFixed(2)}s</td>
+               <td class="text-white">${(f.mouth_asym || 0).toFixed(2)}</td>
+               <td class="text-white">${(f.brow_asym || 0).toFixed(2)}</td>
+               <td class="text-white">${(f.eye_asym || 0).toFixed(2)}</td>
+               <td class="text-cyan-400 font-bold">${(f.total_asym || 0).toFixed(1)}%</td>
+             </tr>
+           `).join('');
+           
+           if (asymChart) {
+               const score = (summary.averages && summary.averages.total_asym) || 0;
+               updateModuleChart(asymChart, { "Balanced": 100 - score, "Asymmetric": score }, 'asymLegend', ['#22d3ee', '#f87171']);
+               document.getElementById('asymScorePercent').innerText = `${(100 - score).toFixed(0)}%`;
+           }
+       }
+
+      if (type === 'touch') {
+          const touchTbody = document.getElementById('touchTableBody');
+          touchTbody.innerHTML = frames.filter(f => (f.confidence || 0) > 0).map(f => {
+              const touchList = f.touches || [];
+              let activity = 'No Contact';
+              if (touchList.includes('MOUTH')) activity = 'Hand on Mouth';
+              else if (touchList.includes('CHIN')) activity = 'Hand on Chin';
+              else if (touchList.length > 0) {
+                  const region = touchList[0].toLowerCase();
+                  activity = 'Hand on ' + region.charAt(0).toUpperCase() + region.slice(1);
+              }
+
+              const status = (f.touch_duration || f.duration || 0) > 0 ? 'Active Touch' : 'Clear';
+              const confidenceFormatted = (f.confidence || 0).toFixed(2) + '%';
+              
+              return `
+                <tr class="group cursor-pointer hover:bg-white/5 transition-all" onclick="jumpToTimestamp(${f.timestamp || 0})">
+                  <td class="font-mono text-cyan-500">#${f.frame_num}</td>
+                  <td class="text-dim">${(f.timestamp || 0).toFixed(2)}s</td>
+                  <td class="text-amber-400 font-bold">${activity}</td>
+                  <td class="${status === 'Active Touch' ? 'text-rose-500' : 'text-emerald-500'} font-bold">${status}</td>
+                  <td class="text-cyan-400 font-mono">${confidenceFormatted}</td>
+                </tr>
+              `;
+          }).join('');
+          
+          if (stressChart) {
+              const dist = summary.region_distribution || summary.distribution || { "None": 100 };
+              updateModuleChart(stressChart, dist, 'stressLegend', ['#f43f5e', '#fbbf24', '#818cf8']);
+              
+              const touchCount = frames.filter(f => (f.confidence || 0) > 0).length;
+              document.getElementById('touchScorePercent').innerText = touchCount;
+              document.getElementById('touchScoreLabel').innerText = 'Incidents';
+          }
+      }
+    }
+
+    function updateModuleChart(chart, dist, legendId, colors) {
+      const labels = Object.keys(dist);
+      const values = labels.map(l => dist[l]);
+      chart.data.labels = labels;
+      chart.data.datasets[0].data = values;
+      chart.data.datasets[0].backgroundColor = colors.slice(0, labels.length);
+      chart.update();
+
+      document.getElementById(legendId).innerHTML = labels.map((l, i) => `
+        <div class="flex justify-between items-center bg-white/5 px-3 py-2 rounded-lg border border-white/5">
+          <span class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full shadow-[0_0_8px_currentColor]" style="background-color: ${colors[i % colors.length]}; color: ${colors[i % colors.length]}"></span>
+            <span class="text-white font-medium">${l}</span>
+          </span>
+          <span class="font-bold text-xs" style="color: ${colors[i % colors.length]}">${dist[l].toFixed(1)}%</span>
+        </div>
+      `).join('');
     }
 
     function updateStatusUI(status, label) {
@@ -1352,245 +1539,279 @@
       else dot.className = "w-2 h-2 bg-gray-500 rounded-full";
     }
 
-    function toggleFullScreen() {
-      const container = document.querySelector(".video-container");
-      if (container) {
-        if (!document.fullscreenElement) container.requestFullscreen();
-        else document.exitFullscreen();
-      }
-    }
-
     function resetConfigurations() {
-      const modules = ["toggleFaceMesh", "toggleEyeGaze", "toggleLipsJaw", "toggleEmotions"];
-      modules.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.checked = (id === "toggleEmotions");
-      });
+      showToast("Configurations Reset", "info");
     }
 
     function openVaultSelection() {
-      VaultComponent.open((item) => {
-        if (item.type !== 'video') { alert("Please select a video file."); return; }
-
-        Loader.show("Loading Evidence");
-
+      VaultComponent.open(async (item) => {
+        if (item.type !== 'video') { showToast("Select a video file", "warning"); return; }
+        currentFilePath = item.filepath;
         const video = document.getElementById("webcam");
         if (mediaStream) { mediaStream.getTracks().forEach(track => track.stop()); mediaStream = null; }
         video.srcObject = null;
         video.src = item.filepath;
         video.setAttribute('controls', 'true');
-        video.style.transform = "none";
+
+        // Respect Mirror Preference from Advanced Tools
+        const prefs = await eel.load_preferences()();
+        if (prefs.success && prefs.preferences && prefs.preferences.mirror_camera) {
+          video.style.transform = "scaleX(-1)";
+        } else {
+          video.style.transform = "none";
+        }
+
         updateStatusUI('vault', 'Vault Analysis');
-        cameraOn = true;
         document.getElementById("camOffState").classList.add("hidden");
         document.getElementById("camOnState").classList.remove("hidden");
-        document.getElementById("camOnState").classList.add("flex");
-
-        const analyseBtn = document.getElementById("analyseBtn");
-        if (analyseBtn) analyseBtn.classList.remove("hidden");
-
-        video.oncanplay = () => {
-          Loader.hide();
-          video.play();
-        };
+        document.getElementById("analyseBtn").classList.remove("hidden");
+        video.oncanplay = () => { video.play(); };
       });
     }
-
     function clearVault() {
+      currentFilePath = null;
       const video = document.getElementById("webcam");
-      const off = document.getElementById("camOffState");
-      const on = document.getElementById("camOnState");
-      const mainBtn = document.getElementById("mainCamBtn");
-      const camBtn = document.getElementById("camBtn");
-
-      if (mediaStream) {
-        mediaStream.getTracks().forEach(track => track.stop());
-        mediaStream = null;
-      }
-
-      video.srcObject = null;
       video.src = "";
       video.removeAttribute('controls');
-      cameraOn = false;
-
-      on.classList.add("hidden");
-      on.classList.remove("flex");
-      off.classList.remove("hidden");
-
-      if (mainBtn) {
-        mainBtn.innerHTML = '<i class="fas fa-video-slash"></i> Camera Off';
-        mainBtn.classList.add("bg-rose-500/10", "text-rose-500", "border-rose-500/30");
-        mainBtn.classList.remove("bg-cyan-500/10", "text-cyan-500", "border-cyan-500/30", "hover:bg-cyan-500", "hover:text-white");
-      }
-      if (camBtn) camBtn.classList.remove("active");
-
-      video.style.transform = "none";
+      document.getElementById("camOnState").classList.add("hidden");
+      document.getElementById("camOffState").classList.remove("hidden");
+      document.getElementById("analyseBtn").classList.add("hidden");
+      document.getElementById("saveReportBtn")?.classList.add("hidden");
       updateStatusUI('ready', 'System Ready');
-
-      if (isRecording) handleSessionToggle();
+      resetUIState();
+      
+      // Clear Charts
+      [emotionChart, eyeChart, jawChart, poseChart, asymChart, stressChart].forEach(c => {
+          if (c) {
+              c.data.datasets[0].data = [100];
+              c.data.labels = ['Waiting'];
+              c.update();
+          }
+      });
+      document.querySelectorAll('[id$="Percent"]').forEach(el => {
+          if (el.id !== 'poseScorePercent') el.innerText = '0%';
+      });
+      document.querySelectorAll('[id$="Legend"]').forEach(el => el.innerHTML = '');
     }
 
-    // Data Simulation Loop
-    setInterval(() => {
-      if (!cameraOn) return;
-      const latency = document.querySelector('.flex.justify-between.w-32 span:last-child');
-      if (latency) {
-        latency.innerText = (10 + Math.floor(Math.random() * 5)) + "MS";
-      }
-    }, 2000);
+    function toggleAnalysisLayout() {
+      const grid = document.getElementById('videoOutputGrid');
+      grid.classList.toggle('md:grid-cols-2');
+      grid.classList.toggle('grid-cols-1');
+      const items = grid.querySelectorAll('.video-inner-wrap');
+      items.forEach(item => {
+          if (grid.classList.contains('md:grid-cols-2')) {
+              item.classList.remove('col-span-full');
+          } else {
+              item.classList.add('col-span-full');
+          }
+      });
+    }
 
-    // Circular Charts Initialization
-    let emotionChart, eyeChart, jawChart;
+    let emotionChart, eyeChart, jawChart, poseChart, asymChart, stressChart;
 
     function initCircularCharts() {
+      const commonOptions = {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        cutout: '80%'
+      };
 
-      const emotionCtx = document.getElementById('emotionDistributionChart').getContext('2d');
-      emotionChart = new Chart(emotionCtx, {
+      emotionChart = new Chart(document.getElementById('emotionDistributionChart').getContext('2d'), {
         type: 'doughnut',
-        data: {
-          labels: ['Neutral', 'Anger', 'Fear'],
-          datasets: [{
-            data: [60, 25, 15],
-            backgroundColor: ['#34d399', '#fbbf24', '#f87171'],
-            borderWidth: 0,
-            cutout: '82%',
-            borderRadius: 8,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              ...tooltipStyle,
-              callbacks: {
-                label: function (context) {
-                  return context.label + ': ' + context.parsed + '%';
-                }
-              }
-            }
-          }
-        }
+        data: { labels: ['Waiting'], datasets: [{ data: [100], backgroundColor: ['#34d399'], borderWidth: 0 }] },
+        options: commonOptions
       });
 
-      const eyeCtx = document.getElementById('eyeMovementChart').getContext('2d');
-      eyeChart = new Chart(eyeCtx, {
+      eyeChart = new Chart(document.getElementById('eyeMovementChart').getContext('2d'), {
         type: 'doughnut',
-        data: {
-          labels: ['Steady Gaze', 'Rapid Blinking'],
-          datasets: [{
-            data: [70, 30],
-            backgroundColor: ['#22d3ee', '#fbbf24'],
-            borderWidth: 0,
-            cutout: '82%',
-            borderRadius: 8,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              ...tooltipStyle,
-              callbacks: {
-                label: function (context) {
-                  return context.label + ': ' + context.parsed + '%';
-                }
-              }
-            }
-          }
-        }
+        data: { labels: ['Waiting'], datasets: [{ data: [100], backgroundColor: ['#22d3ee'], borderWidth: 0 }] },
+        options: commonOptions
       });
 
-      const jawCtx = document.getElementById('lipsJawChart').getContext('2d');
-      jawChart = new Chart(jawCtx, {
+      jawChart = new Chart(document.getElementById('lipsJawChart').getContext('2d'), {
         type: 'doughnut',
-        data: {
-          labels: ['Normal', 'Tensed'],
-          datasets: [{
-            data: [85, 15],
-            backgroundColor: ['#34d399', '#f43f5e'],
-            borderWidth: 0,
-            cutout: '82%',
-            borderRadius: 8,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              ...tooltipStyle,
-              callbacks: {
-                label: function (context) {
-                  return context.label + ': ' + context.parsed + '%';
-                }
-              }
-            }
-          }
-        }
+        data: { labels: ['Waiting'], datasets: [{ data: [100], backgroundColor: ['#34d399'], borderWidth: 0 }] },
+        options: commonOptions
+      });
+
+      poseChart = new Chart(document.getElementById('poseDynamicsChart').getContext('2d'), {
+        type: 'doughnut',
+        data: { labels: ['Waiting'], datasets: [{ data: [100], backgroundColor: ['#818cf8'], borderWidth: 0 }] },
+        options: commonOptions
+      });
+
+      asymChart = new Chart(document.getElementById('asymmetryChart').getContext('2d'), {
+        type: 'doughnut',
+        data: { labels: ['Waiting'], datasets: [{ data: [100], backgroundColor: ['#22d3ee'], borderWidth: 0 }] },
+        options: commonOptions
+      });
+
+      stressChart = new Chart(document.getElementById('stressChart').getContext('2d'), {
+        type: 'doughnut',
+        data: { labels: ['Waiting'], datasets: [{ data: [100], backgroundColor: ['#f43f5e'], borderWidth: 0 }] },
+        options: commonOptions
       });
     }
 
-    // Tooltip Styles
-    const tooltipStyle = {
-      backgroundColor: 'rgba(255, 255, 255, 0.98)',
-      borderColor: 'rgba(0, 118, 214, 0.2)',
-      borderWidth: 1,
-      titleColor: '#0076d6',
-      bodyColor: '#1e293b',
-      padding: 12,
-      cornerRadius: 12
-    };
+    function toggleModuleControls() {
+      const mode = document.getElementById("analysisMode").value;
+      const list = document.getElementById("aloneModuleList");
+      if (mode === 'alone') {
+        list.classList.remove("opacity-50", "pointer-events-none");
+      } else {
+        list.classList.add("opacity-50", "pointer-events-none");
+      }
+    }
 
-    // Initial Load
-    document.addEventListener("DOMContentLoaded", async () => {
-      const result = await eel.get_current_user()();
-      const user = (result.success && result.data) ? result.data : null;
+    function updateVideoGrid(videoUrls, titles) {
+      const grid = document.getElementById('videoOutputGrid');
+      if (videoUrls.length === 0) return;
 
-      if (!user) {
-        window.location.href = 'login.html';
+      if (videoUrls.length === 1) {
+          grid.innerHTML = `
+            <div id="mainVideoWrap" class="relative video-inner-wrap rounded-xl overflow-hidden bg-black col-span-full">
+                <video src="${videoUrls[0]}" class="w-full h-full object-contain" controls autoplay muted playsinline></video>
+            </div>
+          `;
+          return;
+      }
+
+      grid.innerHTML = videoUrls.map((url, i) => `
+        <div class="relative video-inner-wrap rounded-xl overflow-hidden bg-black border border-white/5 hover:border-cyan-500/30 transition-all group">
+            <video src="${url}" class="w-full h-full object-contain" controls muted playsinline></video>
+        </div>
+      `).join('');
+    }
+    async function finalizeAnalysis() {
+      if (!currentFilePath) {
+        showToast("No media loaded for analysis", "warning");
         return;
       }
+
+      const mode = document.getElementById("analysisMode").value;
+      const aloneModule = document.querySelector('input[name="aloneModule"]:checked')?.value;
+
+      if (mode === 'alone' && !aloneModule) {
+        showToast("Please select a specific module", "warning");
+        return;
+      }
+
+      Loader.show(mode === 'pipeline' ? "Engaging Parallel Neural Pipeline..." : `Running Forensic ${aloneModule} Analysis...`);
+
+      try {
+        let result;
+        if (mode === 'pipeline') {
+          result = await eel.run_facial_analysis(currentFilePath, "combined")();
+        } else if (aloneModule === "emotion") {
+          result = await eel.run_emotion_analysis(currentFilePath)();
+        } else {
+          result = await eel.run_facial_analysis(currentFilePath, aloneModule)();
+        }
+
+        if (!result || !result.success) {
+            showToast(result?.message || "Analysis failed", "error");
+            return;
+        }
+
+        lastFacialResult = result;
+        resetUIState();
+        const urls = [];
+        const titles = [];
+
+        if (result.results) {
+            // Combined Analysis
+            const res = result.results;
+            if (res.eye_gaze) { updateFaceUI(res.eye_gaze.summary, 'gaze'); urls.push(res.eye_gaze.video); titles.push('Eye Gaze'); }
+            if (res.head_pose) { updateFaceUI(res.head_pose.summary, 'pose'); urls.push(res.head_pose.video); titles.push('Head Pose'); }
+            if (res.lip_jaw) { updateFaceUI(res.lip_jaw.summary, 'lipjaw'); urls.push(res.lip_jaw.video); titles.push('Lip/Jaw'); }
+            if (res.asymmetry) { updateFaceUI(res.asymmetry.summary, 'asymmetry'); urls.push(res.asymmetry.video); titles.push('Asymmetry'); }
+            if (res.hand_touch) { updateFaceUI(res.hand_touch.summary, 'touch'); urls.push(res.hand_touch.video); titles.push('Hand Touch'); }
+            if (res.emotion) { updateEmotionUI(res.emotion.summary); urls.push(res.emotion.video); titles.push('Emotion'); }
+        } else {
+            // Single Module
+            if (result.type === 'emotion') {
+                updateEmotionUI(result.summary);
+            } else {
+                updateFaceUI(result.summary, result.type);
+            }
+            urls.push(result.video_url);
+            titles.push(result.type || 'Forensic Stream');
+        }
+
+        updateVideoGrid(urls, titles);
+        document.getElementById('saveReportBtn')?.classList.remove('hidden');
+        showToast("Forensic Analysis Complete", "success");
+
+      } catch (err) {
+        console.error("Analysis Error:", err);
+        showToast("Forensic Analysis Failed", "error");
+      } finally {
+        Loader.hide();
+      }
+    }
+
+    async function saveFacialReport() {
+      if (!lastFacialResult) {
+        showToast("No analysis data to save", "warning");
+        return;
+      }
+      Loader.show("Saving Facial Analysis Report...");
+      try {
+        const report = {
+          type: 'facial',
+          source_file: currentFilePath || 'live_recording',
+          full_data: lastFacialResult,
+          timestamp: new Date().toISOString(),
+          analysis_date: new Date().toISOString()
+        };
+        const result = await eel.save_analysis_report(report)();
+        if (result && result.success) {
+          showToast("Report saved successfully", "success");
+        } else {
+          throw new Error(result?.message || "Save failed");
+        }
+      } catch (e) {
+        console.error("Save error:", e);
+        showToast("Failed to save report: " + e.message, "error");
+      } finally {
+        Loader.hide();
+      }
+    }
+
+    function jumpToTimestamp(ts) {
+        const videos = document.querySelectorAll('#videoOutputGrid video');
+        videos.forEach(v => {
+            v.currentTime = ts;
+            v.play().catch(() => {}); 
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = 'login.html'; return; }
+      
       const activeMember = document.querySelector('.active-member-info span.ml-1');
       if (activeMember) activeMember.textContent = `${user.firstName} ${user.lastName} • Unit #${user.username.toUpperCase()}`;
 
       populateDevices();
       initCircularCharts();
-      populateMockTables();
 
       const urlParams = new URLSearchParams(window.location.search);
       const autoFile = urlParams.get('file');
       if (autoFile) {
-        Loader.show("Loading Evidence");
+        currentFilePath = autoFile;
+        updateStatusUI('vault', 'Vault Analysis');
         const video = document.getElementById("webcam");
-        if (mediaStream) { mediaStream.getTracks().forEach(track => track.stop()); mediaStream = null; }
-        video.srcObject = null;
         video.src = autoFile;
         video.setAttribute('controls', 'true');
         video.style.transform = "none";
-        updateStatusUI('vault', 'Vault Analysis');
-        cameraOn = true;
-        document.getElementById("camOffState").classList.add("hidden");
-        document.getElementById("camOnState").classList.remove("hidden");
-        document.getElementById("camOnState").classList.add("flex");
 
-        const analyseBtn = document.getElementById("analyseBtn");
-        if (analyseBtn) analyseBtn.classList.remove("hidden");
-
-        video.oncanplay = () => {
-          Loader.hide();
-          video.play();
-          startAnalysisProcessing();
-        };
+        document.getElementById("camOffState").classList.add("hidden");        document.getElementById("camOnState").classList.remove("hidden");
+        document.getElementById("analyseBtn").classList.remove("hidden");
+        video.oncanplay = () => video.play();
       }
-
-      startAnalysisProcessing();
     });
   </script>
 </body>
-
-</html>
+</html>/html>

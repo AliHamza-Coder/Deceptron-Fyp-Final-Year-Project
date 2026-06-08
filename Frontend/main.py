@@ -20,14 +20,12 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 WEB_DIR = BASE_DIR / "web"
 
+import config as app_config
+BACKEND_URL = app_config.BACKEND_URL
+
 # Persistent storage directory (survives app restarts and PyInstaller extraction)
 DATA_DIR = Path.home() / ".deceptron"
-UPLOADS_DIR = DATA_DIR / "uploads"
-RECORDINGS_DIR = DATA_DIR / "recordings"
-
-# Ensure required directories exist
-UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
-RECORDINGS_DIR.mkdir(parents=True, exist_ok=True)
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 # Import our custom modules
 from modules import database
@@ -100,6 +98,13 @@ def response(success=True, data=None, message=""):
         "message": message
     }
 
+def _get_user_dirs(username):
+    user_dir = DATA_DIR / username
+    return {
+        'uploads': user_dir / "uploads",
+        'recordings': user_dir / "recordings",
+    }
+
 @eel.expose
 def logout():
     """Log out the current user (standardized)"""
@@ -136,7 +141,11 @@ def initiate_upload(filename, total_size, file_type, is_recording=False):
             
         upload_id = str(uuid.uuid4())
         safe_filename = re.sub(r'[^\w\-.]', '_', os.path.basename(filename))
-        temp_path = UPLOADS_DIR / f"temp_{upload_id}"
+        
+        dirs = _get_user_dirs(current_user['username'])
+        target_dir = dirs['recordings'] if is_recording else dirs['uploads']
+        target_dir.mkdir(parents=True, exist_ok=True)
+        temp_path = target_dir / f"temp_{upload_id}"
         
         active_uploads[upload_id] = {
             'filename': safe_filename,
@@ -145,7 +154,7 @@ def initiate_upload(filename, total_size, file_type, is_recording=False):
             'temp_path': temp_path,
             'username': current_user['username'],
             'is_recording': is_recording,
-            'handle': open(temp_path, 'wb') # Open handle immediately for speed
+            'handle': open(temp_path, 'wb')
         }
             
         return response(data={'upload_id': upload_id})
@@ -187,22 +196,15 @@ def finalize_upload(upload_id):
             
         info = active_uploads.pop(upload_id)
         
-        # Close handle before renaming
         if 'handle' in info:
             info['handle'].close()
             
-        # Determine target directory based on type
-        target_dir = UPLOADS_DIR
-        route_prefix = "/data/uploads/"
+        username = info['username']
+        dirs = _get_user_dirs(username)
+        target_dir = dirs['recordings'] if info.get('is_recording') else dirs['uploads']
+        route_prefix = f"/data/{username}/recordings/" if info.get('is_recording') else f"/data/{username}/uploads/"
         
-        # Check if this is a recording
-        if info.get('is_recording'):
-            target_dir = RECORDINGS_DIR
-            route_prefix = "/data/recordings/"
-            
-        # Ensure target directory exists
-        if not target_dir.exists():
-            target_dir.mkdir(parents=True, exist_ok=True)
+        target_dir.mkdir(parents=True, exist_ok=True)
 
         final_path = target_dir / info['filename']
         
@@ -214,7 +216,7 @@ def finalize_upload(upload_id):
         os.rename(info['temp_path'], final_path)
         
         relative_path = f"{route_prefix}{info['filename']}"
-        return database.add_upload(info['username'], info['filename'], info['type'], info['size_str'], relative_path)
+        return database.add_upload(username, info['filename'], info['type'], info['size_str'], relative_path)
     except Exception as e:
         import traceback
         print(f"❌ Error finalizing upload: {e}")
@@ -231,18 +233,17 @@ def save_recording(filename, base64_data, category):
         if not current_user:
             return {'success': False, 'message': 'Not logged in'}
         
-        # 1. Ensure recordings directory exists
-        if not RECORDINGS_DIR.exists():
-            RECORDINGS_DIR.mkdir(parents=True, exist_ok=True)
-            
-        # 2. Clean filename and ensure extension
-        safe_filename = re.sub(r'[^\w\-.]', '_', os.path.basename(filename))
-        if not safe_filename.endswith('.webm'):
-            safe_filename += '.webm'
-            
-        file_path = RECORDINGS_DIR / safe_filename
+        username = current_user['username']
+        dirs = _get_user_dirs(username)
+        rec_dir = dirs['recordings']
+        rec_dir.mkdir(parents=True, exist_ok=True)
         
-        # 3. Decode and save
+        safe_filename = re.sub(r'[^\w\-.]', '_', os.path.basename(filename))
+        base, _ = os.path.splitext(safe_filename)
+        safe_filename = base + '.mp4'
+            
+        file_path = rec_dir / safe_filename
+        
         if ',' in base64_data:
             base64_data = base64_data.split(',')[1]
             
@@ -252,12 +253,11 @@ def save_recording(filename, base64_data, category):
             
         print(f"🎥 Recording saved: {file_path}")
         
-        # 4. Add to database
         size_mb = f"{len(file_content) / (1024*1024):.1f} MB"
-        relative_path = f"/data/recordings/{safe_filename}"
+        relative_path = f"/data/{username}/recordings/{safe_filename}"
         
         return database.add_upload(
-            current_user['username'], 
+            username, 
             safe_filename, 
             'video' if category == 'live' else 'audio', 
             size_mb, 
@@ -277,18 +277,13 @@ def delete_upload_record(upload_id):
         if not current_user:
             return {'success': False, 'message': 'Not logged in'}
         
-        # 1. Delete from database
         result = database.delete_upload(upload_id, current_user['username'])
         
         if result['success']:
-            # 2. Try to delete the physical file
             upload_data = result.get('data')
             if upload_data and 'filepath' in upload_data:
-                # Use the new path structure to find the file
-                # filepath example: "/data/recordings/filename.webm"
                 db_path = upload_data['filepath']
                 if db_path.startswith('/data/'):
-                    # Map route path back to physical disk path
                     relative_to_data = db_path.replace('/data/', '', 1)
                     file_path = DATA_DIR / relative_to_data
                     
@@ -298,15 +293,6 @@ def delete_upload_record(upload_id):
                             print(f"🗑️ Physically deleted: {file_path}")
                         except Exception as e:
                             print(f"⚠️ Failed to delete physical file: {e}")
-                else:
-                    # Fallback for old legacy paths if they exist
-                    filename = os.path.basename(db_path)
-                    # Try both locations
-                    for d in [UPLOADS_DIR, RECORDINGS_DIR]:
-                        p = d / filename
-                        if p.exists():
-                            p.unlink()
-                            break
             
             return response()
         else:
@@ -382,6 +368,105 @@ def load_preferences():
     
     return database.get_user_preferences(current_user['username'])
 
+
+@eel.expose
+def run_voice_analysis(relative_path):
+    """Bridge to FastAPI Voice Analysis"""
+    try:
+        import requests
+        clean_path = relative_path.replace('/data/', '', 1)
+        abs_path = str(DATA_DIR / clean_path)
+        
+        print(f"🎤 Running Voice Analysis on: {abs_path}")
+        response = requests.get(f"{BACKEND_URL}/analyze/voice?file_path={abs_path}")
+        return response.json()
+    except Exception as e:
+        print(f"❌ Voice API Error: {e}")
+        return {'success': False, 'message': str(e)}
+
+@eel.expose
+def run_emotion_analysis(relative_path):
+    """Bridge to FastAPI Emotion Analysis"""
+    try:
+        import requests
+        clean_path = relative_path.replace('/data/', '', 1)
+        abs_path = str(DATA_DIR / clean_path)
+        
+        print(f"🎭 Running Emotion Analysis on: {abs_path}")
+        response = requests.get(f"{BACKEND_URL}/analyze/face/emotion?file_path={abs_path}")
+        return response.json()
+    except Exception as e:
+        print(f"❌ Emotion API Error: {e}")
+        return {'success': False, 'message': str(e)}
+
+@eel.expose
+def run_facial_analysis(relative_path, module_type="pipeline"):
+    """Bridge to FastAPI Facial Analysis (gaze, pose, touch, etc)"""
+    try:
+        import requests
+        clean_path = relative_path.replace('/data/', '', 1)
+        abs_path = str(DATA_DIR / clean_path)
+        
+        if module_type == "lips":
+            module_type = "lipjaw"
+            
+        print(f"👁️ Running Face Analysis ({module_type}) on: {abs_path}")
+        
+        if module_type and module_type not in ("pipeline", "full", "combined"):
+            endpoint = f"{BACKEND_URL}/analyze/face/{module_type}?file_path={abs_path}"
+        else:
+            endpoint = f"{BACKEND_URL}/analyze/face?file_path={abs_path}"
+            
+        response = requests.get(endpoint)
+        return response.json()
+    except Exception as e:
+        print(f"❌ Facial API Error: {e}")
+        return {'success': False, 'message': str(e)}
+
+@eel.expose
+def run_full_pipeline(relative_path):
+    """Bridge to Full Deception Pipeline"""
+    try:
+        import requests
+        clean_path = relative_path.replace('/data/', '', 1)
+        abs_path = str(DATA_DIR / clean_path)
+        
+        print(f"⚙️ Running Full Pipeline on: {abs_path}")
+        response = requests.get(f"{BACKEND_URL}/analyze/pipeline?file_path={abs_path}")
+        return response.json()
+    except Exception as e:
+        print(f"❌ Pipeline API Error: {e}")
+        return {'success': False, 'message': str(e)}
+
+@eel.expose
+def save_analysis_report(report_data):
+    """Save analysis results as a persistent report"""
+    if not current_user:
+        return {'success': False, 'message': 'Not logged in'}
+    return database.save_report(current_user['username'], report_data)
+
+@eel.expose
+def get_reports():
+    """Get user's saved reports"""
+    if not current_user:
+        return response(success=False, message="Not logged in")
+    try:
+        data = database.get_user_reports(current_user['username'])
+        # Sort by timestamp descending
+        data.sort(key=lambda x: x.get('analysis_date', x.get('timestamp', '')), reverse=True)
+        return response(data=data)
+    except Exception as e:
+        return response(success=False, message=str(e))
+
+@eel.expose
+def delete_report(report_id):
+    """Delete a specific forensic report"""
+    if not current_user:
+        return response(success=False, message="Not logged in")
+    try:
+        return database.delete_report(report_id, current_user['username'])
+    except Exception as e:
+        return response(success=False, message=str(e))
 
 # ========================================
 # START THE APPLICATION

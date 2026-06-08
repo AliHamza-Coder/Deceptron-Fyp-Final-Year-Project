@@ -6,7 +6,7 @@
 
 <div align="center">
 
-![Project Version](https://img.shields.io/badge/Version-1.3.0--Enterprise-00dbff?style=for-the-badge&logo=shield)
+![Project Version](https://img.shields.io/badge/Version-1.4.0--Enterprise-00dbff?style=for-the-badge&logo=shield)
 ![Python Backend](https://img.shields.io/badge/Backend-Python--3.9-FFD43B?style=for-the-badge&logo=python)
 ![Eel UI](https://img.shields.io/badge/Frontend-Vanilla--ES6-blue?style=for-the-badge&logo=javascript)
 ![License](https://img.shields.io/badge/License-Proprietary-rose?style=for-the-badge)
@@ -29,21 +29,33 @@ Built for high-stakes environments, Deceptron features a **"Forensic Neon"** des
 ### 📡 Live Analysis Unit
 *   **Neural Vision Mapping**: Real-time subject tracking with localized forensic glows.
 *   **Multi-Modal Stream**: Dedicated panels for live neural data, acoustic indicators, and subject emotion mapping.
-*   **Low-Latency Capture**: High-performance video/audio recording with zero-jitter chunking.
+*   **Low-Latency Capture**: High-performance video/audio recording with **.mp4** standard and **1MB chunked** storage.
 
 ### 🎭 Facial Micro-Expressions
 *   **High-Fidelity Detection**: Specialized module for subtle facial changes.
     *   *Real-time indicator feedback using the Deceptron standard (Cyan/Rose).*
+*   **Natural View Playback**: Integrated YouTube-style playback (Unmirrored) for accurate evidence review.
 *   **Forensic Video Preview**: Clean containerized output with professional telemetry overlays.
+*   **Tabbed Face Analysis**: 6-tab switcher (Emotion, Eyes, Lip/Jaw, Head, Asymmetry, Touch) organizes analysis results without clutter. All table body IDs preserved for backward compatibility.
 
 ### 🎙️ Forensic Voice Analysis
 *   **Spectral Indicators**: Real-time frequency stability and acoustic jitter tracking.
 *   **Emotion Mapping**: High-contrast HSL emotion cards (Cyan, Purple, Amber, Rose).
 *   **Waveform Visualization**: Interactive zoomable waveforms using `WaveSurfer.js`.
 
+### 🧠 NLP Deception Analysis
+*   **Flag Pills**: Color-coded deception flags — evasion/contradiction (rose), cognitive_load/distancing_language (purple), vagueness/over_explanation (amber).
+*   **Bilingual Summary**: Toggle between English and Roman Urdu summary via `toggleNlpLanguage()`.
+*   **Groq-Powered**: Llama-3.3-70B reasoning with `max_tokens=2048` for forensic text analysis.
+
+### 🔗 Fusion Breakdown
+*   **5 Weighted Bars**: Face Behavioral (cyan), Face Emotion (emerald), Voice Stress (amber), NLP Deception (purple), Mismatch (rose).
+*   **Cross-Modal Flags**: Warning/info indicators for inter-module conflicts.
+*   **Bilingual Verdict**: Verdict badge with EN/UR language toggle.
+
 ### 🗂️ Case Reports & Management
 *   **Automated Case Reports**: Instant generation of forensic metrics with trend visualizations.
-*   **Evidence Vault**: Secure, persistent storage for all case recordings and uploads.
+*   **Evidence Vault**: Secure, persistent storage in `~/.deceptron/recordings/` for all case evidence.
 *   **Universal Search**: Quickly locate cases by analyst, ID, or subject name.
 
 ---
@@ -120,8 +132,11 @@ The final executable will be located in the `dist/` directory as `deceptron.exe`
 ## 🚀 Presentation Guide (For FYP Examiners)
 When presenting Deceptron, ensure the following modules are showcased:
 1.  **Auth Flow**: Demonstrate the secure login with password eye-toggles.
-2.  **Live Session**: Start the camera to show the Neural Vision panel.
-3.  **Voice Analysis**: Load a pre-recorded `.webm` to show spectral indicators.
+2.  **Live Session**: Start the camera to show the live preview panel.
+3.  **Analysis Pipeline**: Run analysis on a recording to demonstrate:
+    - **NLP Card**: Flag pills with bilingual EN/UR summary toggle.
+    - **Face Tables**: Tab switcher across all 6 face analysis dimensions.
+    - **Fusion Breakdown**: Weighted bars + cross-modal flags + bilingual verdict.
 4.  **Dashboard Hub**: Showcase the metrics overview and recent case history.
 5.  **Evidence Vault**: Show the persistent storage and case deletion flows.
 
@@ -131,7 +146,7 @@ When presenting Deceptron, ensure the following modules are showcased:
 *   **Project Title**: Deceptron — Advanced Truth Verification
 *   **Project Lead**: Ali Hamza
 *   **Designation**: Final Year Project (FYP)
-*   **Version**: 1.3.0 Standard
+*   **Version**: 1.4.0 Standard
 
 ---
 

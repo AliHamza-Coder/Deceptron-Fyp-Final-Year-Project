@@ -30,6 +30,7 @@
             --border-subtle: #334155;
             /* Visible Slate Border */
             --input-bg: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.7);
         }
 
         body {
@@ -78,6 +79,10 @@
 
         body.sidebar-collapsed #restore-sidebar {
             display: flex;
+        }
+
+        video[style*="scaleX(-1)"]::-webkit-media-controls {
+            transform: scaleX(-1);
         }
 
     .btn-primary {
@@ -279,14 +284,14 @@
                 </div>
             </div>
             <div class="flex items-center space-x-3">
-                <div class="flex space-x-4">
-                    <button class="btn-outline px-6 py-2 text-[10px]" onclick="window.print()">
-                        <i class="fas fa-download text-primary-blue"></i> Export PDF
-                    </button>
-                    <button class="btn-primary border-rose-500/30 text-rose-400 hover:bg-rose-600 hover:text-white text-[10px]">
-                        Archive Session
-                    </button>
-                </div>
+            <div class="flex space-x-4">
+                <button class="btn-outline px-6 py-2 text-[10px]" onclick="exportReportJSON()">
+                    <i class="fas fa-download text-primary-blue"></i> Export JSON
+                </button>
+                <button class="btn-outline px-6 py-2 text-[10px]" onclick="window.print()">
+                    <i class="fas fa-file-pdf text-primary-blue"></i> Export PDF
+                </button>
+            </div>
             </div>
         </header>
 
@@ -305,8 +310,20 @@
                         <p class="text-[10px] font-bold text-rose-400 uppercase mt-1 tracking-widest">Risk Index</p>
                     </div>
                 </div>
-                <div class="chart-container">
-                    <canvas id="truthChart"></canvas>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="chart-container">
+                        <canvas id="truthChart"></canvas>
+                    </div>
+                    <div class="video-container glass overflow-hidden relative group">
+                        <video id="reportVideo" class="w-full h-full object-cover" controls>
+                            <source src="" type="video/mp4">
+                        </video>
+                        <div class="absolute top-4 left-4 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span class="px-3 py-1 bg-black/60 backdrop-blur text-[10px] font-bold text-cyan-400 rounded-lg border border-cyan-500/30">
+                                <i class="fas fa-play-circle mr-2"></i> EVIDENCE PLAYER
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -469,91 +486,364 @@
             </div>
         </div>
     </main>
-
     <script>
-        const ctx = document.getElementById('truthChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['START', '2m', '4m', '6m', '8m', '10m', 'END'],
-                datasets: [{
-                    label: 'Deception Level',
-                    data: [10, 45, 30, 85, 92, 78, 80],
-                    borderColor: '#f43f5e',
-                    backgroundColor: 'rgba(244, 63, 94, 0.05)',
-                    borderWidth: 4,
-                    tension: 0.4,
-                    fill: true,
-                    pointBackgroundColor: '#f43f5e',
-                    pointRadius: 6,
-                    pointHoverRadius: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        grid: { color: 'rgba(255,255,255,0.05)' },
-                        ticks: { color: '#94a3b8', font: { family: 'Inter', weight: 'bold' } }
-                    },
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: '#94a3b8', font: { family: 'Inter', weight: 'bold' } }
+        async function loadReportDetail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const reportId = urlParams.get('id');
+            if (!reportId) {
+                alert("Report ID missing");
+                window.location.href = 'reports.html';
+                return;
+            }
+
+            try {
+                const response = await eel.get_reports()();
+                if (response.success) {
+                    const report = response.data.find(r => r.id === reportId);
+                    if (report) {
+                        renderReport(report);
+                    } else {
+                        alert("Report not found");
+                        window.location.href = 'reports.html';
                     }
                 }
-            }
-        });
-
-        // Radial Charts
-        const ctxRadialA = document.getElementById('radialMetricA').getContext('2d');
-        new Chart(ctxRadialA, {
-            type: 'doughnut',
-            data: {
-                datasets: [{
-                    data: [82, 18],
-                    backgroundColor: ['#0076D6', 'rgba(0,118,214,0.05)'],
-                    borderWidth: 0,
-                    cutout: '80%',
-                    borderRadius: 10
-                }]
-            },
-            options: {
-                plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
-
-        const ctxRadialB = document.getElementById('radialMetricB').getContext('2d');
-        new Chart(ctxRadialB, {
-            type: 'doughnut',
-            data: {
-                datasets: [{
-                    data: [65, 35],
-                    backgroundColor: ['#f43f5e', 'rgba(0,118,214,0.05)'],
-                    borderWidth: 0,
-                    cutout: '80%',
-                    borderRadius: 10
-                }]
-            },
-            options: {
-                plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
-
-        function closeApp() {
-            if (confirm("Are you sure you want to logout?")) {
-                window.location.href = 'login.html';
+            } catch (error) {
+                console.error("Error loading report:", error);
             }
         }
-    </script>
+
+        function renderReport(report) {
+            // Normalize: data may be nested inside full_data
+            if (report.full_data && typeof report.full_data === 'object') {
+                Object.keys(report.full_data).forEach(k => {
+                    if (report[k] === undefined) report[k] = report.full_data[k];
+                });
+            }
+
+            document.querySelector('h1').innerText = report.type.toUpperCase() + " Intelligence Report";
+            document.querySelector('.text-dim.font-bold').innerText = `Session Identity: #${report.id.substring(0,8)} • Verified`;
+            
+            const video = document.getElementById('reportVideo');
+            if (report.source_file) {
+                const relativePath = report.source_file.split('.deceptron').pop().replace(/\\/g, '/');
+                video.src = `/data${relativePath}`;
+            }
+            
+            const scoreDisplay = document.querySelector('.text-5xl.font-bold');
+            let score = 0;
+            let label = "Confidence Rating";
+            
+            if (report.type === 'pipeline') {
+                score = Math.round(report.overall_deception_score || 0);
+                label = "Deception Risk";
+            } else if (report.type === 'voice') {
+                const da = report.deception_analysis || {};
+                score = Math.round(da.overall_deception_score || da.confidence_percent || 0);
+                label = "Deception Score";
+            } else if (report.type === 'facial' || report.type === 'emotion') {
+                const emo = report.emotion || (report.results && report.results.emotion) || {};
+                const dist = emo.summary && emo.summary.distribution;
+                if (dist && typeof dist === 'object') {
+                    const vals = Object.values(dist);
+                    const top = vals.length ? Math.max(...vals) : 0;
+                    score = Math.round(top);
+                } else {
+                    score = Math.round(emo.confidence * 100 || 0);
+                }
+                label = "Emotion Match";
+            }
+            
+            scoreDisplay.innerText = score + "%";
+            document.querySelector('.text-right p').innerText = label;
+
+            const noteArea = document.querySelector('textarea');
+            if (noteArea) {
+                noteArea.value = report.conclusion || '';
+            }
+
+            updateMainChart(report, score);
+
+            // Update Transcript
+            const transcriptBox = document.querySelector('.transcript-box');
+            if (report.type === 'pipeline' && report.segments && report.segments.length) {
+                transcriptBox.innerHTML = report.segments.map((seg, i) => {
+                    const f = seg.fusion || {};
+                    const rs = seg.raw_scores || {};
+                    const emo = (rs.emotion && rs.emotion.dominant_emotion) || 'Neutral';
+                    const scoreSeg = Math.round(f.final_deception_score || 0);
+                    const start = seg.start_sec || seg.start_time || 0;
+                    const end = seg.end_sec || seg.end_time || 0;
+                    const text = seg.transcript_original || seg.transcription || '';
+                    return `
+                    <div class="transcript-item cursor-pointer hover:bg-slate-800/50 transition-all p-3 rounded-lg" onclick="document.getElementById('reportVideo').currentTime = ${start}">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[10px] font-bold text-primary-blue uppercase tracking-widest">Segment SEG_${String(i+1).padStart(3,'0')} [${start}s - ${end}s]</span>
+                            <span class="text-[9px] px-2 py-0.5 ${scoreSeg > 60 ? 'bg-rose-600/20 text-rose-400 border-rose-500/20' : 'bg-cyan-600/20 text-cyan-400 border-cyan-500/20'} border rounded-full font-bold uppercase">
+                                ${scoreSeg > 60 ? 'Deception Spike' : 'Stable Signal'}
+                            </span>
+                        </div>
+                        <p class="text-sm text-slate-300 leading-relaxed italic mb-2">"${text || 'No vocal data'}"</p>
+                        <div class="flex gap-4 text-[9px] font-bold text-dim uppercase">
+                             <span><i class="fas fa-heartbeat mr-1"></i> Stress: ${scoreSeg}%</span>
+                             <span><i class="fas fa-smile mr-1"></i> Emotion: ${emo}</span>
+                        </div>
+                    </div>`;
+                }).join('');
+            } else if (report.type === 'voice') {
+                const orig = report.transcription_original || report.transcription || '';
+                transcriptBox.innerHTML = `
+                    <div class="transcript-item p-3">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[10px] font-bold text-primary-blue uppercase tracking-widest">Full Transcription</span>
+                        </div>
+                        <p class="text-sm text-slate-300 leading-relaxed italic">"${orig}"</p>
+                    </div>`;
+            } else if ((report.type === 'facial' || report.type === 'emotion') && report.results) {
+                const emo = report.results.emotion || {};
+                const frames = emo.summary && emo.summary.frames ? emo.summary.frames : [];
+                transcriptBox.innerHTML = `
+                    <div class="transcript-item p-3">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-[10px] font-bold text-primary-blue uppercase tracking-widest">Facial Analysis Overview</span>
+                        </div>
+                        <p class="text-sm text-slate-300 leading-relaxed">${frames.length} frames analyzed across ${Object.keys(report.results).length} modalities.</p>
+                    </div>`;
+            } else {
+                transcriptBox.innerHTML = `
+                    <div class="py-10 text-center opacity-50">
+                        <i class="fas fa-closed-captioning text-3xl mb-3"></i>
+                        <p class="text-xs uppercase font-bold tracking-widest">No transcript available for this session type</p>
+                    </div>`;
+            }
+
+            // Context Card
+            const contextItems = document.querySelectorAll('article.glass:nth-child(1) .flex.justify-between span:last-child');
+            if (contextItems.length >= 4) {
+                contextItems[0].innerText = (report.source_file || '').split('/').pop() || 'N/A';
+                contextItems[1].innerText = (report.type || '').toUpperCase();
+                contextItems[3].innerText = (report.id || '').substring(0,12);
+            }
+
+            // Conclusion Card
+            const conclusionP = document.querySelector('article.glass:nth-child(2) p');
+            const conclusionList = document.querySelector('article.glass:nth-child(2) ul');
+            const verdictSpan = document.querySelector('article.glass:nth-child(2) span.px-3');
+
+            if (report.type === 'pipeline') {
+                const risk = Math.round(report.overall_deception_score || 0);
+                const flags = report.key_flags || [];
+                conclusionP.innerText = report.conclusion || "Full multi-modal analysis concluded.";
+                conclusionList.innerHTML = `
+                    <li class="flex items-center"><span class="w-1 h-1 bg-rose-500 rounded-full mr-2"></span> Risk: ${risk}%</li>
+                    <li class="flex items-center"><span class="w-1 h-1 bg-rose-500 rounded-full mr-2"></span> Markers: ${(report.segments || []).length} segments</li>
+                    <li class="flex items-center"><span class="w-1 h-1 bg-rose-500 rounded-full mr-2"></span> Flags: ${flags.length > 0 ? flags.join(', ') : 'None'}</li>`;
+                verdictSpan.innerText = `Verdict: ${risk > 60 ? 'HIGH RISK' : 'STABLE'}`;
+                verdictSpan.className = risk > 60 ? 'px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 text-rose-500 text-[9px] font-bold uppercase rounded-lg shadow-[0_0_15px_rgba(244,63,94,0.1)]' : 'px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[9px] font-bold uppercase rounded-lg shadow-[0_0_15px_rgba(16,185,129,0.1)]';
+            } else if (report.type === 'voice') {
+                const da = report.deception_analysis || {};
+                const mt = report.micro_tremors || {};
+                const sc = report.spectral_clarity || {};
+                const flags = da.triggered_flags || [];
+                conclusionP.innerText = `Acoustic profile score: ${score}%. ${flags.length > 0 ? 'Flags: ' + flags.join(', ') : 'No significant markers triggered.'}`;
+                conclusionList.innerHTML = `
+                    <li class="flex items-center"><span class="w-1 h-1 bg-cyan-500 rounded-full mr-2"></span> Jitter: ${(mt.jitter_local_percent || 0).toFixed(4)}</li>
+                    <li class="flex items-center"><span class="w-1 h-1 bg-cyan-500 rounded-full mr-2"></span> Shimmer: ${(mt.shimmer_local_percent || 0).toFixed(4)}</li>
+                    <li class="flex items-center"><span class="w-1 h-1 bg-cyan-500 rounded-full mr-2"></span> HNR: ${(sc.hnr_db || 0).toFixed(2)} dB</li>`;
+                verdictSpan.innerText = `Verdict: ${score > 60 ? 'AUTHENTIC' : 'SUSPICIOUS'}`;
+                verdictSpan.className = score > 60 ? 'px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[9px] font-bold uppercase rounded-lg' : 'px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 text-rose-500 text-[9px] font-bold uppercase rounded-lg';
+            } else {
+                const res = report.results || {};
+                const emo = res.emotion || report.emotion || {};
+                const dist = emo.summary && emo.summary.distribution;
+                const topEmotion = dist ? Object.entries(dist).sort((a, b) => b[1] - a[1])[0] : null;
+                const dominant = topEmotion ? topEmotion[0] : (emo.dominant_emotion || 'Neutral');
+                const frameCount = (emo.summary && emo.summary.frames && emo.summary.frames.length) || 0;
+                conclusionP.innerText = `Visual forensic audit identified ${dominant} as the dominant state. ${frameCount} frames analyzed.`;
+                conclusionList.innerHTML = `
+                    <li class="flex items-center"><span class="w-1 h-1 bg-purple-500 rounded-full mr-2"></span> Emotion: ${dominant}</li>
+                    <li class="flex items-center"><span class="w-1 h-1 bg-purple-500 rounded-full mr-2"></span> Frames: ${frameCount}</li>
+                    <li class="flex items-center"><span class="w-1 h-1 bg-purple-500 rounded-full mr-2"></span> Type: ${emo.type || report.type || 'Standard'}</li>`;
+                verdictSpan.innerText = `Verdict: ANALYSED`;
+            }
+
+            initRadialCharts(report, score);
+        }
+
+        function updateMainChart(report, score) {
+            const ctx = document.getElementById('truthChart').getContext('2d');
+            let chartData = [];
+            let labels = [];
+            
+            if (report.type === 'pipeline' && report.timeline && report.timeline.length) {
+                chartData = report.timeline.map(t => t.deception_score);
+                labels = report.timeline.map(t => t.timestamp);
+            } else if (report.type === 'voice') {
+                chartData = [score, 100 - score, 50];
+                labels = ['Score', 'Baseline', 'Threshold'];
+            } else if ((report.type === 'facial' || report.type === 'emotion') && report.results) {
+                const emo = report.results.emotion || {};
+                const frames = (emo.summary && emo.summary.frames) || [];
+                if (frames.length) {
+                    chartData = frames.filter((_,i) => i % Math.max(1, Math.floor(frames.length/20)) === 0).map(f => f.confidence * 100 || 50);
+                    labels = frames.filter((_,i) => i % Math.max(1, Math.floor(frames.length/20)) === 0).map(f => (f.timestamp || f.frame_num || 0).toString() + 's');
+                }
+            }
+
+            if (window._detailChart) window._detailChart.destroy();
+            window._detailChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels.length ? labels : ['No Data'],
+                    datasets: [{
+                        label: 'Forensic Confidence',
+                        data: chartData.length ? chartData : [0],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.05)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: '#ef4444',
+                        pointHoverBorderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (e, elements) => {
+                        if (elements.length > 0 && report.timeline) {
+                            const index = elements[0].index;
+                            const ts = report.timeline[index] && report.timeline[index].second;
+                            if (ts !== undefined) {
+                                const video = document.getElementById('reportVideo');
+                                if (video) { video.currentTime = ts; video.play(); showToast(`Jumping to ${ts.toFixed(1)}s`, "info"); }
+                            }
+                        }
+                    },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => `Risk: ${context.parsed.y}% - Click to Play`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function initRadialCharts(report, score) {
+            score = score || 0;
+            const ctxA = document.getElementById('radialMetricA').getContext('2d');
+            const ctxB = document.getElementById('radialMetricB').getContext('2d');
+            
+            let valA = 0;
+            let valB = 0;
+            let labelA = "Primary";
+            let labelB = "Secondary";
+
+            if (report.type === 'pipeline') {
+                const firstSeg = report.segments && report.segments[0];
+                const raw = firstSeg && firstSeg.raw_scores;
+                const vs = raw && raw.voice_stress;
+                valA = Math.round((report.overall_deception_score || 0));
+                valB = Math.round((vs && vs.vocal_strain_score) || 0);
+                labelA = "Deception";
+                labelB = "Vocal Stress";
+            } else if (report.type === 'voice') {
+                valA = Math.round(score);
+                const mt = report.micro_tremors || {};
+                valB = Math.round((1 - (mt.jitter_local_percent || 0)) * 100);
+                labelA = "Overall";
+                labelB = "Jitter Inversion";
+            } else {
+                const res = report.results || {};
+                const emo = res.emotion || report.emotion || {};
+                const dist = emo.summary && emo.summary.distribution;
+                if (dist) {
+                    const vals = Object.values(dist);
+                    valA = Math.round((vals.length ? Math.max(...vals) : 0));
+                } else {
+                    valA = Math.round(emo.confidence * 100 || 0);
+                }
+                valB = Math.round(valA * 0.7);
+                labelA = "Emotion Match";
+                labelB = "Tracking";
+            }
+            
+            new Chart(ctxA, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [valA, 100 - valA],
+                        backgroundColor: ['#2563eb', 'rgba(255,255,255,0.05)'],
+                        borderWidth: 0, cutout: '80%', borderRadius: 5
+                    }]
+                },
+                options: { plugins: { legend: { display: false }, tooltip: { enabled: false } }, responsive: true, maintainAspectRatio: false }
+            });
+
+            new Chart(ctxB, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [valB, 100 - valB],
+                        backgroundColor: ['#ef4444', 'rgba(255,255,255,0.05)'],
+                        borderWidth: 0, cutout: '80%', borderRadius: 5
+                    }]
+                },
+                options: { plugins: { legend: { display: false }, tooltip: { enabled: false } }, responsive: true, maintainAspectRatio: false }
+            });
+
+            const labels = document.querySelectorAll('.text-center.space-y-3 .text-[9px].text-dim');
+            if (labels.length >= 2) {
+                labels[0].innerText = labelA;
+                labels[1].innerText = labelB;
+            }
+
+            document.querySelectorAll('.absolute.inset-0 span').forEach((span, i) => {
+                span.innerText = Math.round(i === 0 ? valA : valB) + "%";
+            });
+        }
+
+        function exportReportJSON() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const reportId = urlParams.get('id');
+            (async () => {
+                const response = await eel.get_reports()();
+                if (response.success) {
+                    const report = response.data.find(r => r.id === reportId);
+                    if (report) {
+                        const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `deceptron_report_${reportId.substring(0,8)}.json`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showToast("Report exported successfully", "success");
+                    }
+                }
+            })();
+        }
+
+        function showToast(msg, type) {
+            const div = document.createElement('div');
+            const colors = { success: 'bg-emerald-600', error: 'bg-rose-600', info: 'bg-cyan-600' };
+            div.className = `fixed top-6 right-6 z-[9999] px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest shadow-2xl text-white ${colors[type] || colors.info}`;
+            div.innerText = msg;
+            document.body.appendChild(div);
+            setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 500); }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', loadReportDetail);
     </script>
 </body>
-
 </html>

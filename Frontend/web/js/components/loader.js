@@ -49,7 +49,11 @@ const Loader = (function() {
     }
 
     function updateProgress(percent) {
-        // Disabled per user request for simplicity
+        init();
+        const titleEl = document.getElementById('loader-title');
+        if (titleEl) {
+            titleEl.textContent = `Processing... ${Math.round(percent)}%`;
+        }
     }
 
     function hide() {

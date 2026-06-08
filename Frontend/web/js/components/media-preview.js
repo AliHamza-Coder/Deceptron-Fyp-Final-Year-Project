@@ -263,6 +263,9 @@ function initVideoModal() {
                 body.light-mode #videoModalTitle, body.light-mode #videoSize, body.light-mode #videoDuration { color: #0f172a !important; }
                 body.light-mode .video-modal-container .bg-white\/5 { background: #f5f3ff !important; border: 1px solid rgba(139, 92, 246, 0.1) !important; }
                 body.light-mode .video-modal-container .text-gray-500 { color: #64748b !important; }
+                video[style*="scaleX(-1)"]::-webkit-media-controls {
+                    transform: scaleX(-1);
+                }
             </style>
         </div>
     `;

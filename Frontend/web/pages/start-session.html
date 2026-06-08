@@ -12,6 +12,12 @@
   <script src="../scripts/chart.min.js"></script>
   <script src="../js/components/loader.js"></script>
   <script src="../scripts/wavesurfer.min.js"></script>
+  <script src="../js/common/constants.js"></script>
+  <script src="../js/common/utils.js"></script>
+  <script src="../js/common/api.js"></script>
+  <script src="../js/common/auth.js"></script>
+  <script src="../js/components/sidebar.js"></script>
+  <script src="../js/components/vault-component.js"></script>
   <link rel="stylesheet" href="../vendor/font-awesome/css/all.min.css" />
   <link rel="stylesheet" href="../styles/sidebar.css" />
  <style>
@@ -92,10 +98,17 @@
       border: 1px solid var(--border-subtle);
       border-radius: 1.5rem;
       padding: 2.5rem;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      transform: scale(0.9);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .vault-item:hover {
+    video[style*="scaleX(-1)"]::-webkit-media-controls {
+      transform: scaleX(-1);
+    }
+
+    .vault-item {
       background: rgba(255, 255, 255, 0.08);
       border-color: var(--accent-cyan);
     }
@@ -377,6 +390,73 @@
       border-left-color: var(--primary-blue);
       transform: translateX(5px);
     }
+
+    /* Face Tab Bar */
+    .face-tab {
+      padding: 6px 14px;
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border-radius: 10px;
+      color: #64748b;
+      transition: all 0.25s ease;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    .face-tab:hover {
+      color: #22d3ee;
+      background: rgba(34, 211, 238, 0.08);
+    }
+    .face-tab.active {
+      color: #fff;
+      background: rgba(34, 211, 238, 0.15);
+      box-shadow: 0 0 12px rgba(34, 211, 238, 0.1);
+    }
+    .face-tab-content {
+      transition: opacity 0.2s ease;
+    }
+    .face-tab-content.hidden {
+      display: none;
+    }
+
+    /* NLP Flag Pills */
+    .nlp-flag {
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border: 1px solid;
+      transition: all 0.2s ease;
+    }
+    .nlp-flag-rose {
+      background: rgba(244, 63, 94, 0.12);
+      border-color: rgba(244, 63, 94, 0.3);
+      color: #fb7185;
+    }
+    .nlp-flag-amber {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+    }
+    .nlp-flag-purple {
+      background: rgba(168, 85, 247, 0.12);
+      border-color: rgba(168, 85, 247, 0.3);
+      color: #c084fc;
+    }
+    .nlp-flag-cyan {
+      background: rgba(6, 182, 212, 0.12);
+      border-color: rgba(6, 182, 212, 0.3);
+      color: #22d3ee;
+    }
+    .nlp-flag-emerald {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #34d399;
+    }
   </style>
 </head>
 
@@ -511,6 +591,11 @@
               onclick="finalizeAnalysis()">
               <i class="fas fa-brain mr-2"></i> Analyse
             </button>
+            <button id="saveReportBtn"
+              class="btn-primary px-6 py-3 text-xs hidden"
+              onclick="handleSaveReport()">
+              <i class="fas fa-save mr-2"></i> Save Report
+            </button>
           </div>
         </div>
       </div>
@@ -570,6 +655,28 @@
 
       <!-- Forensic Analytics & Detailed Breakdown -->
       <div class="col-span-12 grid grid-cols-12 gap-6 pb-8">
+        <!-- NLP Deception Indicators Card -->
+        <div class="col-span-12" id="nlpCard">
+          <div class="glass p-6 border-cyan-500/10">
+            <div class="flex items-center justify-between mb-5">
+              <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                <i class="fas fa-microphone-alt mr-2 text-cyan-400"></i> NLP Deception Analysis
+              </h3>
+              <button id="nlpLangToggle" onclick="toggleNlpLanguage()"
+                class="text-[9px] px-3 py-1.5 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-bold uppercase rounded-lg hover:bg-cyan-500 hover:text-white transition-all flex items-center gap-1.5">
+                <i class="fas fa-language text-[10px]"></i> <span id="nlpLangLabel">URDU</span>
+              </button>
+            </div>
+            <div id="nlpFlagsContainer" class="flex flex-wrap gap-2 mb-4 min-h-[28px]">
+              <span class="text-[10px] text-gray-500 italic">Awaiting analysis...</span>
+            </div>
+            <div class="bg-black/30 rounded-xl p-4 border border-white/5 relative">
+              <div class="absolute top-3 right-3 text-[8px] text-gray-600 font-mono" id="nlpLangHint">ENGLISH</div>
+              <p id="nlpSummaryText" class="text-xs text-gray-300 leading-relaxed italic">No forensic linguistic data available yet.</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Hero: Main Truth Level Chart -->
         <div class="col-span-12 truth-chart-card">
           <div class="flex justify-between items-start mb-10">
@@ -578,8 +685,8 @@
               <p class="text-xs text-gray-400">Deep neural synchronization of behavioral markers across the session duration.</p>
             </div>
             <div class="text-right">
-              <span class="text-5xl font-black heading-font text-rose-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.4)]">78%</span>
-              <p class="text-[10px] font-bold text-rose-400 uppercase mt-1 tracking-widest">Session Risk Index</p>
+              <span class="text-5xl font-black heading-font text-gray-600 drop-shadow-none" id="sessionRiskDisplay">0%</span>
+              <p class="text-[10px] font-bold text-gray-500 uppercase mt-1 tracking-widest">Awaiting Analysis</p>
             </div>
           </div>
           <div class="chart-container">
@@ -589,81 +696,116 @@
 
         <!-- Visual Circular Graphs Section -->
         <div id="circularGraphsSection" class="col-span-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <!-- Graph 1: Overall Emotion Distribution -->
-          <article class="glass p-6 border-cyan-500/10">
+          <!-- Graph 1: Emotion Distribution -->
+          <article class="glass p-6">
             <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4">
-              <i class="fas fa-chart-pie mr-2 text-cyan-400"></i> Overall Emotion Distribution
+              <i class="fas fa-chart-pie mr-2 text-emerald-400"></i> Emotion Distribution
             </h3>
             <div class="relative h-48 flex items-center justify-center">
               <canvas id="emotionDistributionChart" width="180" height="180"></canvas>
               <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span class="text-2xl font-bold text-emerald-400">60%</span>
-                <span class="text-[8px] text-gray-500 uppercase tracking-tighter">Neutrality</span>
+                <span id="dominantEmotionPercent" class="text-2xl font-bold text-emerald-400">0%</span>
+                <span id="dominantEmotionLabel" class="text-[8px] text-gray-500 uppercase tracking-tighter">Neutral</span>
               </div>
             </div>
-            <div class="mt-4 space-y-2 text-[10px]">
-              <div class="flex justify-between items-center">
-                <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400"></span>Neutral</span>
-                <span class="text-emerald-400 font-bold">60%</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400"></span>Anger</span>
-                <span class="text-amber-400 font-bold">25%</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-rose-400"></span>Fear</span>
-                <span class="text-rose-400 font-bold">15%</span>
-              </div>
-            </div>
+            <div id="emotionLegend" class="mt-4 space-y-2 text-[10px]"></div>
           </article>
 
-          <!-- Graph 2: Eye Movement Tracking -->
-          <article class="glass p-6 border-purple-500/10">
+          <!-- Graph 2: Gaze Stability -->
+          <article class="glass p-6">
             <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4">
-              <i class="fas fa-eye mr-2 text-purple-400"></i> Eye Movement Tracking
+              <i class="fas fa-eye mr-2 text-blue-400"></i> Gaze Stability
             </h3>
             <div class="relative h-48 flex items-center justify-center">
               <canvas id="eyeMovementChart" width="180" height="180"></canvas>
               <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span class="text-2xl font-bold text-cyan-400">70%</span>
-                <span class="text-[8px] text-gray-500 uppercase tracking-tighter">Steady Gaze</span>
+                <span id="gazeScorePercent" class="text-2xl font-bold text-blue-400">0%</span>
+                <span id="gazeScoreLabel" class="text-[8px] text-gray-500 uppercase tracking-tighter">Steady Gaze</span>
               </div>
             </div>
-            <div class="mt-4 space-y-2 text-[10px]">
-              <div class="flex justify-between items-center">
-                <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-cyan-400"></span>Steady Gaze</span>
-                <span class="text-cyan-400 font-bold">70%</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-400"></span>Rapid Blinking</span>
-                <span class="text-amber-400 font-bold">30%</span>
-              </div>
-            </div>
+            <div id="gazeLegend" class="mt-4 space-y-2 text-[10px]"></div>
           </article>
 
-          <!-- Graph 3: Lips & Jaw Anomalies -->
-          <article class="glass p-6 border-amber-500/10">
+          <!-- Graph 3: Lip & Jaw Stress -->
+          <article class="glass p-6">
             <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4">
-              <i class="fas fa-grip-lines mr-2 text-amber-400"></i> Lips & Jaw Anomalies
+              <i class="fas fa-grip-lines mr-2 text-amber-400"></i> Lip & Jaw Stress
             </h3>
             <div class="relative h-48 flex items-center justify-center">
               <canvas id="lipsJawChart" width="180" height="180"></canvas>
               <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span class="text-2xl font-bold text-emerald-400">85%</span>
-                <span class="text-[8px] text-gray-500 uppercase tracking-tighter">Normal Activity</span>
+                <span id="oralScorePercent" class="text-2xl font-bold text-emerald-400">0%</span>
+                <span id="oralScoreLabel" class="text-[8px] text-gray-500 uppercase tracking-tighter">Activity</span>
               </div>
             </div>
-            <div class="mt-4 space-y-2 text-[10px]">
-              <div class="flex justify-between items-center">
-                <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400"></span>Normal</span>
-                <span class="text-emerald-400 font-bold">85%</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-rose-400"></span>Tensed</span>
-                <span class="text-rose-400 font-bold">15%</span>
-              </div>
-            </div>
+            <div id="oralLegend" class="mt-4 space-y-2 text-[10px]"></div>
           </article>
+
+          <!-- Graph 4: Head Pose Analysis -->
+          <article class="glass p-6">
+            <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4">
+              <i class="fas fa-user mr-2 text-purple-400"></i> Head Pose Analysis
+            </h3>
+            <div class="relative h-48 flex items-center justify-center">
+              <canvas id="poseDynamicsChart" width="180" height="180"></canvas>
+              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <i id="poseStatusIcon" class="fas fa-user-check text-2xl text-purple-500/80 mb-1 transition-all duration-500"></i>
+                  <span id="poseScoreLabel" class="text-[8px] text-gray-500 uppercase tracking-tighter">Dynamics</span>
+              </div>
+            </div>
+            <div id="poseLegend" class="mt-4 space-y-2 text-[10px]"></div>
+          </article>
+
+          <!-- Graph 5: Facial Asymmetry -->
+          <article class="glass p-6">
+            <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4">
+              <i class="fas fa-balance-scale mr-2 text-cyan-400"></i> Facial Asymmetry
+            </h3>
+            <div class="relative h-48 flex items-center justify-center">
+              <canvas id="asymmetryChart" width="180" height="180"></canvas>
+              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span id="asymScorePercent" class="text-2xl font-bold text-cyan-400">0%</span>
+                  <span id="asymScoreLabel" class="text-[8px] text-gray-500 uppercase tracking-tighter">Balance</span>
+              </div>
+            </div>
+            <div id="asymLegend" class="mt-4 space-y-2 text-[10px]"></div>
+          </article>
+
+          <!-- Graph 6: Touch Detection -->
+          <article class="glass p-6">
+            <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4">
+              <i class="fas fa-hand-paper mr-2 text-rose-400"></i> Touch Detection
+            </h3>
+            <div class="relative h-48 flex items-center justify-center">
+              <canvas id="stressChart" width="180" height="180"></canvas>
+              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span id="touchScorePercent" class="text-2xl font-bold text-rose-500">0%</span>
+                  <span id="touchScoreLabel" class="text-[8px] text-gray-500 uppercase tracking-tighter">Incidents</span>
+              </div>
+            </div>
+            <div id="stressLegend" class="mt-4 space-y-2 text-[10px]"></div>
+          </article>
+        </div>
+
+        <!-- Video Output Section -->
+        <div id="sessionVideoSection" class="col-span-12 hidden">
+          <section class="glass p-6 border-cyan-500/10">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                <i class="fas fa-video mr-2 text-blue-400"></i> Video Output
+              </h3>
+            </div>
+            <div id="sessionVideoGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-fr max-h-[500px] overflow-y-auto p-2 bg-slate-900 rounded-2xl border border-slate-800">
+              <div id="sessionMainVideoWrap" class="relative rounded-xl overflow-hidden bg-black col-span-full min-h-[300px] flex items-center justify-center">
+                <canvas id="sessionOutputCanvas" class="w-full h-full object-cover opacity-90 hidden"></canvas>
+                <video id="sessionOutputVideo" class="hidden w-full h-full object-contain" controls></video>
+                <div id="sessionVideoPlaceholder" class="text-gray-600 text-[10px] uppercase tracking-widest font-bold flex flex-col items-center gap-3">
+                  <i class="fas fa-film text-3xl"></i>
+                  <span>Analysis video will appear here</span>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
 
         <!-- Dual Section: Transcript and AI Reasoning -->
@@ -674,26 +816,9 @@
               <i class="fas fa-comment-dots mr-3 text-cyan-400"></i> Forensic Transcript
             </h3>
             <div class="transcript-box">
-              <div class="transcript-item">
-                <div class="flex justify-between mb-2">
-                  <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Subject [02:14]</span>
-                  <span class="text-[9px] px-2 py-0.5 bg-rose-500/20 text-rose-400 rounded-full font-bold">Stress High</span>
-                </div>
-                <p class="text-sm text-gray-300 leading-relaxed italic">"I was never in the secure server room after 10 PM. The logs must be incorrect or tampered with by someone else."</p>
-              </div>
-              <div class="transcript-item">
-                <div class="flex justify-between mb-2">
-                  <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Subject [05:42]</span>
-                  <span class="text-[9px] px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full font-bold">Baseline Normal</span>
-                </div>
-                <p class="text-sm text-gray-300 leading-relaxed italic">"I have been working for this company for 8 years and have never had a security violation before this incident."</p>
-              </div>
-              <div class="transcript-item">
-                <div class="flex justify-between mb-2">
-                  <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Subject [08:30]</span>
-                  <span class="text-[9px] px-2 py-0.5 bg-rose-500/20 text-rose-400 rounded-full font-bold">Micro-tremor Alert</span>
-                </div>
-                <p class="text-sm text-gray-300 leading-relaxed italic">"I don't recognize the IP address used to access the database. I don't own any devices capable of that."</p>
+              <div class="py-10 text-center opacity-50">
+                <i class="fas fa-closed-captioning text-3xl mb-3"></i>
+                <p class="text-xs uppercase font-bold tracking-widest">No transcript available. Record and analyse a session.</p>
               </div>
             </div>
           </div>
@@ -736,135 +861,171 @@
           </div>
         </article>
       </div>
-    </div>
 
-    <!-- Bottom Visualization: Neural Vision -->
-    <section class="px-4 space-y-4">
-      <div class="glass p-8 min-h-[450px] flex flex-col border-cyan-500/10 relative overflow-hidden group">
-        <div class="flex justify-between items-center mb-6">
-          <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 border border-cyan-500/20 glow-cyan">
-              <i class="fas fa-eye text-xl"></i>
-            </div>
-            <div>
-              <h3 class="text-sm font-black uppercase tracking-[0.3em] text-cyan-400">Forensic Video Output</h3>
-              <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">Advanced Forensic Signal Visualization</p>
+      <!-- Facial Analysis: Tabbed Interface -->
+      <div id="facialAnalysisTables" class="col-span-12 hidden">
+        <div class="glass p-6 border-white/5">
+          <div class="flex items-center justify-between mb-5">
+            <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center">
+              <i class="fas fa-robot mr-2 text-cyan-400"></i> Facial Feature Analysis
+            </h3>
+            <div class="flex items-center gap-1 bg-black/30 rounded-xl p-1 border border-white/5" id="faceTabBar">
+              <button class="face-tab active" data-tab="emotion" onclick="switchFaceTab('emotion')">Emotion</button>
+              <button class="face-tab" data-tab="eye" onclick="switchFaceTab('eye')">Eyes</button>
+              <button class="face-tab" data-tab="lip" onclick="switchFaceTab('lip')">Lip/Jaw</button>
+              <button class="face-tab" data-tab="head" onclick="switchFaceTab('head')">Head</button>
+              <button class="face-tab" data-tab="asym" onclick="switchFaceTab('asym')">Asymmetry</button>
+              <button class="face-tab" data-tab="touch" onclick="switchFaceTab('touch')">Touch</button>
             </div>
           </div>
-          <div class="flex items-center space-x-3">
-            <button onclick="toggleFullScreen()" title="Maximize"
-              class="text-gray-500 hover:text-cyan-400 transition-all transform hover:scale-110 p-2 bg-white/5 rounded-xl border border-white/10"><i
-                class="fas fa-expand-arrows-alt text-sm"></i></button>
-            <button title="Download Signal"
-              class="text-gray-500 hover:text-cyan-400 transition-all transform hover:scale-110 p-2 bg-white/5 rounded-xl border border-white/10"><i
-                class="fas fa-download text-sm"></i></button>
+
+          <!-- Emotion -->
+          <div class="face-tab-content" id="faceTab-emotion">
+            <div class="voice-table-container custom-scrollbar">
+              <table class="voice-table">
+                <thead><tr><th>Frame #</th><th>Timestamp</th><th>Dominant Emotion</th><th>Confidence Score</th></tr></thead>
+                <tbody id="emotionTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Eye -->
+          <div class="face-tab-content hidden" id="faceTab-eye">
+            <div class="voice-table-container custom-scrollbar">
+              <table class="voice-table">
+                <thead><tr><th>Frame #</th><th>Timestamp</th><th>Blink Activity</th><th>Focus Area</th><th>EAR Score</th></tr></thead>
+                <tbody id="eyeGazeTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Lip/Jaw -->
+          <div class="face-tab-content hidden" id="faceTab-lip">
+            <div class="voice-table-container custom-scrollbar">
+              <table class="voice-table">
+                <thead><tr><th>Frame #</th><th>Timestamp</th><th>Lip Status</th><th>Jaw Tightness</th><th>Chin Tremor</th></tr></thead>
+                <tbody id="lipJawTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Head -->
+          <div class="face-tab-content hidden" id="faceTab-head">
+            <div class="voice-table-container custom-scrollbar">
+              <table class="voice-table">
+                <thead><tr><th>Frame #</th><th>Timestamp</th><th>Pitch Angle</th><th>Yaw Angle</th><th>Stiffness</th><th>Movement Status</th></tr></thead>
+                <tbody id="headPoseTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Asymmetry -->
+          <div class="face-tab-content hidden" id="faceTab-asym">
+            <div class="voice-table-container custom-scrollbar">
+              <table class="voice-table">
+                <thead><tr><th>Frame #</th><th>Timestamp</th><th>Mouth Asym</th><th>Brow Asym</th><th>Eye Asym</th><th>Total Score</th></tr></thead>
+                <tbody id="asymmetryTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Touch -->
+          <div class="face-tab-content hidden" id="faceTab-touch">
+            <div class="voice-table-container custom-scrollbar">
+              <table class="voice-table">
+                <thead><tr><th>Frame #</th><th>Timestamp</th><th>Activity Description</th><th>Detection Status</th><th>Confidence Score</th></tr></thead>
+                <tbody id="touchTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fusion Breakdown: 2-Column Layout -->
+    <section class="px-4 space-y-4" id="fusionBreakdownSection">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Left: Fusion Score Breakdown -->
+        <div class="glass p-6 border-cyan-500/10">
+          <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-5">
+            <i class="fas fa-chart-bar mr-2 text-cyan-400"></i> Fusion Score Breakdown
+          </h3>
+          <div class="space-y-4" id="fusionBreakdownBars">
+            <div class="space-y-1.5">
+              <div class="flex justify-between text-[9px] font-bold uppercase tracking-wider">
+                <span class="text-cyan-400">Face Behavioral</span>
+                <span class="text-white" id="fbFaceBehavioral">0%</span>
+              </div>
+              <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                <div class="h-full bg-cyan-400 rounded-full transition-all duration-1000" style="width:0%" id="barFaceBehavioral"></div>
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <div class="flex justify-between text-[9px] font-bold uppercase tracking-wider">
+                <span class="text-emerald-400">Face Emotion</span>
+                <span class="text-white" id="fbFaceEmotion">0%</span>
+              </div>
+              <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                <div class="h-full bg-emerald-400 rounded-full transition-all duration-1000" style="width:0%" id="barFaceEmotion"></div>
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <div class="flex justify-between text-[9px] font-bold uppercase tracking-wider">
+                <span class="text-amber-400">Voice Stress</span>
+                <span class="text-white" id="fbVoiceStress">0%</span>
+              </div>
+              <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                <div class="h-full bg-amber-400 rounded-full transition-all duration-1000" style="width:0%" id="barVoiceStress"></div>
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <div class="flex justify-between text-[9px] font-bold uppercase tracking-wider">
+                <span class="text-purple-400">NLP Deception</span>
+                <span class="text-white" id="fbNlpDeception">0%</span>
+              </div>
+              <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                <div class="h-full bg-purple-400 rounded-full transition-all duration-1000" style="width:0%" id="barNlpDeception"></div>
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <div class="flex justify-between text-[9px] font-bold uppercase tracking-wider">
+                <span class="text-rose-400">Mismatch Bonus</span>
+                <span class="text-white" id="fbMismatch">0%</span>
+              </div>
+              <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                <div class="h-full bg-rose-400 rounded-full transition-all duration-1000" style="width:0%" id="barMismatch"></div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="flex-1 relative video-inner-wrap bg-black/60 rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
-          <canvas id="neuralVisionCanvas" class="w-full h-full object-cover opacity-90"></canvas>
-          <div class="absolute inset-0 pointer-events-none border-[20px] border-cyan-500/5 group-hover:border-cyan-500/10 transition-all duration-500"></div>
-          <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent animate-pulse"></div>
+        <!-- Right: Cross-Modal Flags + Verdict -->
+        <div class="glass p-6 border-cyan-500/10 flex flex-col">
+          <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-5">
+            <i class="fas fa-exchange-alt mr-2 text-cyan-400"></i> Cross-Modal Signals
+          </h3>
+          <div id="crossModalFlags" class="space-y-2 flex-1">
+            <div class="text-[10px] text-gray-500 italic">No flags triggered.</div>
+          </div>
+          <div id="fusionVerdictBadge" class="mt-auto pt-4 border-t border-white/5 hidden">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 border border-cyan-500/20">
+                <i class="fas fa-gavel text-lg"></i>
+              </div>
+              <div>
+                <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">Bilingual Verdict</p>
+                <p id="fusionVerdictText" class="text-xs text-white font-bold mt-0.5"></p>
+              </div>
+              <button id="fusionVerdictToggle" onclick="toggleVerdictLanguage()" class="ml-auto text-[9px] px-2.5 py-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-bold uppercase rounded-lg hover:bg-cyan-500 hover:text-white transition-all">
+                <i class="fas fa-language mr-1"></i><span id="fusionVerdictLang">UR</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <div id="bottomAnalysisSection" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Card 1: Output Context -->
-      <article class="glass p-8 space-y-5 border-white/5">
-        <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center">
-          <i class="fas fa-info-circle mr-2 text-cyan-400"></i> Output Context
-        </h3>
-        <div class="space-y-4">
-          <div class="flex justify-between items-center text-[11px]">
-            <span class="text-gray-400 font-medium">Source</span>
-            <span class="text-white font-mono bg-white/5 px-2 py-0.5 rounded" id="ctxSource">Live Feed #01</span>
-          </div>
-          <div class="flex justify-between items-center text-[11px]">
-            <span class="text-gray-400 font-medium">Resolution</span>
-            <span class="text-white font-mono" id="ctxResolution">1280x720 (HD)</span>
-          </div>
-          <div class="flex justify-between items-center text-[11px]">
-            <span class="text-gray-400 font-medium">Latency</span>
-            <span class="text-emerald-400 font-bold" id="ctxLatency">18ms</span>
-          </div>
-          <div class="flex justify-between items-center text-[11px]">
-            <span class="text-gray-400 font-medium">Capture Stat</span>
-            <span class="text-white font-mono" id="ctxStats">30 FPS • Stable</span>
-          </div>
-        </div>
-      </article>
 
-      <!-- Card 2: Description -->
-      <article class="glass p-8 space-y-5 border-rose-500/10">
-        <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center">
-          <i class="fas fa-align-left mr-2 text-rose-500"></i> Description
-        </h3>
-        <div class="space-y-4">
-          <p class="text-[11px] text-gray-300 leading-relaxed" id="descSummary">
-            Deception model detected high-frequency micro-tremors in vocal pitch matching rehearsed narrative clusters. Significant variance from truthful baseline noted during key disclosures.
-          </p>
-          <ul class="space-y-2 text-[10px] text-gray-400" id="descBullets">
-            <li class="flex items-center">
-              <span class="w-1 h-1 bg-rose-500 rounded-full mr-2"></span>
-              Rehearsed narrative pattern detected
-            </li>
-            <li class="flex items-center">
-              <span class="w-1 h-1 bg-rose-500 rounded-full mr-2"></span>
-              Pitch variance during key disclosures
-            </li>
-            <li class="flex items-center">
-              <span class="w-1 h-1 bg-rose-500 rounded-full mr-2"></span>
-              Baseline deviation > 15%
-            </li>
-          </ul>
-          <div class="pt-2">
-            <span class="px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 text-rose-500 text-[9px] font-bold uppercase rounded-lg shadow-[0_0_15px_rgba(244,63,94,0.1)]" id="descVerdictBadge">
-              Verdict: High Lying Risk
-            </span>
-          </div>
-        </div>
-      </article>
-
-      <!-- Card 3: Analysis % -->
-      <article class="glass p-8 space-y-8 border-cyan-500/10">
-        <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center">
-          <i class="fas fa-chart-pie mr-2 text-cyan-400"></i> Analysis %
-        </h3>
-        <div class="space-y-8">
-          <div class="space-y-3">
-            <div class="flex justify-between text-[10px] font-bold uppercase tracking-wider">
-              <span class="text-gray-400">Primary Risk Score</span>
-              <span class="text-rose-500 text-sm" id="analysisPrimaryVal">82%</span>
-            </div>
-            <div class="h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
-              <div class="h-full bg-rose-500 rounded-full shadow-[0_0_12px_rgba(244,63,94,0.4)] transition-all duration-1000" style="width: 82%" id="analysisPrimaryBar"></div>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4 pt-2">
-            <div class="text-center space-y-3">
-              <div class="relative w-20 h-20 mx-auto group">
-                <canvas id="radialMetricA" width="80" height="80"></canvas>
-                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <span class="text-xs font-black text-white" id="valMetricA">45%</span>
-                </div>
-              </div>
-              <span class="text-[9px] text-gray-500 uppercase font-black tracking-[0.2em] group-hover:text-cyan-400 transition-colors">Vocal Jitter</span>
-            </div>
-            <div class="text-center space-y-3">
-              <div class="relative w-20 h-20 mx-auto group">
-                <canvas id="radialMetricB" width="80" height="80"></canvas>
-                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <span class="text-xs font-black text-white" id="valMetricB">32%</span>
-                </div>
-              </div>
-              <span class="text-[9px] text-gray-500 uppercase font-black tracking-[0.2em] group-hover:text-rose-500 transition-colors">Neural Stress</span>
-            </div>
-          </div>
-        </div>
-      </article>
-    </div>
   </main>
 
   <!-- Save Modal -->
@@ -950,71 +1111,7 @@
       },
     });
 
-    // 2. Radial Metrics for Analysis % Card
-    let radialChartA, radialChartB;
-    function initAnalysisCharts() {
-      const ctxRadialA = document.getElementById("radialMetricA");
-      if (ctxRadialA) {
-        radialChartA = new Chart(ctxRadialA.getContext("2d"), {
-          type: "doughnut",
-          data: {
-            labels: ["Value", "Remaining"],
-            datasets: [
-              {
-                data: [45, 55],
-                backgroundColor: [
-                  "#06b6d4",
-                  body.classList.contains("light-mode")
-                    ? "rgba(0, 118, 214, 0.1)"
-                    : "rgba(255, 255, 255, 0.05)",
-                ],
-                borderWidth: 0,
-                cutout: "80%",
-                borderRadius: 20,
-              },
-            ],
-          },
-          options: {
-            plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            responsive: true,
-            maintainAspectRatio: false,
-            circumference: 360,
-            rotation: 0,
-          },
-        });
-      }
-
-      const ctxRadialB = document.getElementById("radialMetricB");
-      if (ctxRadialB) {
-        radialChartB = new Chart(ctxRadialB.getContext("2d"), {
-          type: "doughnut",
-          data: {
-            labels: ["Value", "Remaining"],
-            datasets: [
-              {
-                data: [32, 68],
-                backgroundColor: [
-                  "#f43f5e",
-                  body.classList.contains("light-mode")
-                    ? "rgba(0, 118, 214, 0.1)"
-                    : "rgba(255, 255, 255, 0.05)",
-                ],
-                borderWidth: 0,
-                cutout: "80%",
-                borderRadius: 20,
-              },
-            ],
-          },
-          options: {
-            plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            responsive: true,
-            maintainAspectRatio: false,
-            circumference: 360,
-            rotation: 0,
-          },
-        });
-      }
-    }
+    // 2. Radial Metrics (removed — content now in Fusion Breakdown & Circular Charts)
 
     // --- Neural Vision Output Logic ---
     const neuralCanvas = document.getElementById("neuralVisionCanvas");
@@ -1073,6 +1170,7 @@
 
     // Global State
     var mediaStream = null;
+    var currentFilePath = "";
 
     async function toggleCamera() {
       const off = document.getElementById("camOffState");
@@ -1204,16 +1302,377 @@
       }
     }
 
-    function finalizeAnalysis() {
-      Loader.show("Processing Evidence");
-      setTimeout(() => {
-        Loader.hide();
-        const bottomAnalysis = document.getElementById("bottomAnalysisSection");
-        if (bottomAnalysis) {
-          bottomAnalysis.classList.remove("hidden");
-          bottomAnalysis.scrollIntoView({ behavior: 'smooth' });
+    let lastAnalysisData = null;
+
+    async function finalizeAnalysis() {
+      if (!currentFilePath) {
+        showToast("Please load or record a video first", "warning");
+        return;
+      }
+
+      Loader.show("Running Multi-Modal Forensic Pipeline...");
+      try {
+        const result = await runFullPipeline(currentFilePath);
+        
+        if (result.success) {
+          const reportData = result.data || result;
+          lastAnalysisData = reportData;
+          
+          const facialTables = document.getElementById("facialAnalysisTables");
+          if (facialTables) facialTables.classList.remove("hidden");
+
+          const videoSection = document.getElementById("sessionVideoSection");
+          if (videoSection && reportData.processed_video) {
+            videoSection.classList.remove("hidden");
+          }
+
+          updatePipelineUI(reportData);
+          
+          const dbReportData = {
+            type: 'pipeline',
+            source_file: currentFilePath,
+            full_data: reportData,
+            timestamp: new Date().toISOString(),
+            analysis_date: new Date().toISOString()
+          };
+          await eel.save_analysis_report(dbReportData)();
+          
+          document.getElementById("saveReportBtn").classList.remove("hidden");
+          
+          showToast("Forensic pipeline analysis complete", "success");
+        } else {
+          showToast("Pipeline analysis failed: " + (result.message || "Unknown error"), "error");
         }
-      }, 2500);
+      } catch (error) {
+        console.error(error);
+        showToast("Neural engine communication error", "error");
+      } finally { Loader.hide(); }
+    }
+
+    async function handleSaveReport() {
+      if (!lastAnalysisData) {
+        showToast("No analysis data to save", "warning");
+        return;
+      }
+      try {
+        const dbReportData = {
+          type: 'pipeline',
+          source_file: currentFilePath,
+          full_data: lastAnalysisData,
+          timestamp: new Date().toISOString(),
+          analysis_date: new Date().toISOString()
+        };
+        const result = await eel.save_analysis_report(dbReportData)();
+        if (result.success) {
+          showToast("Report saved successfully!", "success");
+        } else {
+          showToast("Failed to save report: " + (result.message || "Unknown error"), "error");
+        }
+      } catch (error) {
+        console.error(error);
+        showToast("Error saving report", "error");
+      }
+    }
+
+    function updatePipelineUI(data) {
+        const deceptionScore = Math.round(data.overall_deception_score || 0);
+        const riskIndexDisplay = document.getElementById('sessionRiskDisplay');
+        if (riskIndexDisplay) {
+            riskIndexDisplay.innerText = deceptionScore + '%';
+            riskIndexDisplay.className = deceptionScore > 50 ? 'text-5xl font-black heading-font text-rose-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.4)]' : 'text-5xl font-black heading-font text-emerald-400';
+        }
+        const riskLabel = riskIndexDisplay?.nextElementSibling;
+        if (riskLabel) riskLabel.innerText = deceptionScore > 50 ? 'Session Risk Index' : 'Session Credibility';
+
+        // 1. Update Timeline Chart
+        updateTimelineChart(data.timeline);
+
+        // 4. Update Transcript
+        updateTranscriptUI(data.segments);
+
+        // 5. Update NLP Card
+        updateNlpUI(data.segments);
+
+        // 5. Update Fusion Breakdown
+        if (data.segments && data.segments.length > 0) {
+            updateVoiceTable(data.segments);
+            
+            const firstSeg = data.segments[0];
+            const raw = firstSeg.raw_scores;
+            
+            if (raw.emotion) updateEmotionDistribution(raw.emotion.summary || raw.emotion);
+            if (raw.eye_gaze) updateEyeGazeUI(raw.eye_gaze.summary || raw.eye_gaze);
+            if (raw.lip_jaw) updateLipJawUI(raw.lip_jaw.summary || raw.lip_jaw);
+            if (raw.head_pose) updateHeadPoseUI(raw.head_pose.summary || raw.head_pose);
+            if (raw.asymmetry) updateAsymmetryUI(raw.asymmetry.summary || raw.asymmetry);
+            if (raw.hand_touch) updateTouchUI(raw.hand_touch.summary || raw.hand_touch);
+
+            updateFusionBreakdown(firstSeg.fusion.breakdown);
+            updateCrossModalSection(firstSeg.fusion.cross_modal_flags, firstSeg.reasoning, firstSeg.fusion.final_deception_score);
+        }
+
+        // 6. Show Video Output if available
+        const videoSection = document.getElementById('sessionVideoSection');
+        if (videoSection && data.processed_video) {
+            videoSection.classList.remove('hidden');
+            const videoEl = document.getElementById('sessionOutputVideo');
+            const canvasEl = document.getElementById('sessionOutputCanvas');
+            const placeholder = document.getElementById('sessionVideoPlaceholder');
+            if (videoEl && data.processed_video) {
+                videoEl.src = data.processed_video;
+                videoEl.classList.remove('hidden');
+                if (canvasEl) canvasEl.classList.add('hidden');
+                if (placeholder) placeholder.classList.add('hidden');
+                videoEl.load();
+            }
+        }
+    }
+
+    function updateTimelineChart(timeline) {
+        if (!timeline || timeline.length === 0) return;
+        const ctx = document.getElementById('truthChart');
+        if (!ctx) return;
+        
+        const labels = timeline.map(t => t.timestamp);
+        const scores = timeline.map(t => t.deception_score);
+        
+        const chart = Chart.getChart('truthChart');
+        if (chart) {
+            chart.data.labels = labels;
+            chart.data.datasets[0].data = scores;
+            chart.update();
+        }
+    }
+
+    function updateTranscriptUI(segments) {
+        const container = document.querySelector('.transcript-box');
+        if (!container || !segments) return;
+        window._lastSegments = segments;
+        
+        container.innerHTML = segments.map((seg, idx) => {
+            const qHtml = seg.question && seg.question.text
+                ? `<div class="mb-2 pl-3 border-l-2 border-amber-500/40">
+                      <span class="text-[9px] font-bold text-amber-400 uppercase tracking-widest">Interviewer Question</span>
+                      <p class="text-xs text-amber-300/80 mt-0.5 italic">"${seg.question.text}"</p>
+                   </div>`
+                : '';
+            const nlp = seg.raw_scores && seg.raw_scores.nlp;
+            const tu = nlp && nlp.translated_urdu;
+            const te = nlp && nlp.translated_english;
+            const transHtml = (tu || te) ? `
+                <div class="mt-3 pt-3 border-t border-cyan-500/10">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-[9px] font-bold text-cyan-400 uppercase tracking-widest">Translation</span>
+                        <button onclick="toggleSegTrans(${idx})"
+                            class="text-[8px] px-2 py-0.5 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-bold uppercase rounded hover:bg-cyan-500 hover:text-white transition-all">
+                            <span id="segTransLabel_${idx}">URDU</span>
+                        </button>
+                    </div>
+                    <p id="segTransText_${idx}" class="text-xs text-cyan-300/80 leading-relaxed italic">"${tu || ''}"</p>
+                </div>` : '';
+            return `
+            <div class="transcript-item">
+                ${qHtml}
+                <div class="flex justify-between mb-2 mt-2">
+                    <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Subject [${seg.start_sec.toFixed(2)}s - ${seg.end_sec.toFixed(2)}s]</span>
+                    <span class="text-[9px] px-2 py-0.5 ${seg.fusion.is_deceptive ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'} rounded-full font-bold">
+                        Risk: ${seg.fusion.final_deception_score.toFixed(1)}%
+                    </span>
+                </div>
+                <p class="text-sm text-gray-300 leading-relaxed italic">"${seg.transcript_original}"</p>
+                ${transHtml}
+                <p class="text-[10px] text-cyan-500/70 mt-2 font-mono">${seg.reasoning.split('\n')[0]}</p>
+            </div>
+        `}).join('');
+    }
+
+    function updateVoiceTable(segments) {
+        const tbody = document.getElementById('frameTableBody');
+        if (!tbody) return;
+        
+        tbody.innerHTML = segments.map((seg, i) => {
+            const v = seg.raw_scores.voice_stress;
+            const emo = seg.raw_scores.emotion?.dominant_emotion || "Neutral";
+            return `
+            <tr>
+              <td class="font-mono text-cyan-500 font-bold">#SEG_${String(i+1).padStart(3,'0')}</td>
+              <td class="font-mono text-gray-500">${seg.start_sec.toFixed(2)}s</td>
+              <td class="text-white italic">"${seg.transcript_original}"</td>
+              <td><span class="status-pill status-pill-${emo.toLowerCase()}">${emo}</span></td>
+              <td class="font-mono">${v.vocal_strain_score ? (v.vocal_strain_score * 2).toFixed(0) : '--'} Hz</td>
+              <td class="font-mono">${v.vocal_strain_score || '--'} %</td>
+              <td class="font-bold text-cyan-400">${v.confidence_percent || 90}%</td>
+              <td class="text-[9px] font-black uppercase tracking-tighter ${seg.fusion.is_deceptive ? 'text-rose-500' : 'text-emerald-500'}">
+                ${seg.fusion.is_deceptive ? 'DECEPTIVE' : 'TRUTHFUL'}
+              </td>
+            </tr>
+            `;
+        }).join('');
+    }
+
+    function updateEmotionDistribution(summary) {
+        if (!summary) return;
+        const dist = summary.distribution || {};
+        const labels = Object.keys(dist);
+        const values = labels.map(l => dist[l].percentage || dist[l]);
+        
+        if (emotionChart) {
+            const colors = ['#10b981', '#f59e0b', '#ef4444', '#6366f1', '#ec4899', '#06b6d4', '#8b5cf6'];
+            updateModuleChart(emotionChart, labels.reduce((o, l) => { o[l] = dist[l].percentage || dist[l]; return o; }, {}), 'emotionLegend', colors);
+            let dominant = labels[0];
+            labels.forEach(l => {
+                const v = dist[l].percentage || dist[l];
+                if (v > (dist[dominant].percentage || dist[dominant])) dominant = l;
+            });
+            document.getElementById('dominantEmotionPercent').innerText = `${(dist[dominant].percentage || dist[dominant]).toFixed(0)}%`;
+            document.getElementById('dominantEmotionLabel').innerText = dominant;
+        }
+        
+        const tbody = document.getElementById('emotionTableBody');
+        if (tbody && summary.frames) {
+            tbody.innerHTML = summary.frames.filter((_, i) => i % 20 === 0).map(f => `
+                <tr>
+                    <td class="font-mono text-cyan-500">#${f.frame_num}</td>
+                    <td class="text-gray-500">${f.timestamp.toFixed(2)}s</td>
+                    <td class="text-white">${f.emotion}</td>
+                    <td class="text-cyan-400 font-bold">${f.confidence.toFixed(1)}%</td>
+                </tr>
+            `).join('');
+        }
+    }
+
+    function updateEyeGazeUI(summary) {
+        if (!summary) return;
+        if (eyeChart && summary.distribution) {
+            const dist = summary.distribution || { "CENTER": 100 };
+            updateModuleChart(eyeChart, dist, 'gazeLegend', ['#22d3ee', '#818cf8', '#34d399']);
+            const steadyPercent = dist["CENTER"] || dist["Forward"] || dist["Center"] || 0;
+            document.getElementById('gazeScorePercent').innerText = `${steadyPercent.toFixed(0)}%`;
+            document.getElementById('gazeScoreLabel').innerText = 'Steady Gaze';
+        }
+        const tbody = document.getElementById('eyeGazeTableBody');
+        if (tbody && summary.frames) {
+            tbody.innerHTML = summary.frames.filter((_, i) => i % 20 === 0).map(f => `
+                <tr>
+                    <td class="font-mono text-cyan-500">#${f.frame_num}</td>
+                    <td class="text-gray-500">${f.timestamp.toFixed(2)}s</td>
+                    <td class="text-white">${f.blink_count > 0 ? 'Blink' : 'Steady'}</td>
+                    <td class="text-cyan-400">${f.gaze || 'Center'}</td>
+                    <td class="text-white font-mono">${(f.ear || 0).toFixed(3)}</td>
+                </tr>
+            `).join('');
+        }
+    }
+
+    function updateLipJawUI(summary) {
+        if (!summary) return;
+        if (jawChart) {
+            const dist = summary.durations ? {
+                "Lip Stress": summary.durations.lip_tensed_percent || 0,
+                "Jaw Stress": summary.durations.jaw_tensed_percent || 0,
+                "Normal": 100 - ((summary.durations.lip_tensed_percent || 0) + (summary.durations.jaw_tensed_percent || 0))
+            } : (summary.distribution || { "Normal": 100 });
+            updateModuleChart(jawChart, dist, 'oralLegend', ['#818cf8', '#f43f5e', '#fbbf24']);
+            const stressVal = (summary.durations?.lip_tensed_percent || 0) + (summary.durations?.jaw_tensed_percent || 0);
+            document.getElementById('oralScorePercent').innerText = `${(100 - stressVal).toFixed(0)}%`;
+        }
+        const tbody = document.getElementById('lipJawTableBody');
+        if (tbody && summary.frames) {
+            tbody.innerHTML = summary.frames.filter((_, i) => i % 20 === 0).map(f => `
+                <tr>
+                    <td class="font-mono text-cyan-500">#${f.frame_num}</td>
+                    <td class="text-gray-500">${f.timestamp.toFixed(2)}s</td>
+                    <td class="text-white">${f.lip_status || 'Neutral'}</td>
+                    <td class="text-white">${(f.jaw_tightness || 0).toFixed(1)}%</td>
+                    <td class="text-white">${(f.chin_tremor || 0).toFixed(1)}%</td>
+                </tr>
+            `).join('');
+        }
+    }
+
+    function updateHeadPoseUI(summary) {
+        if (!summary) return;
+        if (poseChart) {
+            const dyn = summary.dynamics || {};
+            const nod = dyn.nodding_percent || 0;
+            const shake = dyn.shaking_percent || 0;
+            const stable = Math.max(0, 100 - (nod + shake));
+            const dynamics = { "Stable": stable, "Nodding": nod, "Shaking": shake };
+            updateModuleChart(poseChart, dynamics, 'poseLegend', ['#10b981', '#f59e0b', '#ef4444']);
+            const iconEl = document.getElementById('poseStatusIcon');
+            const labelEl = document.getElementById('poseScoreLabel');
+            if (stable > 70) {
+                iconEl.className = 'fas fa-user-check text-2xl text-emerald-400 mb-1 transition-all';
+                labelEl.innerText = 'STABLE';
+            } else if (nod > shake) {
+                iconEl.className = 'fas fa-arrow-up-down text-2xl text-amber-400 mb-1 transition-all';
+                labelEl.innerText = 'NODDING';
+            } else if (shake > 0) {
+                iconEl.className = 'fas fa-arrows-left-right text-2xl text-rose-400 mb-1 transition-all';
+                labelEl.innerText = 'SHAKING';
+            } else {
+                iconEl.className = 'fas fa-user-shield text-2xl text-purple-400 mb-1 transition-all';
+                labelEl.innerText = 'ACTIVE';
+            }
+        }
+        const tbody = document.getElementById('headPoseTableBody');
+        if (tbody && summary.frames) {
+            tbody.innerHTML = summary.frames.filter((_, i) => i % 20 === 0).map(f => `
+                <tr>
+                    <td class="font-mono text-cyan-500">#${f.frame_num}</td>
+                    <td class="text-gray-500">${f.timestamp.toFixed(2)}s</td>
+                    <td class="text-white">${f.pitch.toFixed(1)}°</td>
+                    <td class="text-white">${f.yaw.toFixed(1)}°</td>
+                    <td class="text-white">${f.stiffness_score.toFixed(1)}</td>
+                    <td class="${f.is_nodding ? 'text-amber-400' : 'text-emerald-400'}">${f.is_nodding ? 'Nodding' : 'Stable'}</td>
+                </tr>
+            `).join('');
+        }
+    }
+
+    function updateAsymmetryUI(summary) {
+        if (!summary) return;
+        if (asymChart) {
+            const score = (summary.averages && summary.averages.total_asym) || 0;
+            updateModuleChart(asymChart, { "Balanced": 100 - score, "Asymmetric": score }, 'asymLegend', ['#22d3ee', '#f87171']);
+            document.getElementById('asymScorePercent').innerText = `${(100 - score).toFixed(0)}%`;
+        }
+        const tbody = document.getElementById('asymmetryTableBody');
+        if (tbody && summary.frames) {
+            tbody.innerHTML = summary.frames.filter((_, i) => i % 20 === 0).map(f => `
+                <tr>
+                    <td class="font-mono text-cyan-500">#${f.frame_num}</td>
+                    <td class="text-gray-500">${f.timestamp.toFixed(2)}s</td>
+                    <td class="text-white">${f.mouth_asym.toFixed(2)}</td>
+                    <td class="text-white">${f.brow_asym.toFixed(2)}</td>
+                    <td class="text-white">${f.eye_asym.toFixed(2)}</td>
+                    <td class="text-cyan-400 font-bold">${f.total_asym.toFixed(1)}</td>
+                </tr>
+            `).join('');
+        }
+    }
+
+    function updateTouchUI(summary) {
+        if (!summary) return;
+        if (stressChart) {
+            const dist = summary.region_distribution || summary.distribution || { "None": 100 };
+            updateModuleChart(stressChart, dist, 'stressLegend', ['#f43f5e', '#fbbf24', '#818cf8']);
+            const touchCount = (summary.frames || []).filter(f => (f.confidence || 0) > 0).length;
+            document.getElementById('touchScorePercent').innerText = touchCount;
+            document.getElementById('touchScoreLabel').innerText = 'Incidents';
+        }
+        const tbody = document.getElementById('touchTableBody');
+        if (tbody && summary.frames) {
+            tbody.innerHTML = summary.frames.filter(f => f.confidence > 0).map(f => `
+                <tr>
+                    <td class="font-mono text-cyan-500">#${f.frame_num}</td>
+                    <td class="text-gray-500">${f.timestamp.toFixed(2)}s</td>
+                    <td class="text-amber-400">${f.touches.join(', ')}</td>
+                    <td class="text-rose-500 font-bold">DETECTED</td>
+                    <td class="text-cyan-400">${f.confidence.toFixed(1)}%</td>
+                </tr>
+            `).join('');
+        }
     }
 
     function openSaveModal() {
@@ -1334,7 +1793,7 @@
 
     async function saveData() {
       const subjectId = document.querySelector('#saveModal input[placeholder="Enter name or ID..."]').value || "Unknown_Subject";
-      const filename = `session_${subjectId}_${new Date().getTime()}.webm`;
+      const filename = `session_${subjectId}_${new Date().getTime()}.mp4`;
 
       const saveBtn = document.querySelector('#saveModal button[onclick="saveData()"]');
       const originalText = saveBtn.innerText;
@@ -1393,12 +1852,24 @@
 
           const video = document.getElementById("webcam");
           video.srcObject = null;
-          video.src = finalResult.data && finalResult.data.filepath ? finalResult.data.filepath : `../recordings/${filename}`;
+          currentFilePath = finalResult.data && finalResult.data.filepath ? finalResult.data.filepath : `../recordings/${filename}`;
+          video.src = currentFilePath;
           video.setAttribute("controls", "true");
           video.muted = false;
-          video.style.transform = "scaleX(-1)";
+          
+          // Respect Mirror Preference from Advanced Tools
+          const prefs = await eel.load_preferences()();
+          if (prefs.success && prefs.preferences && prefs.preferences.mirror_camera) {
+            video.style.transform = "scaleX(-1)";
+          } else {
+            video.style.transform = "none";
+          }
+
           video.load();
-          video.play();
+          video.oncanplay = () => {
+            video.play();
+            startNeuralVision();
+          };
 
           const off = document.getElementById("camOffState");
           const on = document.getElementById("camOnState");
@@ -1455,6 +1926,20 @@
     }
 
     function resetUIState() {
+      lastAnalysisData = null;
+      document.getElementById("saveReportBtn")?.classList.add("hidden");
+      document.getElementById("sessionVideoSection")?.classList.add("hidden");
+      const riskDisplay = document.getElementById("sessionRiskDisplay");
+      if (riskDisplay) {
+        riskDisplay.className = "text-5xl font-black heading-font text-gray-600 drop-shadow-none";
+        riskDisplay.innerText = "0%";
+      }
+      const riskLabel = riskDisplay?.nextElementSibling;
+      if (riskLabel) riskLabel.innerText = "Awaiting Analysis";
+      const videoEl = document.getElementById("sessionOutputVideo");
+      if (videoEl) { videoEl.classList.add("hidden"); videoEl.src = ""; }
+      const placeholder = document.getElementById("sessionVideoPlaceholder");
+      if (placeholder) placeholder.classList.remove("hidden");
       const btn = document.getElementById("sessionBtn");
       const pauseBtn = document.getElementById("pauseBtn");
       isRecording = false;
@@ -1475,26 +1960,7 @@
     function populateFrameTable() {
       const tbody = document.getElementById('frameTableBody');
       if (!tbody) return;
-      const segments = [
-        { time: "00:00:02", text: "Please state your name and Unit ID.", emotion: "Neutral", pitch: "185", jitter: "0.12", conf: "99", status: "STABLE" },
-        { time: "00:00:05", text: "Officer Hamza, Unit ID 7821-X.", emotion: "Calm", pitch: "192", jitter: "0.15", conf: "98", status: "VERIFIED" },
-        { time: "00:00:09", text: "I was present at the coordinates indicated.", emotion: "Stress", pitch: "245", jitter: "0.85", conf: "92", status: "ANOMALY" },
-        { time: "00:00:14", text: "The situation was under control until the breach.", emotion: "Anger", pitch: "298", jitter: "1.24", conf: "94", status: "HIGH_STRESS" },
-        { time: "00:00:18", text: "Authorization was granted by the central core.", emotion: "Neutral", pitch: "210", jitter: "0.34", conf: "97", status: "STABLE" },
-        { time: "00:00:22", text: "End of report summary for unit.", emotion: "Calm", pitch: "188", jitter: "0.18", conf: "99", status: "VERIFIED" }
-      ];
-      tbody.innerHTML = segments.map((s, i) => `
-        <tr>
-          <td class="font-mono text-cyan-500 font-bold">#SEG_${String(i+1).padStart(3,'0')}</td>
-          <td class="font-mono text-gray-500">${s.time}</td>
-          <td class="text-white italic">"${s.text}"</td>
-          <td><span class="status-pill status-pill-${s.emotion.toLowerCase()}">${s.emotion}</span></td>
-          <td class="font-mono">${s.pitch} Hz</td>
-          <td class="font-mono">${s.jitter} %</td>
-          <td class="font-bold text-cyan-400">${s.conf}%</td>
-          <td class="text-[9px] font-black uppercase tracking-tighter ${s.status==='ANOMALY'||s.status==='HIGH_STRESS'?'text-rose-500':'text-emerald-500'}">${s.status}</td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center text-gray-500 py-8 text-[10px] italic">No vocal analysis data. Record and analyse a session to populate.</td></tr>`;
     }
 
     // Download frame data as CSV
@@ -1524,34 +1990,237 @@
     }
 
     // Circular pie charts
-    let emotionDistChart, eyeMovChart, lipsJawChartInst;
+    let emotionChart, eyeChart, jawChart, poseChart, asymChart, stressChart;
 
     function initCircularCharts() {
-      const emotionCtx = document.getElementById('emotionDistributionChart');
-      if (emotionCtx) {
-        emotionDistChart = new Chart(emotionCtx.getContext('2d'), {
+      const commonOptions = {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        cutout: '80%'
+      };
+
+      const eCtx = document.getElementById('emotionDistributionChart');
+      if (eCtx) {
+        emotionChart = new Chart(eCtx.getContext('2d'), {
           type: 'doughnut',
-          data: { labels: ['Neutral','Anger','Fear'], datasets: [{ data:[60,25,15], backgroundColor:['#34d399','#fbbf24','#f87171'], borderWidth:0, cutout:'82%', borderRadius:8 }] },
-          options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } }
+          data: { labels: ['Waiting'], datasets: [{ data: [100], backgroundColor: ['#34d399'], borderWidth: 0 }] },
+          options: commonOptions
         });
       }
-      const eyeCtx = document.getElementById('eyeMovementChart');
-      if (eyeCtx) {
-        eyeMovChart = new Chart(eyeCtx.getContext('2d'), {
+
+      const gCtx = document.getElementById('eyeMovementChart');
+      if (gCtx) {
+        eyeChart = new Chart(gCtx.getContext('2d'), {
           type: 'doughnut',
-          data: { labels: ['Steady Gaze','Rapid Blinking'], datasets: [{ data:[70,30], backgroundColor:['#22d3ee','#fbbf24'], borderWidth:0, cutout:'82%', borderRadius:8 }] },
-          options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } }
+          data: { labels: ['Waiting'], datasets: [{ data: [100], backgroundColor: ['#22d3ee'], borderWidth: 0 }] },
+          options: commonOptions
         });
       }
-      const jawCtx = document.getElementById('lipsJawChart');
-      if (jawCtx) {
-        lipsJawChartInst = new Chart(jawCtx.getContext('2d'), {
+
+      const lCtx = document.getElementById('lipsJawChart');
+      if (lCtx) {
+        jawChart = new Chart(lCtx.getContext('2d'), {
           type: 'doughnut',
-          data: { labels: ['Normal','Tensed'], datasets: [{ data:[85,15], backgroundColor:['#34d399','#f43f5e'], borderWidth:0, cutout:'82%', borderRadius:8 }] },
-          options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } }
+          data: { labels: ['Waiting'], datasets: [{ data: [100], backgroundColor: ['#34d399'], borderWidth: 0 }] },
+          options: commonOptions
+        });
+      }
+
+      const pCtx = document.getElementById('poseDynamicsChart');
+      if (pCtx) {
+        poseChart = new Chart(pCtx.getContext('2d'), {
+          type: 'doughnut',
+          data: { labels: ['Waiting'], datasets: [{ data: [100], backgroundColor: ['#818cf8'], borderWidth: 0 }] },
+          options: commonOptions
+        });
+      }
+
+      const aCtx = document.getElementById('asymmetryChart');
+      if (aCtx) {
+        asymChart = new Chart(aCtx.getContext('2d'), {
+          type: 'doughnut',
+          data: { labels: ['Waiting'], datasets: [{ data: [100], backgroundColor: ['#22d3ee'], borderWidth: 0 }] },
+          options: commonOptions
+        });
+      }
+
+      const sCtx = document.getElementById('stressChart');
+      if (sCtx) {
+        stressChart = new Chart(sCtx.getContext('2d'), {
+          type: 'doughnut',
+          data: { labels: ['Waiting'], datasets: [{ data: [100], backgroundColor: ['#f43f5e'], borderWidth: 0 }] },
+          options: commonOptions
         });
       }
     }
+
+    function updateModuleChart(chart, dist, legendId, colors) {
+      const labels = Object.keys(dist);
+      const values = labels.map(l => dist[l]);
+      chart.data.labels = labels;
+      chart.data.datasets[0].data = values;
+      chart.data.datasets[0].backgroundColor = colors.slice(0, labels.length);
+      chart.update();
+
+      document.getElementById(legendId).innerHTML = labels.map((l, i) => `
+        <div class="flex justify-between items-center bg-white/5 px-3 py-2 rounded-lg border border-white/5">
+          <span class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full shadow-[0_0_8px_currentColor]" style="background-color: ${colors[i % colors.length]}; color: ${colors[i % colors.length]}"></span>
+            <span class="text-white font-medium">${l}</span>
+          </span>
+          <span class="font-bold text-xs" style="color: ${colors[i % colors.length]}">${dist[l].toFixed(1)}%</span>
+        </div>
+      `).join('');
+    }
+
+    // ── Face Analysis Tab Switcher ────────────────────────────────────────
+    function switchFaceTab(tab) {
+      document.querySelectorAll('.face-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.face-tab-content').forEach(c => c.classList.add('hidden'));
+      document.querySelector(`.face-tab[data-tab="${tab}"]`).classList.add('active');
+      document.getElementById(`faceTab-${tab}`).classList.remove('hidden');
+    }
+
+    // ── Segment Translation Toggle ──────────────────────────────────────
+    let segTransState = {};
+
+    function toggleSegTrans(idx) {
+      segTransState[idx] = !segTransState[idx];
+      document.getElementById('segTransLabel_' + idx).innerText = segTransState[idx] ? 'EN' : 'UR';
+      const segments = window._lastSegments;
+      if (!segments || !segments[idx]) return;
+      const nlp = segments[idx].raw_scores && segments[idx].raw_scores.nlp;
+      if (!nlp) return;
+      const text = segTransState[idx] ? (nlp.translated_english || '') : (nlp.translated_urdu || '');
+      document.getElementById('segTransText_' + idx).innerText = text ? '"' + text + '"' : '';
+    }
+
+    // ── NLP Language Toggle ──────────────────────────────────────────────
+    let nlpShowUrdu = false;
+    let nlpDataCache = { en: '', ur: '' };
+
+    function toggleNlpLanguage() {
+      nlpShowUrdu = !nlpShowUrdu;
+      document.getElementById('nlpLangLabel').innerText = nlpShowUrdu ? 'ENGLISH' : 'URDU';
+      document.getElementById('nlpLangHint').innerText = nlpShowUrdu ? 'ROMAN URDU' : 'ENGLISH';
+      const el = document.getElementById('nlpSummaryText');
+      if (nlpDataCache.ur) {
+        el.innerText = nlpShowUrdu ? nlpDataCache.ur : nlpDataCache.en;
+      }
+    }
+
+    function updateNlpUI(segments) {
+      if (!segments || segments.length === 0) return;
+      const first = segments.find(s => s.raw_scores && s.raw_scores.nlp);
+      if (!first) return;
+      const nlp = first.raw_scores.nlp;
+      const flags = nlp.triggered_flags || [];
+      const summary = nlp.summary || '';
+      const indicators = nlp.deception_indicators || {};
+
+      // Parse bilingual summary
+      let enPart = summary;
+      let urPart = '';
+      const ruMatch = summary.match(/(?:Roman Urdu|URDU):\s*(.+)/i);
+      if (ruMatch) {
+        urPart = ruMatch[1].trim();
+        enPart = summary.substring(0, ruMatch.index).replace(/(?:English|ENGLISH):\s*/i, '').trim();
+      }
+
+      nlpDataCache = { en: enPart || summary, ur: urPart || summary };
+      document.getElementById('nlpSummaryText').innerText = nlpShowUrdu ? (nlpDataCache.ur || nlpDataCache.en) : nlpDataCache.en;
+
+      // Flag color mapping
+      const flagColors = {
+        evasion: 'nlp-flag-rose',
+        over_explanation: 'nlp-flag-amber',
+        irrelevance: 'nlp-flag-rose',
+        contradiction: 'nlp-flag-rose',
+        vagueness: 'nlp-flag-amber',
+        improbable_details: 'nlp-flag-amber',
+        cognitive_load: 'nlp-flag-purple',
+        distancing_language: 'nlp-flag-purple',
+        emotion_mismatch: 'nlp-flag-cyan',
+      };
+
+      const container = document.getElementById('nlpFlagsContainer');
+      if (flags.length === 0) {
+        container.innerHTML = '<span class="text-[10px] text-emerald-400 italic">No deception indicators triggered.</span>';
+      } else {
+        container.innerHTML = flags.map(f => {
+          const cls = flagColors[f.replace(/\s+/g, '_').toLowerCase()] || 'nlp-flag-cyan';
+          const label = f.replace(/_/g, ' ');
+          return `<span class="nlp-flag ${cls}">${label}</span>`;
+        }).join('');
+      }
+    }
+
+    // ── Fusion Breakdown ─────────────────────────────────────────────────
+    function updateFusionBreakdown(breakdown) {
+      if (!breakdown) return;
+      const items = [
+        { key: 'face_behavioral', id: 'fbFaceBehavioral', bar: 'barFaceBehavioral', color: 'bg-cyan-400' },
+        { key: 'face_emotion', id: 'fbFaceEmotion', bar: 'barFaceEmotion', color: 'bg-emerald-400' },
+        { key: 'voice_stress', id: 'fbVoiceStress', bar: 'barVoiceStress', color: 'bg-amber-400' },
+        { key: 'nlp_deception', id: 'fbNlpDeception', bar: 'barNlpDeception', color: 'bg-purple-400' },
+        { key: 'mismatch_bonus', id: 'fbMismatch', bar: 'barMismatch', color: 'bg-rose-400' },
+      ];
+      items.forEach(item => {
+        const val = Math.round(breakdown[item.key] || 0);
+        document.getElementById(item.id).innerText = val + '%';
+        document.getElementById(item.bar).style.width = val + '%';
+      });
+    }
+
+    // ── Cross-Modal Flags + Verdict ──────────────────────────────────────
+    let verdictDataCache = { en: '', ur: '' };
+    let verdictShowUrdu = false;
+
+    function toggleVerdictLanguage() {
+      verdictShowUrdu = !verdictShowUrdu;
+      document.getElementById('fusionVerdictLang').innerText = verdictShowUrdu ? 'EN' : 'UR';
+      const el = document.getElementById('fusionVerdictText');
+      if (verdictDataCache.ur) {
+        el.innerText = verdictShowUrdu ? verdictDataCache.ur : verdictDataCache.en;
+      }
+    }
+
+    function updateCrossModalSection(crossFlags, reasoning, fusionScore) {
+      const flagsContainer = document.getElementById('crossModalFlags');
+      if (!crossFlags || crossFlags.length === 0) {
+        flagsContainer.innerHTML = '<div class="text-[10px] text-emerald-400 italic">No cross-modal conflicts detected.</div>';
+      } else {
+        flagsContainer.innerHTML = crossFlags.map(f => {
+          const isWarning = f.includes('mismatch') || f.includes('Conflict');
+          return `<div class="flex items-center gap-2 text-[10px] ${isWarning ? 'text-rose-400' : 'text-amber-400'}">
+            <i class="fas fa-${isWarning ? 'exclamation-triangle' : 'info-circle'} text-[9px]"></i>
+            <span>${f}</span>
+          </div>`;
+        }).join('');
+      }
+
+      // Parse bilingual verdict from reasoning
+      if (reasoning) {
+        const lines = reasoning.split('\n');
+        let enVerdict = reasoning;
+        let urVerdict = '';
+        const enIdx = reasoning.indexOf('ENGLISH:');
+        const urIdx = reasoning.indexOf('ROMAN URDU:');
+        if (enIdx >= 0 && urIdx > enIdx) {
+          enVerdict = reasoning.substring(enIdx + 8, urIdx).trim();
+          urVerdict = reasoning.substring(urIdx + 11).trim();
+        } else if (urIdx >= 0) {
+          urVerdict = reasoning.substring(urIdx + 11).trim();
+        }
+
+        verdictDataCache = { en: enVerdict, ur: urVerdict || enVerdict };
+        document.getElementById('fusionVerdictText').innerText = verdictShowUrdu ? verdictDataCache.ur : verdictDataCache.en;
+        document.getElementById('fusionVerdictBadge').classList.remove('hidden');
+      }
+    }
+
+    // Neural vision is no longer used; keep no-op for safety
+    function startNeuralVision() {}
 
     function toggleSidebar() {
       body.classList.toggle("sidebar-collapsed");
@@ -1655,10 +2324,10 @@
       }
     }
 
-    function openVault() {
-      VaultComponent.open((item) => {
+    async function openVault() {
+      VaultComponent.open(async (item) => {
         if (item.type !== "video") {
-          alert("Please select a video file for Live Check analysis.");
+          showToast("Please select a video file for analysis.", "warning");
           return;
         }
 
@@ -1673,9 +2342,17 @@
         }
 
         video.srcObject = null;
-        video.src = item.filepath;
+        currentFilePath = item.filepath;
+        video.src = currentFilePath;
         video.setAttribute("controls", "true");
-        video.style.transform = "none";
+        
+        // Respect Mirror Preference from Advanced Tools
+        const prefs = await eel.load_preferences()();
+        if (prefs.success && prefs.preferences && prefs.preferences.mirror_camera) {
+          video.style.transform = "scaleX(-1)";
+        } else {
+          video.style.transform = "none";
+        }
 
         document.querySelector("h1").innerHTML = item.filename + ' <span class="text-cyan-400 font-normal">| PIPELINE LOADED</span>';
 
@@ -1687,9 +2364,7 @@
         const analyseBtn = document.getElementById("analyseBtn");
         if (analyseBtn) analyseBtn.classList.remove("hidden");
 
-        Loader.show("Loading Evidence");
         video.oncanplay = () => {
-          Loader.hide();
           video.play();
           startNeuralVision();
         };
@@ -1712,7 +2387,6 @@
       }
 
       populateDevices();
-      initAnalysisCharts();
       initEmotionAnalysis();
       initCircularCharts();
 
@@ -1724,18 +2398,18 @@
         new Chart(ctxTruth.getContext('2d'), {
           type: 'line',
           data: {
-            labels: ['START', '2m', '4m', '6m', '8m', '10m', 'END'],
+            labels: ['Awaiting', 'Data'],
             datasets: [{
               label: 'Deception Level',
-              data: [10, 45, 30, 85, 92, 78, 80],
-              borderColor: '#f43f5e',
-              backgroundColor: 'rgba(244, 63, 94, 0.1)',
-              borderWidth: 4,
-              tension: 0.4,
+              data: [0, 0],
+              borderColor: '#334155',
+              backgroundColor: 'rgba(51, 65, 85, 0.1)',
+              borderWidth: 2,
+              tension: 0,
               fill: true,
-              pointBackgroundColor: '#f43f5e',
-              pointRadius: 6,
-              pointHoverRadius: 8
+              pointBackgroundColor: '#334155',
+              pointRadius: 3,
+              pointHoverRadius: 5
             }]
           },
           options: {

@@ -40,13 +40,14 @@ async function getUploads() {
  */
 async function uploadFile(file, isRecording = false, progressCallback = null) {
     try {
-        const CHUNK_SIZE = 512 * 1024; // 512KB chunks
+        const CHUNK_SIZE = 1024 * 1024;
         const totalSize = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
         const fileType = file.type.startsWith('video') ? 'video' : 'audio';
         
-        // Initiate upload
+        const fileName = file.name || `recording_${Date.now()}.mp4`;
+        
         const initResult = await eel.initiate_upload(
-            file.name,
+            fileName,
             totalSize,
             fileType,
             isRecording
@@ -208,6 +209,91 @@ async function signup(userData) {
     } catch (error) {
         console.error('Signup failed:', error);
         return { success: false, message: error.message };
+    }
+}
+
+/**
+ * Run Voice Analysis
+ * @param {string} relativePath - Relative path to file
+ * @returns {Promise<Object>} Analysis result
+ */
+async function runVoiceAnalysis(relativePath) {
+    try {
+        return await eel.run_voice_analysis(relativePath)();
+    } catch (error) {
+        console.error('Voice analysis failed:', error);
+        return { success: false, message: error.message };
+    }
+}
+
+/**
+ * Run Emotion Analysis
+ * @param {string} relativePath - Relative path to file
+ * @returns {Promise<Object>} Analysis result
+ */
+async function runEmotionAnalysis(relativePath) {
+    try {
+        return await eel.run_emotion_analysis(relativePath)();
+    } catch (error) {
+        console.error('Emotion analysis failed:', error);
+        return { success: false, message: error.message };
+    }
+}
+
+/**
+ * Run Facial Analysis
+ * @param {string} relativePath - Relative path to file
+ * @param {string} module - Module to run (pipeline, gaze, pose, etc)
+ * @returns {Promise<Object>} Analysis result
+ */
+async function runFacialAnalysis(relativePath, module = 'pipeline') {
+    try {
+        return await eel.run_facial_analysis(relativePath, module)();
+    } catch (error) {
+        console.error('Facial analysis failed:', error);
+        return { success: false, message: error.message };
+    }
+}
+
+/**
+ * Run Full Deception Pipeline
+ * @param {string} relativePath - Relative path to file
+ * @returns {Promise<Object>} Analysis result
+ */
+async function runFullPipeline(relativePath) {
+    try {
+        return await eel.run_full_pipeline(relativePath)();
+    } catch (error) {
+        console.error('Full pipeline failed:', error);
+        return { success: false, message: error.message };
+    }
+}
+
+/**
+ * Save Analysis Report
+ * @param {Object} reportData - Report data to save
+ * @returns {Promise<Object>} Result
+ */
+async function saveReport(reportData) {
+    try {
+        return await eel.save_analysis_report(reportData)();
+    } catch (error) {
+        console.error('Save report failed:', error);
+        return { success: false, message: error.message };
+    }
+}
+
+/**
+ * Get User Reports
+ * @returns {Promise<Array>} Array of reports
+ */
+async function getReports() {
+    try {
+        const result = await eel.get_reports()();
+        return result.success ? result.data : [];
+    } catch (error) {
+        console.error('Get reports failed:', error);
+        return [];
     }
 }
 

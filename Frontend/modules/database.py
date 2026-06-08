@@ -2,6 +2,8 @@ from pathlib import Path
 from tinydb import TinyDB, Query
 from datetime import datetime
 import uuid
+import hashlib
+import secrets
 
 # Persistent Database setup
 # Use Home directory so accounts are NOT wiped when the temp PyInstaller folder is deleted
@@ -12,13 +14,24 @@ DB_PATH = str(DB_DIR / 'db.json')
 db = TinyDB(DB_PATH)
 users_table = db.table('users')
 uploads_table = db.table('uploads')
+reports_table = db.table('reports')
+
+def _hash_password(password):
+    salt = secrets.token_hex(16)
+    h = hashlib.sha256((salt + password).encode()).hexdigest()
+    return f"{salt}${h}"
+
+def _verify_password(password, stored):
+    if '$' not in stored:
+        return stored == password
+    salt, h = stored.split('$', 1)
+    return hashlib.sha256((salt + password).encode()).hexdigest() == h
 
 def signup_user(user_data):
     """
     Register a new user in the database.
     """
     User = Query()
-    # Check for existing user with same email OR username in one query
     result = users_table.search((User.email == user_data['email']) | (User.username == user_data['username']))
     
     if result:
@@ -28,6 +41,7 @@ def signup_user(user_data):
         if existing.get('username') == user_data['username']:
              return {'success': False, 'message': 'Username already taken'}
     
+    user_data['password'] = _hash_password(user_data['password'])
     users_table.insert(user_data)
     return {'success': True, 'message': 'User registered successfully'}
 
@@ -36,12 +50,11 @@ def login_user(identity, password):
     Verify user credentials (email or username).
     """
     User = Query()
-    # Search for matching email OR username with the given password
-    result = users_table.search(((User.email == identity) | (User.username == identity)) & (User.password == password))
+    result = users_table.search((User.email == identity) | (User.username == identity))
     if result:
         user = result[0]
-        # Return a copy without password
-        return {'success': True, 'user': {k: v for k, v in user.items() if k != 'password'}}
+        if _verify_password(password, user['password']):
+            return {'success': True, 'user': {k: v for k, v in user.items() if k != 'password'}}
     return {'success': False, 'message': 'Invalid credentials'}
 
 def add_upload(username, file_name, file_type, file_size, file_path=""):
@@ -97,8 +110,8 @@ def change_password(username, current_pwd, new_pwd):
     """
     User = Query()
     user = users_table.get(User.username == username)
-    if user and user['password'] == current_pwd:
-        users_table.update({'password': new_pwd}, User.username == username)
+    if user and _verify_password(current_pwd, user['password']):
+        users_table.update({'password': _hash_password(new_pwd)}, User.username == username)
         return {'success': True}
     return {'success': False, 'message': 'Current password incorrect'}
 
@@ -141,3 +154,38 @@ def update_last_login(username):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     users_table.update({'last_login': timestamp}, User.username == username)
     return {'success': True, 'timestamp': timestamp}
+
+def save_report(username, report_data):
+    """
+    Save a new analysis report for a specific user.
+    """
+    report_data['id'] = str(uuid.uuid4())
+    report_data['username'] = username
+    report_data['timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    reports_table.insert(report_data)
+    return {'success': True, 'data': report_data}
+
+def get_user_reports(username):
+    """
+    Retrieve all reports for a specific user.
+    """
+    Report = Query()
+    return reports_table.search(Report.username == username)
+
+def get_report_by_id(report_id, username):
+    """
+    Get a specific report.
+    """
+    Report = Query()
+    return reports_table.get((Report.id == report_id) & (Report.username == username))
+
+def delete_report(report_id, username):
+    """
+    Delete a report.
+    """
+    Report = Query()
+    item = reports_table.get((Report.id == report_id) & (Report.username == username))
+    if item:
+        reports_table.remove(doc_ids=[item.doc_id])
+        return {'success': True}
+    return {'success': False, 'message': 'Report not found'}

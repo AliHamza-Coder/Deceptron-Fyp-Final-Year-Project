@@ -90,7 +90,6 @@
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
         }
 
-        /* Preview Area */
         .preview-area {
             background: #05080f;
             border-radius: 2.5rem;
@@ -98,6 +97,12 @@
             width: 100%;
             aspect-ratio: 16/9;
             position: relative;
+        }
+
+        video[style*="scaleX(-1)"]::-webkit-media-controls {
+            transform: scaleX(-1);
+        }
+
             border: 4px solid rgba(255, 255, 255, 0.05);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
         }

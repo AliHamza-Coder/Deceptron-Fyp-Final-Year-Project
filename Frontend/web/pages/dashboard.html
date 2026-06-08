@@ -149,52 +149,6 @@
             transform: translateX(5px);
         }
 
-        .btn-primary {
-            background: rgba(37, 99, 235, 0.1);
-            border: 1px solid rgba(37, 99, 235, 0.3);
-            color: var(--accent-cyan);
-            border-radius: 0.75rem;
-            transition: all 0.3s ease;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-blue);
-            color: #ffffff;
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
-            transform: translateY(-2px);
-        }
-
-        .btn-outline {
-            border: 1px solid var(--border-subtle);
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-main);
-            border-radius: 0.75rem;
-            transition: all 0.3s ease;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .btn-outline:hover {
-            border-color: var(--primary-blue);
-            background: var(--primary-blue);
-            color: #ffffff;
-            box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
-            transform: translateY(-2px);
-        }
-
         .card::before {
             content: '';
             position: absolute;
@@ -408,84 +362,7 @@
                         <div class="col-span-1"></div>
                     </div>
 
-                    <!-- Rows -->
-                    <div class="analysis-row grid grid-cols-12 gap-4 items-center px-4 py-4 rounded-xl cursor-pointer group" onclick="window.location.href='report-detail.html'">
-                        <div class="col-span-5 flex items-center space-x-3">
-                            <div
-                                class="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center text-xs border border-slate-700 transition-all duration-300">
-                                <i class="fas fa-user-secret text-slate-400"></i>
-                            </div>
-                            <div>
-                                <div class="text-sm font-semibold">John Doe</div>
-                                <div class="text-[10px] text-slate-500">Ref: #4092</div>
-                            </div>
-                        </div>
-                        <div class="col-span-2 text-xs text-slate-500">Today, 14:30</div>
-                        <div class="col-span-4">
-                            <div class="flex items-center space-x-3">
-                                <div class="flex-1 progress-bar-bg">
-                                    <div class="progress-bar-fill bg-rose-500" style="width: 78%"></div>
-                                </div>
-                                <span class="text-xs font-bold text-rose-500">78%</span>
-                            </div>
-                        </div>
-                        <div class="col-span-1 text-right">
-                            <button class="text-gray-500 hover:text-cyan-400 cursor-pointer"
-                                onclick="window.location.href='report-detail.html'"><i class="fas fa-eye"></i></button>
-                        </div>
-                    </div>
-
-                    <div class="analysis-row grid grid-cols-12 gap-4 items-center px-4 py-3 rounded-xl cursor-pointer group" onclick="window.location.href='report-detail.html'">
-                        <div class="col-span-5 flex items-center space-x-3">
-                            <div
-                                class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-xs border border-slate-100 glow-slate transition-all duration-300">
-                                <i class="fas fa-user text-slate-400"></i>
-                            </div>
-                            <div>
-                                <div class="text-sm font-semibold">Jane Smith</div>
-                                <div class="text-[10px] text-gray-500">Ref: #4091</div>
-                            </div>
-                        </div>
-                        <div class="col-span-2 text-xs text-slate-500">Today, 11:15</div>
-                        <div class="col-span-4">
-                            <div class="flex items-center space-x-3">
-                                <div class="flex-1 progress-bar-bg">
-                                    <div class="progress-bar-fill bg-emerald-500" style="width: 12%"></div>
-                                </div>
-                                <span class="text-xs font-bold text-emerald-600">12%</span>
-                            </div>
-                        </div>
-                        <div class="col-span-1 text-right">
-                            <button class="text-gray-500 hover:text-cyan-400 cursor-pointer"
-                                onclick="window.location.href='report-detail.html'"><i class="fas fa-eye"></i></button>
-                        </div>
-                    </div>
-
-                    <div class="analysis-row grid grid-cols-12 gap-4 items-center px-4 py-3 rounded-xl cursor-pointer group" onclick="window.location.href='report-detail.html'">
-                        <div class="col-span-5 flex items-center space-x-3">
-                            <div
-                                class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-xs border border-slate-100 glow-slate transition-all duration-300">
-                                <i class="fas fa-mask text-slate-400"></i>
-                            </div>
-                            <div>
-                                <div class="text-sm font-semibold">Unknown</div>
-                                <div class="text-[10px] text-gray-500">Ref: #4090</div>
-                            </div>
-                        </div>
-                        <div class="col-span-2 text-xs text-slate-500">Oct 23, 16:50</div>
-                        <div class="col-span-4">
-                            <div class="flex items-center space-x-3">
-                                <div class="flex-1 progress-bar-bg">
-                                    <div class="progress-bar-fill bg-amber-500" style="width: 45%"></div>
-                                </div>
-                                <span class="text-xs font-bold text-amber-600">45%</span>
-                            </div>
-                        </div>
-                        <div class="col-span-1 text-right">
-                            <button class="text-gray-500 hover:text-cyan-400 cursor-pointer"
-                                onclick="window.location.href='report-detail.html'"><i class="fas fa-eye"></i></button>
-                        </div>
-                    </div>
+                    <!-- Rows injected dynamically -->
                 </div>
             </div>
 
@@ -495,7 +372,7 @@
                 <div class="chart-container flex items-center justify-center">
                     <canvas id="trendChart"></canvas>
                     <div class="absolute text-center">
-                        <span class="block text-3xl font-bold heading-font text-white">124</span>
+                        <span id="totalCasesCount" class="block text-3xl font-bold heading-font text-white">0</span>
                         <span class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Cases</span>
                     </div>
                 </div>
@@ -506,107 +383,151 @@
                             <span class="w-2 h-2 rounded-full bg-rose-500 mr-2"></span>
                             <span class="text-xs text-slate-400">High Lying Risk</span>
                         </div>
-                        <span class="text-xs font-bold text-slate-300">35%</span>
+                        <span id="highRiskPerc" class="text-xs font-bold text-rose-400">0%</span>
                     </div>
                     <div class="flex items-center justify-between group">
                         <div class="flex items-center px-3 py-1 bg-white/5 rounded-full transition-all">
                             <span class="w-2 h-2 rounded-full bg-amber-500 mr-2"></span>
                             <span class="text-xs text-slate-400">Not Sure</span>
                         </div>
-                        <span class="text-xs font-bold text-slate-300">25%</span>
+                        <span id="midRiskPerc" class="text-xs font-bold text-amber-400">0%</span>
                     </div>
                     <div class="flex items-center justify-between group">
                         <div class="flex items-center px-3 py-1 bg-white/5 rounded-full transition-all">
                             <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>
                             <span class="text-xs text-slate-400">Trustworthy</span>
                         </div>
-                        <span class="text-xs font-bold text-slate-300">40%</span>
+                        <span id="lowRiskPerc" class="text-xs font-bold text-emerald-400">0%</span>
                     </div>
                 </div>
             </div>
         </section>
     </main>
-
     <script>
-        const ctx = document.getElementById('trendChart').getContext('2d');
-        const trendChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['High Lying Risk', 'Not Sure', 'Trustworthy'],
-                datasets: [{
-                    data: [35, 25, 40],
-                    backgroundColor: [
-                        '#f43f5e', // rose-500
-                        '#f59e0b', // amber-500
-                        '#10b981'  // emerald-500
-                    ],
-                    borderWidth: 0,
-                    hoverOffset: 10,
-                    borderRadius: 5
-                }]
-            },
-            options: {
-                cutout: '80%',
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                        tooltip: {
-                        enabled: true,
-                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                        titleFont: { family: 'Orbitron' },
-                        bodyFont: { family: 'Inter' },
-                        padding: 12,
-                        cornerRadius: 12,
-                        displayColors: false
-                    }
-                },
-                responsive: true,
-                maintainAspectRatio: false
+        function getReportRiskScore(report) {
+            if (report.type === 'pipeline') {
+                return Math.round((report.full_data || {}).overall_deception_score || report.overall_deception_score || 0);
+            } else if (report.type === 'voice') {
+                const stable = report.metrics?.pitch_stability || 50;
+                return Math.round(100 - stable);
+            } else if (report.type === 'facial' || report.type === 'emotion') {
+                const conf = (report.emotion || {}).confidence || 0.5;
+                return Math.round((1 - conf) * 100);
             }
-        });
+            return 50;
+        }
 
-        // Simple Nav Toggle (for simulation)
-        const navItems = document.querySelectorAll('.nav-item');
-        navItems.forEach(item => {
-            item.addEventListener('click', () => {
-                navItems.forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-            });
-        });
+        function getReportIcon(report) {
+            if (report.type === 'pipeline') return 'fa-video';
+            if (report.type === 'voice') return 'fa-microphone-alt';
+            if (report.type === 'facial' || report.type === 'emotion') return 'fa-face-smile';
+            return 'fa-file';
+        }
 
-        const body = document.body;
-
-
-        // Initial Load
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Check session
+        async function loadDashboardData() {
             try {
-                const result = await eel.get_current_user()();
-                const user = (result.success && result.data) ? result.data : null;
-                
-                if (!user) {
-                    window.location.href = 'login.html';
-                    return;
+                const response = await eel.get_reports()();
+                if (!response.success) return;
+
+                const reports = response.data;
+                const recentList = document.querySelector('.space-y-2');
+                const header = recentList.querySelector('.grid-cols-12');
+                recentList.innerHTML = '';
+                recentList.appendChild(header);
+
+                if (reports.length === 0) {
+                    recentList.innerHTML += `
+                        <div class="py-10 text-center opacity-50">
+                            <p class="text-xs uppercase font-bold tracking-widest">No recent sessions recorded</p>
+                        </div>
+                    `;
+                } else {
+                    reports.slice(0, 3).forEach(report => {
+                        const risk = getReportRiskScore(report);
+                        const colorClass = risk > 60 ? 'bg-rose-500' : (risk < 30 ? 'bg-emerald-500' : 'bg-amber-500');
+                        const textClass = risk > 60 ? 'text-rose-500' : (risk < 30 ? 'text-emerald-500' : 'text-amber-500');
+                        const date = new Date(report.analysis_date || report.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        const icon = getReportIcon(report);
+
+                        const row = document.createElement('div');
+                        row.className = 'analysis-row grid grid-cols-12 gap-4 items-center px-4 py-4 rounded-xl cursor-pointer group';
+                        row.onclick = () => window.location.href = `report-detail.html?id=${report.id}`;
+                        row.innerHTML = `
+                            <div class="col-span-5 flex items-center space-x-3">
+                                <div class="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center text-xs border border-slate-700">
+                                    <i class="fas ${icon} text-slate-400"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-semibold truncate w-32">${(report.source_file || '').split('/').pop()}</div>
+                                    <div class="text-[10px] text-slate-500">Ref: #${report.id.substring(0,6)}</div>
+                                </div>
+                            </div>
+                            <div class="col-span-2 text-xs text-slate-500">${date}</div>
+                            <div class="col-span-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="flex-1 progress-bar-bg">
+                                        <div class="progress-bar-fill ${colorClass}" style="width: ${risk}%"></div>
+                                    </div>
+                                    <span class="text-xs font-bold ${textClass}">${risk}%</span>
+                                </div>
+                            </div>
+                            <div class="col-span-1 text-right">
+                                <button class="text-gray-500 hover:text-cyan-400"><i class="fas fa-eye"></i></button>
+                            </div>
+                        `;
+                        recentList.appendChild(row);
+                    });
                 }
 
-                // Update Header Name/Initials
-                const userInitials = document.getElementById('profile-initials');
-                if (userInitials && (user.fullname || user.username)) {
-                    const name = user.fullname || user.username;
-                    const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                    if (!user.avatar) {
-                        userInitials.textContent = initials;
-                    }
-                }
+                updateTrendChart(reports);
+                document.getElementById('totalCasesCount').innerText = reports.length;
+
             } catch (err) {
-                console.error("Auth check failed:", err);
-                window.location.href = 'login.html';
-                return;
+                console.error("Dashboard refresh failed:", err);
             }
-        });
+        }
 
-        // Logout logic is now handled globally by sidebar.js
+        function updateTrendChart(reports) {
+            let high = 0, mid = 0, low = 0;
+            reports.forEach(r => {
+                const risk = getReportRiskScore(r);
+                if (risk > 60) high++;
+                else if (risk < 30) low++;
+                else mid++;
+            });
+
+            const total = reports.length || 1;
+            const highPerc = Math.round((high / total) * 100);
+            const midPerc = Math.round((mid / total) * 100);
+            const lowPerc = 100 - highPerc - midPerc;
+
+            if (window.trendChart) {
+                window.trendChart.data.datasets[0].data = [highPerc, midPerc, lowPerc];
+                window.trendChart.update();
+            }
+
+            document.getElementById('highRiskPerc').innerText = highPerc + '%';
+            document.getElementById('midRiskPerc').innerText = midPerc + '%';
+            document.getElementById('lowRiskPerc').innerText = lowPerc + '%';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            window.trendChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['High Risk', 'Ambiguous', 'Trustworthy'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: ['#f43f5e', '#f59e0b', '#10b981'],
+                        borderWidth: 0, hoverOffset: 10, borderRadius: 5
+                    }]
+                },
+                options: { cutout: '80%', plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false }
+            });
+
+            loadDashboardData();
+        });
     </script>
 </body>
-</html>
+</html>

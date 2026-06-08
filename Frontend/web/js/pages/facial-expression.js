@@ -60,7 +60,7 @@ async function stopRecording() {
 
 // ── Save ──────────────────────────────────────────────────────────────────────
 
-async function saveRecording() {
+    async function saveRecording() {
     const blob = recorder.getBlob('video/webm');
     if (!blob) { showToast('No recording to save', 'error'); return; }
 

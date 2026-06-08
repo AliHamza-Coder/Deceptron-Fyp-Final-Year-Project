@@ -108,7 +108,6 @@ const VaultComponent = (function() {
         }, 10);
 
         // Fetch data
-        renderLoader();
         try {
             const result = await eel.get_uploads()();
             if (result.success) {
