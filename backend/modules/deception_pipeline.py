@@ -15,6 +15,10 @@ Output:
 import os
 import sys
 
+# Disable tqdm progress bars to fix [WinError 6] The handle is invalid on Windows
+os.environ.setdefault("TQDM_DISABLE", "1")
+os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+
 # Fix for PyTorch 2.6+: Monkey-patch torch.load to force weights_only=False
 # This allows pyannote and other modules to load custom classes safely from local files.
 try:

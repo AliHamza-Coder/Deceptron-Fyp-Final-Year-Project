@@ -82,7 +82,7 @@ class HeadPoseAnalyzer:
 
         out = None
         if output_path:
-            fourcc = cv2.VideoWriter_fourcc(*'mp4v'); out = cv2.VideoWriter(output_path, fourcc, fps, (out_w, out_h))
+            fourcc = cv2.VideoWriter_fourcc(*'H264'); out = cv2.VideoWriter(output_path, fourcc, fps, (out_w, out_h))
         cam_matrix = np.array([[width, 0, width/2], [0, width, height/2], [0, 0, 1]], dtype=np.float32)
         dist_coeffs = np.zeros((4, 1))
 

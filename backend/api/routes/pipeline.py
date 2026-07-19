@@ -2,8 +2,13 @@ from fastapi import APIRouter, Form, Query
 import os
 import json
 import uuid
+import io
 from pathlib import Path
 import traceback
+
+# Disable tqdm progress bars for all sub-processes (child processes inherit env)
+os.environ.setdefault("TQDM_DISABLE", "1")
+os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
 
 router = APIRouter(prefix="/analyze", tags=["Forensics"])
 
@@ -41,6 +46,9 @@ async def analyze_pipeline(
     
     try:
         physical_video = resolve_path(video_path)
+        if not os.path.exists(physical_video):
+            return {"success": False, "message": f"Video file not found: {physical_video}"}
+        
         physical_audio = resolve_path(audio_path_final) if audio_path_final else None
         
         from deception_pipeline import DeceptionPipeline
@@ -69,6 +77,7 @@ async def analyze_pipeline(
             return {"success": False, "message": "Pipeline completed but no report was generated."}
             
     except Exception as e:
+        tb_str = "".join(traceback.format_exception(type(e), e, e.__traceback__))
         print("Pipeline API Error:")
-        traceback.print_exc()
-        return {"success": False, "message": str(e)}
+        print(tb_str)
+        return {"success": False, "message": str(e), "traceback": tb_str}

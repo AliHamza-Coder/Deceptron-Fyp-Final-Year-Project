@@ -56,7 +56,7 @@ class LipJawAnalyzer:
 
         out = None
         if output_path:
-            fourcc = cv2.VideoWriter_fourcc(*'mp4v'); out = cv2.VideoWriter(output_path, fourcc, fps, (out_w, out_h))
+            fourcc = cv2.VideoWriter_fourcc(*'H264'); out = cv2.VideoWriter(output_path, fourcc, fps, (out_w, out_h))
         auto_calib = (start_frame == 1 and self.baseline_nose_chin is None)
         calib_duration, calib_ended = 5.0, not auto_calib
         calib_nose_chin, calib_lip_ratios, calib_face_scale = [], [], []

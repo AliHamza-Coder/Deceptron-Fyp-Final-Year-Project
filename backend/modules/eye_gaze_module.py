@@ -48,7 +48,7 @@ class EyeGazeAnalyzer:
         
         out = None
         if output_path:
-            fourcc = cv2.VideoWriter_fourcc(*'mp4v'); out = cv2.VideoWriter(output_path, fourcc, fps, (out_w, out_h))
+            fourcc = cv2.VideoWriter_fourcc(*'H264'); out = cv2.VideoWriter(output_path, fourcc, fps, (out_w, out_h))
         frame_data, frame_idx = [], 0
         self.total_blinks = 0; self.blink_timestamps = []
 

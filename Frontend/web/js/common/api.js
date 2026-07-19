@@ -309,3 +309,76 @@ async function logout() {
         return { success: false, message: error.message };
     }
 }
+
+/**
+ * Initiate signup with email verification
+ * @param {Object} userData - User registration data
+ * @returns {Promise<Object>} Result
+ */
+async function initiateSignup(userData) {
+    try {
+        return await eel.initiate_signup(userData)();
+    } catch (error) {
+        console.error('Initiate signup failed:', error);
+        return { success: false, message: error.message };
+    }
+}
+
+/**
+ * Verify email with code
+ * @param {string} email - User email
+ * @param {string} code - 6-digit verification code
+ * @returns {Promise<Object>} Result
+ */
+async function verifyEmail(email, code) {
+    try {
+        return await eel.verify_email(email, code)();
+    } catch (error) {
+        console.error('Email verification failed:', error);
+        return { success: false, message: error.message };
+    }
+}
+
+/**
+ * Resend verification code
+ * @param {string} email - User email
+ * @returns {Promise<Object>} Result
+ */
+async function resendVerificationCode(email) {
+    try {
+        return await eel.resend_verification_code(email)();
+    } catch (error) {
+        console.error('Resend code failed:', error);
+        return { success: false, message: error.message };
+    }
+}
+
+/**
+ * Send password reset code
+ * @param {string} email - User email
+ * @returns {Promise<Object>} Result
+ */
+async function sendResetCode(email) {
+    try {
+        return await eel.send_reset_code(email)();
+    } catch (error) {
+        console.error('Send reset code failed:', error);
+        return { success: false, message: error.message };
+    }
+}
+
+/**
+ * Reset password with code
+ * @param {string} email - User email
+ * @param {string} code - 6-digit reset code
+ * @param {string} newPassword - New password
+ * @returns {Promise<Object>} Result
+ */
+async function resetPassword(email, code, newPassword) {
+    try {
+        return await eel.reset_password(email, code, newPassword)();
+    } catch (error) {
+        console.error('Reset password failed:', error);
+        return { success: false, message: error.message };
+    }
+}

@@ -4,10 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deceptron - Report Detail #4092</title>
+    <title>Deceptron - Report Detail</title>
     <link rel="icon" href="../assets/images/Eye icon.png">
     <link rel="stylesheet" href="../styles/output.css">
+    <script src="/eel.js"></script>
     <script src="../scripts/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="../js/common/constants.js"></script>
+    <script src="../js/common/utils.js"></script>
+    <script src="../js/common/api.js"></script>
+    <script src="../js/common/auth.js"></script>
     <link rel="stylesheet" href="../vendor/font-awesome/css/all.min.css">
     <link rel="stylesheet" href="../styles/sidebar.css">
     <style>
@@ -81,56 +87,6 @@
             display: flex;
         }
 
-        video[style*="scaleX(-1)"]::-webkit-media-controls {
-            transform: scaleX(-1);
-        }
-
-    .btn-primary {
-        background: rgba(37, 99, 235, 0.1);
-        border: 1px solid rgba(37, 99, 235, 0.3);
-        color: var(--accent-cyan);
-        border-radius: 0.75rem;
-        transition: all 0.3s ease;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-    }
-
-    .btn-primary:hover {
-        background: var(--primary-blue);
-        color: #ffffff;
-        border-color: var(--primary-blue);
-        box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
-        transform: translateY(-2px);
-    }
-
-    .btn-outline {
-        border: 1px solid var(--border-subtle);
-        background: rgba(255, 255, 255, 0.05);
-        color: var(--text-main);
-        border-radius: 0.75rem;
-        transition: all 0.3s ease;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-    }
-
-    .btn-outline:hover {
-        border-color: var(--primary-blue);
-        background: var(--primary-blue);
-        color: #ffffff;
-        box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
-        transform: translateY(-2px);
-    }
-
         .transcript-box {
             background: rgba(0, 0, 0, 0.2);
             border-radius: 1.25rem;
@@ -160,6 +116,31 @@
             position: relative;
             height: 300px;
         }
+        .voice-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+        .voice-table thead th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            color: #64748b;
+            font-weight: 800;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .voice-table tbody td {
+            padding: 0.65rem 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            font-size: 0.7rem;
+        }
+        .voice-table tbody tr:hover {
+            background: rgba(255,255,255,0.02);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,118,214,0.2); border-radius: 10px; }
 
         .pulse-deceptive {
             animation: pulse-red 2s infinite;
@@ -269,11 +250,7 @@
 </head>
 
 <body>
-    <!-- Sidebar Component Container -->
     <script src="../js/components/sidebar.js"></script>
-    <script>
-        initSidebar();
-    </script>
 
     <main class="main-content">
         <header class="p-8 pb-4 flex justify-between items-center">
@@ -284,12 +261,12 @@
                 </div>
             </div>
             <div class="flex items-center space-x-3">
-            <div class="flex space-x-4">
-                <button class="btn-outline px-6 py-2 text-[10px]" onclick="exportReportJSON()">
-                    <i class="fas fa-download text-primary-blue"></i> Export JSON
+            <div class="flex space-x-3">
+                <button class="btn-outline px-4 py-2.5 text-[10px]" onclick="exportReportJSON()">
+                    <i class="fas fa-file-code text-cyan-400"></i> JSON
                 </button>
-                <button class="btn-outline px-6 py-2 text-[10px]" onclick="window.print()">
-                    <i class="fas fa-file-pdf text-primary-blue"></i> Export PDF
+                <button class="btn-primary px-5 py-2.5 text-[10px] bg-gradient-to-r from-blue-600 to-cyan-500 text-white border-0 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40" onclick="downloadReportArchive()">
+                    <i class="fas fa-file-archive"></i> Download Archive
                 </button>
             </div>
             </div>
@@ -306,8 +283,8 @@
                             markers across session duration</p>
                     </div>
                     <div class="text-right">
-                        <span class="text-5xl font-bold heading-font text-rose-500">78%</span>
-                        <p class="text-[10px] font-bold text-rose-400 uppercase mt-1 tracking-widest">Risk Index</p>
+                        <span class="text-5xl font-bold heading-font text-gray-600" id="detailScoreDisplay">0%</span>
+                        <p class="text-[10px] font-bold text-gray-500 uppercase mt-1 tracking-widest" id="detailScoreLabel">Awaiting Data</p>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -366,6 +343,16 @@
                         <p class="text-sm text-slate-300 leading-relaxed italic">"I don't recognize the IP address used
                             to access the database. I don't own any devices capable of that."</p>
                     </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Analysis Results per Type -->
+            <div id="analysisResultsSection" class="hidden">
+                <div class="glass p-8">
+                    <h3 class="text-sm font-bold heading-font uppercase tracking-[0.2em] text-white mb-6 flex items-center">
+                        <i class="fas fa-microscope mr-3 text-primary-blue"></i> <span id="analysisResultsTitle">Analysis Results</span>
+                    </h3>
+                    <div id="analysisResultsContent" class="space-y-4"></div>
                 </div>
             </div>
 
@@ -450,20 +437,20 @@
                                 <canvas id="radialMetricA"></canvas>
                                 <div
                                     class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                    <span class="text-xs font-bold text-white">82%</span>
+                                    <span class="text-xs font-bold text-white">0%</span>
                                 </div>
                             </div>
-                            <span class="text-[9px] text-dim uppercase font-bold tracking-widest">Facial</span>
+                            <span id="radialLabelA" class="text-[9px] text-dim uppercase font-bold tracking-widest">Primary</span>
                         </div>
                         <div class="text-center space-y-3">
                             <div class="relative w-20 h-20 mx-auto group">
                                 <canvas id="radialMetricB"></canvas>
                                 <div
                                     class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                    <span class="text-xs font-bold text-white">65%</span>
+                                    <span class="text-xs font-bold text-white">0%</span>
                                 </div>
                             </div>
-                            <span class="text-[9px] text-dim uppercase font-bold tracking-widest">Voice</span>
+                            <span id="radialLabelB" class="text-[9px] text-dim uppercase font-bold tracking-widest">Secondary</span>
                         </div>
                     </div>
                 </article>
@@ -474,12 +461,13 @@
                 <h3 class="text-xs font-bold uppercase tracking-[0.2em] mb-6 text-white flex items-center">
                     <i class="fas fa-clipboard-list mr-3 text-primary-blue"></i> Analyst Notes & Disposition
                 </h3>
-                <textarea
+                <textarea id="archiveNotes"
                     class="w-full h-32 bg-slate-900/50 p-6 rounded-xl text-sm text-slate-200 border border-slate-700 focus:border-primary-blue focus:outline-none resize-none font-medium transition-all"
-                    placeholder="Enter session notes here...">Subject was visibly agitated during the second phase. Recommend re-interview with polygraph synchronization.</textarea>
+                    placeholder="Enter session notes here..."></textarea>
                 <div class="mt-6 flex justify-end">
-                    <button
-                        class="px-10 py-4 bg-primary-blue text-white text-xs font-bold uppercase tracking-widest rounded-xl shadow-lg shadow-blue-900/40 hover:bg-blue-600 transition-all cursor-pointer">
+                    <button id="saveNotesBtn"
+                        class="px-10 py-4 bg-primary-blue text-white text-xs font-bold uppercase tracking-widest rounded-xl shadow-lg shadow-blue-900/40 hover:bg-blue-600 transition-all cursor-pointer"
+                        onclick="saveNotes()">
                         Update Archive Notes
                     </button>
                 </div>
@@ -491,24 +479,29 @@
             const urlParams = new URLSearchParams(window.location.search);
             const reportId = urlParams.get('id');
             if (!reportId) {
-                alert("Report ID missing");
+                showToast("Report ID missing", "error");
                 window.location.href = 'reports.html';
                 return;
             }
-
             try {
+                const user = await getCurrentUser();
+                if (!user) { window.location.href = 'login.html'; return; }
                 const response = await eel.get_reports()();
-                if (response.success) {
+                if (response.success && response.data) {
                     const report = response.data.find(r => r.id === reportId);
                     if (report) {
                         renderReport(report);
                     } else {
-                        alert("Report not found");
+                        showToast("Report not found", "error");
                         window.location.href = 'reports.html';
                     }
+                } else {
+                    showToast("Failed to load reports", "error");
+                    window.location.href = 'reports.html';
                 }
             } catch (error) {
                 console.error("Error loading report:", error);
+                showToast("Error loading report", "error");
             }
         }
 
@@ -523,13 +516,31 @@
             document.querySelector('h1').innerText = report.type.toUpperCase() + " Intelligence Report";
             document.querySelector('.text-dim.font-bold').innerText = `Session Identity: #${report.id.substring(0,8)} • Verified`;
             
+            // Video/Audio source
             const video = document.getElementById('reportVideo');
-            if (report.source_file) {
-                const relativePath = report.source_file.split('.deceptron').pop().replace(/\\/g, '/');
-                video.src = `/data${relativePath}`;
+            const videoWrap = video.closest('.video-container');
+            const heroChartGrid = document.querySelector('.grid.grid-cols-1.lg\\:grid-cols-2');
+            if (report.type === 'voice') {
+                if (videoWrap) videoWrap.style.display = 'none';
+                if (heroChartGrid) heroChartGrid.className = 'grid grid-cols-1';
+                video.removeAttribute('src');
+            } else if (report.source_file) {
+                if (report.type === 'pipeline' && report.video_path) {
+                    const stem = report.video_path.split(/[/\\]/).pop().replace(/\.[^.]+$/, '');
+                    video.src = '/data/results/' + stem + '_combined_presentation.mp4';
+                    if (videoWrap) videoWrap.classList.remove('hidden');
+                } else if (report.source_file.match(/\.(mp4|webm|ogg)$/i)) {
+                    video.src = '/data/results/' + report.source_file.split(/[/\\]/).pop();
+                    if (videoWrap) videoWrap.classList.remove('hidden');
+                } else {
+                    if (videoWrap) videoWrap.classList.add('hidden');
+                }
+            } else {
+                if (videoWrap) videoWrap.classList.add('hidden');
             }
             
-            const scoreDisplay = document.querySelector('.text-5xl.font-bold');
+            const scoreDisplay = document.getElementById('detailScoreDisplay');
+            const scoreLabelEl = document.getElementById('detailScoreLabel');
             let score = 0;
             let label = "Confidence Rating";
             
@@ -553,8 +564,11 @@
                 label = "Emotion Match";
             }
             
+            const scoreColor = score > 60 ? 'text-rose-500' : (score < 30 ? 'text-emerald-400' : 'text-amber-400');
+            scoreDisplay.className = 'text-5xl font-bold heading-font ' + scoreColor;
             scoreDisplay.innerText = score + "%";
-            document.querySelector('.text-right p').innerText = label;
+            scoreLabelEl.innerText = label;
+            scoreLabelEl.className = 'text-[10px] font-bold uppercase mt-1 tracking-widest ' + (score > 60 ? 'text-rose-400' : (score < 30 ? 'text-emerald-400' : 'text-amber-400'));
 
             const noteArea = document.querySelector('textarea');
             if (noteArea) {
@@ -590,14 +604,7 @@
                     </div>`;
                 }).join('');
             } else if (report.type === 'voice') {
-                const orig = report.transcription_original || report.transcription || '';
-                transcriptBox.innerHTML = `
-                    <div class="transcript-item p-3">
-                        <div class="flex justify-between mb-2">
-                            <span class="text-[10px] font-bold text-primary-blue uppercase tracking-widest">Full Transcription</span>
-                        </div>
-                        <p class="text-sm text-slate-300 leading-relaxed italic">"${orig}"</p>
-                    </div>`;
+                transcriptBox.closest('.glass').style.display = 'none';
             } else if ((report.type === 'facial' || report.type === 'emotion') && report.results) {
                 const emo = report.results.emotion || {};
                 const frames = emo.summary && emo.summary.frames ? emo.summary.frames : [];
@@ -614,6 +621,74 @@
                         <i class="fas fa-closed-captioning text-3xl mb-3"></i>
                         <p class="text-xs uppercase font-bold tracking-widest">No transcript available for this session type</p>
                     </div>`;
+            }
+
+            // Analysis Results per Type
+            const analysisSection = document.getElementById('analysisResultsSection');
+            const analysisContent = document.getElementById('analysisResultsContent');
+            const analysisTitle = document.getElementById('analysisResultsTitle');
+            if (report.type === 'voice' && report.transcription_original) {
+                analysisSection.classList.remove('hidden');
+                analysisTitle.innerText = 'Voice Analysis — Acoustic Profile';
+                const da = report.deception_analysis || {};
+                const mt = report.micro_tremors || {};
+                const sc = report.spectral_clarity || {};
+                analysisContent.innerHTML = `
+                    <div class="bg-black/30 rounded-xl p-5 border border-white/5 flex items-center gap-4">
+                        <i class="fas fa-wave-square text-3xl text-cyan-400/50"></i>
+                        <div class="flex-1">
+                            <div class="h-12 rounded-lg bg-gradient-to-r from-cyan-500/5 via-cyan-400/10 to-cyan-500/5 flex items-center overflow-hidden" id="voiceWaveform">
+                                ${Array.from({length: 60}, (_, i) => {
+                                    const h = 20 + Math.sin(i * 0.5) * 10 + Math.random() * 8;
+                                    return `<div class="flex-1 mx-px rounded-full" style="height:${h}px;background:rgba(34,211,238,${0.2 + Math.random() * 0.3})"></div>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                        <span class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">Acoustic Waveform</span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-black/30 rounded-xl p-4 border border-white/5 text-center">
+                            <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">Pitch</p>
+                            <p class="text-lg font-bold text-cyan-400 mt-1">${(da.pitch_stability || 0).toFixed(1)} Hz</p>
+                        </div>
+                        <div class="bg-black/30 rounded-xl p-4 border border-white/5 text-center">
+                            <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">Jitter</p>
+                            <p class="text-lg font-bold text-amber-400 mt-1">${((mt.jitter_local_percent || 0)*100).toFixed(2)}%</p>
+                        </div>
+                        <div class="bg-black/30 rounded-xl p-4 border border-white/5 text-center">
+                            <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">Shimmer</p>
+                            <p class="text-lg font-bold text-rose-400 mt-1">${((mt.shimmer_local_percent || 0)*100).toFixed(2)}%</p>
+                        </div>
+                        <div class="bg-black/30 rounded-xl p-4 border border-white/5 text-center">
+                            <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">HNR</p>
+                            <p class="text-lg font-bold text-emerald-400 mt-1">${(sc.hnr_db || 0).toFixed(1)} dB</p>
+                        </div>
+                    </div>
+                    <div class="bg-black/30 rounded-xl p-4 border border-white/5">
+                        <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest mb-2">Transcription</p>
+                        <p class="text-sm text-gray-300 leading-relaxed italic">"${report.transcription_original || 'No transcription available.'}"</p>
+                    </div>`;
+            } else if (report.type === 'facial' || report.type === 'emotion') {
+                const emo = report.emotion || (report.results && report.results.emotion) || {};
+                const frames = (emo.summary && emo.summary.frames) || [];
+                if (frames.length) {
+                    analysisSection.classList.remove('hidden');
+                    analysisTitle.innerText = 'Facial Analysis — Frame-by-Frame';
+                    const sampleFrames = frames.filter((_, i) => i % Math.max(1, Math.floor(frames.length/20)) === 0);
+                    analysisContent.innerHTML = `
+                        <div class="voice-table-container custom-scrollbar max-h-[300px] overflow-y-auto">
+                            <table class="voice-table w-full">
+                                <thead><tr><th>Frame</th><th>Time</th><th>Emotion</th><th>Confidence</th></tr></thead>
+                                <tbody>${sampleFrames.map(f => `
+                                    <tr><td class="font-mono text-cyan-500">#${f.frame_num}</td><td class="text-gray-500">${(f.timestamp || 0).toFixed(2)}s</td><td class="text-white">${f.emotion || 'Neutral'}</td><td class="text-cyan-400 font-bold">${(f.confidence || 0).toFixed(1)}%</td></tr>
+                                `).join('')}</tbody>
+                            </table>
+                        </div>`;
+                }
+            } else if (report.type === 'pipeline') {
+                analysisSection.classList.add('hidden');
+            } else {
+                analysisSection.classList.add('hidden');
             }
 
             // Context Card
@@ -800,15 +875,16 @@
                 options: { plugins: { legend: { display: false }, tooltip: { enabled: false } }, responsive: true, maintainAspectRatio: false }
             });
 
-            const labels = document.querySelectorAll('.text-center.space-y-3 .text-[9px].text-dim');
-            if (labels.length >= 2) {
-                labels[0].innerText = labelA;
-                labels[1].innerText = labelB;
-            }
+            const labelAEl = document.getElementById('radialLabelA');
+            const labelBEl = document.getElementById('radialLabelB');
+            if (labelAEl) labelAEl.innerText = labelA;
+            if (labelBEl) labelBEl.innerText = labelB;
 
-            document.querySelectorAll('.absolute.inset-0 span').forEach((span, i) => {
-                span.innerText = Math.round(i === 0 ? valA : valB) + "%";
-            });
+            const spans = document.querySelectorAll('.absolute.inset-0 span');
+            if (spans.length >= 2) {
+                spans[0].innerText = Math.round(valA) + "%";
+                spans[1].innerText = Math.round(valB) + "%";
+            }
         }
 
         function exportReportJSON() {
@@ -834,6 +910,131 @@
             })();
         }
 
+        async function downloadReportArchive() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const reportId = urlParams.get('id');
+            if (!reportId) { showToast("No report loaded", "error"); return; }
+            try {
+                const response = await eel.get_reports()();
+                if (!response.success) { showToast("Failed to get report data", "error"); return; }
+                const report = response.data.find(r => r.id === reportId);
+                if (!report) { showToast("Report not found", "error"); return; }
+                const fdata = report.full_data || report;
+                const stem = 'deceptron_report_' + reportId.substring(0, 8);
+                const zip = new JSZip();
+
+                // 1. JSON
+                zip.file(stem + '.json', JSON.stringify(report, null, 2));
+
+                // 2. CSV
+                let csvContent = '';
+                if (report.type === 'pipeline') {
+                    csvContent = 'Segment,Start,End,Transcript,Emotion,Deception Score,Verdict\n';
+                    (fdata.segments || []).forEach(s => {
+                        const rs = s.raw_scores || {};
+                        const fusion = s.fusion || {};
+                        const emo = (rs.emotion || {}).dominant_emotion || 'Neutral';
+                        csvContent += [
+                            s.segment_id || '',
+                            s.start_sec || 0,
+                            s.end_sec || 0,
+                            '"' + (s.transcript_original || '').replace(/"/g, '""') + '"',
+                            emo,
+                            fusion.final_deception_score || 0,
+                            fusion.is_deceptive ? 'DECEPTIVE' : 'TRUTHFUL'
+                        ].join(',') + '\n';
+                    });
+                } else if (report.type === 'voice') {
+                    csvContent = 'Metric,Value\n';
+                    const da = fdata.deception_analysis || {};
+                    Object.entries(da).forEach(([k, v]) => { if (typeof v === 'number') csvContent += k + ',' + v + '\n'; });
+                    const mt = fdata.micro_tremors || {};
+                    Object.entries(mt).forEach(([k, v]) => { if (typeof v === 'number') csvContent += 'micro_tremors_' + k + ',' + v + '\n'; });
+                } else if (report.type === 'facial' || report.type === 'emotion') {
+                    csvContent = 'Frame,Timestamp,Emotion,Confidence\n';
+                    const emo = fdata.emotion || ((fdata.results || {}).emotion || {});
+                    const frames = (emo.summary || {}).frames || [];
+                    frames.forEach(f => {
+                        csvContent += [
+                            f.frame_num || '',
+                            f.timestamp || 0,
+                            f.emotion || 'Neutral',
+                            f.confidence || 0
+                        ].join(',') + '\n';
+                    });
+                }
+                if (csvContent) zip.file(stem + '.csv', csvContent);
+
+                // 3. Media file (video/audio)
+                let mediaPath = '';
+                if (report.type === 'voice' && report.source_file) {
+                    mediaPath = report.source_file;
+                } else if (report.type === 'pipeline' && report.video_path) {
+                    mediaPath = report.video_path;
+                } else if ((report.type === 'facial' || report.type === 'emotion') && report.source_file) {
+                    mediaPath = report.source_file;
+                }
+                if (mediaPath) {
+                    let mediaUrl = '';
+                    const mediaName = mediaPath.split(/[/\\]/).pop();
+                    if (report.type === 'pipeline' && report.video_path) {
+                        const stem2 = report.video_path.split(/[/\\]/).pop().replace(/\.[^.]+$/, '');
+                        mediaUrl = '/data/results/' + stem2 + '_combined_presentation.mp4';
+                    } else {
+                        mediaUrl = '/data/results/' + mediaName;
+                    }
+                    try {
+                        const resp = await fetch(mediaUrl);
+                        if (resp.ok) {
+                            const blob = await resp.blob();
+                            zip.file(mediaName, blob);
+                        }
+                    } catch (_) {}
+                }
+
+                // 4. Notes
+                const notesEl = document.getElementById('archiveNotes');
+                if (notesEl && notesEl.value.trim()) {
+                    zip.file(stem + '_notes.txt', notesEl.value);
+                }
+
+                const content = await zip.generateAsync({ type: 'blob' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(content);
+                a.download = stem + '.zip';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+                showToast("Archive downloaded (ZIP)", "success");
+            } catch (e) {
+                showToast("Archive error: " + e.message, "error");
+            }
+        }
+
+        async function saveNotes() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const reportId = urlParams.get('id');
+            const notesEl = document.getElementById('archiveNotes');
+            if (!reportId || !notesEl) { showToast("Cannot save", "error"); return; }
+            try {
+                const response = await eel.get_reports()();
+                if (!response.success || !response.data) { showToast("Failed to load reports", "error"); return; }
+                const reports = response.data;
+                const idx = reports.findIndex(r => r.id === reportId);
+                if (idx === -1) { showToast("Report not found", "error"); return; }
+                reports[idx].conclusion = notesEl.value;
+                const saveResp = await eel.save_reports(reports)();
+                if (saveResp && saveResp.success) {
+                    showToast("Notes saved successfully", "success");
+                } else {
+                    showToast("Failed to save notes", "error");
+                }
+            } catch (e) {
+                showToast("Save error: " + e.message, "error");
+            }
+        }
+
         function showToast(msg, type) {
             const div = document.createElement('div');
             const colors = { success: 'bg-emerald-600', error: 'bg-rose-600', info: 'bg-cyan-600' };
@@ -843,7 +1044,10 @@
             setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 500); }, 3000);
         }
 
-        document.addEventListener('DOMContentLoaded', loadReportDetail);
+        document.addEventListener('DOMContentLoaded', async () => {
+            try { initSidebar(); } catch(e) {}
+            loadReportDetail();
+        });
     </script>
 </body>
 </html>

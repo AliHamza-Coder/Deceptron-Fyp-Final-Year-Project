@@ -1475,18 +1475,22 @@
 
       if (type === 'touch') {
           const touchTbody = document.getElementById('touchTableBody');
-          touchTbody.innerHTML = frames.filter(f => (f.confidence || 0) > 0).map(f => {
+          touchTbody.innerHTML = frames.filter((_, i) => i % 10 === 0).map(f => {
               const touchList = f.touches || [];
               let activity = 'No Contact';
               if (touchList.includes('MOUTH')) activity = 'Hand on Mouth';
               else if (touchList.includes('CHIN')) activity = 'Hand on Chin';
+              else if (touchList.includes('NOSE')) activity = 'Hand on Nose';
+              else if (touchList.includes('EYES')) activity = 'Hand on Eyes';
+              else if (touchList.includes('FOREHEAD')) activity = 'Hand on Forehead';
               else if (touchList.length > 0) {
                   const region = touchList[0].toLowerCase();
                   activity = 'Hand on ' + region.charAt(0).toUpperCase() + region.slice(1);
               }
 
-              const status = (f.touch_duration || f.duration || 0) > 0 ? 'Active Touch' : 'Clear';
-              const confidenceFormatted = (f.confidence || 0).toFixed(2) + '%';
+              const hasTouch = (f.confidence || 0) > 0;
+              const status = hasTouch ? 'Active Touch' : 'Clear';
+              const confidenceFormatted = hasTouch ? (f.confidence || 0).toFixed(2) + '%' : '—';
               
               return `
                 <tr class="group cursor-pointer hover:bg-white/5 transition-all" onclick="jumpToTimestamp(${f.timestamp || 0})">
@@ -1503,7 +1507,7 @@
               const dist = summary.region_distribution || summary.distribution || { "None": 100 };
               updateModuleChart(stressChart, dist, 'stressLegend', ['#f43f5e', '#fbbf24', '#818cf8']);
               
-              const touchCount = frames.filter(f => (f.confidence || 0) > 0).length;
+              const touchCount = summary.touch_count || frames.filter(f => (f.confidence || 0) > 0).length;
               document.getElementById('touchScorePercent').innerText = touchCount;
               document.getElementById('touchScoreLabel').innerText = 'Incidents';
           }
@@ -1617,39 +1621,40 @@
         cutout: '80%'
       };
 
+      const emptyData = { labels: ['—'], datasets: [{ data: [100], backgroundColor: ['rgba(255,255,255,0.03)'], borderWidth: 0 }] };
       emotionChart = new Chart(document.getElementById('emotionDistributionChart').getContext('2d'), {
         type: 'doughnut',
-        data: { labels: ['Waiting'], datasets: [{ data: [100], backgroundColor: ['#34d399'], borderWidth: 0 }] },
+        data: emptyData,
         options: commonOptions
       });
 
       eyeChart = new Chart(document.getElementById('eyeMovementChart').getContext('2d'), {
         type: 'doughnut',
-        data: { labels: ['Waiting'], datasets: [{ data: [100], backgroundColor: ['#22d3ee'], borderWidth: 0 }] },
+        data: emptyData,
         options: commonOptions
       });
 
       jawChart = new Chart(document.getElementById('lipsJawChart').getContext('2d'), {
         type: 'doughnut',
-        data: { labels: ['Waiting'], datasets: [{ data: [100], backgroundColor: ['#34d399'], borderWidth: 0 }] },
+        data: emptyData,
         options: commonOptions
       });
 
       poseChart = new Chart(document.getElementById('poseDynamicsChart').getContext('2d'), {
         type: 'doughnut',
-        data: { labels: ['Waiting'], datasets: [{ data: [100], backgroundColor: ['#818cf8'], borderWidth: 0 }] },
+        data: emptyData,
         options: commonOptions
       });
 
       asymChart = new Chart(document.getElementById('asymmetryChart').getContext('2d'), {
         type: 'doughnut',
-        data: { labels: ['Waiting'], datasets: [{ data: [100], backgroundColor: ['#22d3ee'], borderWidth: 0 }] },
+        data: emptyData,
         options: commonOptions
       });
 
       stressChart = new Chart(document.getElementById('stressChart').getContext('2d'), {
         type: 'doughnut',
-        data: { labels: ['Waiting'], datasets: [{ data: [100], backgroundColor: ['#f43f5e'], borderWidth: 0 }] },
+        data: emptyData,
         options: commonOptions
       });
     }
@@ -1664,24 +1669,50 @@
       }
     }
 
+    let _backendBase = '';
+
+    async function getBackendBase() {
+      try { _backendBase = await eel.get_backend_url()(); } catch(e) { _backendBase = ''; }
+    }
+
+    function absVideoUrl(path) {
+      if (!path) return '';
+      if (path.startsWith('http://') || path.startsWith('https://')) return path;
+      if (path.startsWith('/')) return _backendBase + path;
+      return _backendBase + '/' + path;
+    }
+
+    function resolveVideoUrl(path) {
+      if (!path) return '';
+      if (path.startsWith('http://') || path.startsWith('https://')) return path;
+      const base = window.location.origin;
+      if (path.startsWith('/')) return base + path;
+      return base + '/' + path;
+    }
+
     function updateVideoGrid(videoUrls, titles) {
       const grid = document.getElementById('videoOutputGrid');
       if (videoUrls.length === 0) return;
 
       if (videoUrls.length === 1) {
-          grid.innerHTML = `
-            <div id="mainVideoWrap" class="relative video-inner-wrap rounded-xl overflow-hidden bg-black col-span-full">
-                <video src="${videoUrls[0]}" class="w-full h-full object-contain" controls autoplay muted playsinline></video>
-            </div>
-          `;
-          return;
+        const src = resolveVideoUrl(videoUrls[0]);
+        grid.innerHTML = `
+          <div id="mainVideoWrap" class="relative video-inner-wrap rounded-xl overflow-hidden bg-black col-span-full">
+            <video src="${src}" class="w-full h-full object-contain" controls autoplay muted playsinline></video>
+          </div>
+        `;
+        return;
       }
 
-      grid.innerHTML = videoUrls.map((url, i) => `
-        <div class="relative video-inner-wrap rounded-xl overflow-hidden bg-black border border-white/5 hover:border-cyan-500/30 transition-all group">
-            <video src="${url}" class="w-full h-full object-contain" controls muted playsinline></video>
-        </div>
-      `).join('');
+      grid.innerHTML = videoUrls.map((url, i) => {
+        const src = resolveVideoUrl(url);
+        return `
+          <div class="relative video-inner-wrap rounded-xl overflow-hidden bg-black border border-white/5 hover:border-cyan-500/30 transition-all group">
+            <video src="${src}" class="w-full h-full object-contain" controls muted playsinline></video>
+            ${titles[i] ? `<div class="absolute top-2 left-2 text-[8px] text-white bg-black/60 px-2 py-1 rounded font-bold uppercase tracking-widest pointer-events-none z-10">${titles[i]}</div>` : ''}
+          </div>
+        `;
+      }).join('');
     }
     async function finalizeAnalysis() {
       if (!currentFilePath) {
@@ -1796,6 +1827,7 @@
 
       populateDevices();
       initCircularCharts();
+      getBackendBase();
 
       const urlParams = new URLSearchParams(window.location.search);
       const autoFile = urlParams.get('file');

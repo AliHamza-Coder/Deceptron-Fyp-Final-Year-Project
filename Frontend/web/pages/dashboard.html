@@ -262,9 +262,6 @@
             </div>
 
             <div class="flex items-center space-x-3">
-                <button class="btn-outline px-6 py-2.5 text-[10px] hidden md:flex" onclick="triggerImport()">
-                    <i class="fas fa-file-import text-primary-blue"></i> Import Intelligence
-                </button>
                 <div class="flex items-center space-x-3 p-1.5 bg-blue-500/5 rounded-2xl border border-blue-500/10 cursor-pointer hover:bg-blue-500/10 transition-all"
                     onclick="window.location.href='profile.html'">
                     <div id="profile-initials"
@@ -346,13 +343,13 @@
 
         <section class="p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Recent Analysis Table -->
-            <div class="lg:col-span-2 card p-8 h-fit">
+            <div class="lg:col-span-2 card p-8 min-h-[480px]">
                 <div class="flex justify-between items-center mb-8">
                     <h3 class="text-xl font-bold">Recent Analysis</h3>
                     <a href="reports.html"
                         class="text-xs text-cyan-400 hover:text-cyan-300 transition-colors uppercase tracking-widest font-bold">History</a>
                 </div>
-                <div class="space-y-2">
+                <div id="recentAnalysisContainer" class="space-y-2 relative" style="min-height:360px">
                     <!-- Table Header -->
                     <div
                         class="grid grid-cols-12 gap-4 px-4 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
@@ -383,21 +380,21 @@
                             <span class="w-2 h-2 rounded-full bg-rose-500 mr-2"></span>
                             <span class="text-xs text-slate-400">High Lying Risk</span>
                         </div>
-                        <span id="highRiskPerc" class="text-xs font-bold text-rose-400">0%</span>
+                        <span id="highRiskCount" class="text-xs font-bold text-rose-400">0</span>
                     </div>
                     <div class="flex items-center justify-between group">
                         <div class="flex items-center px-3 py-1 bg-white/5 rounded-full transition-all">
                             <span class="w-2 h-2 rounded-full bg-amber-500 mr-2"></span>
                             <span class="text-xs text-slate-400">Not Sure</span>
                         </div>
-                        <span id="midRiskPerc" class="text-xs font-bold text-amber-400">0%</span>
+                        <span id="midRiskCount" class="text-xs font-bold text-amber-400">0</span>
                     </div>
                     <div class="flex items-center justify-between group">
                         <div class="flex items-center px-3 py-1 bg-white/5 rounded-full transition-all">
                             <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>
                             <span class="text-xs text-slate-400">Trustworthy</span>
                         </div>
-                        <span id="lowRiskPerc" class="text-xs font-bold text-emerald-400">0%</span>
+                        <span id="lowRiskCount" class="text-xs font-bold text-emerald-400">0</span>
                     </div>
                 </div>
             </div>
@@ -436,11 +433,12 @@
                 recentList.appendChild(header);
 
                 if (reports.length === 0) {
-                    recentList.innerHTML += `
-                        <div class="py-10 text-center opacity-50">
-                            <p class="text-xs uppercase font-bold tracking-widest">No recent sessions recorded</p>
-                        </div>
-                    `;
+                    recentList.innerHTML = '';
+                    recentList.appendChild(header);
+                    const emptyDiv = document.createElement('div');
+                    emptyDiv.className = 'absolute inset-0 flex items-center justify-center opacity-50';
+                    emptyDiv.innerHTML = '<p class="text-xs uppercase font-bold tracking-widest">No recent sessions recorded</p>';
+                    recentList.appendChild(emptyDiv);
                 } else {
                     reports.slice(0, 3).forEach(report => {
                         const risk = getReportRiskScore(report);
@@ -506,9 +504,9 @@
                 window.trendChart.update();
             }
 
-            document.getElementById('highRiskPerc').innerText = highPerc + '%';
-            document.getElementById('midRiskPerc').innerText = midPerc + '%';
-            document.getElementById('lowRiskPerc').innerText = lowPerc + '%';
+            document.getElementById('highRiskCount').innerText = high;
+            document.getElementById('midRiskCount').innerText = mid;
+            document.getElementById('lowRiskCount').innerText = low;
         }
 
         document.addEventListener('DOMContentLoaded', () => {

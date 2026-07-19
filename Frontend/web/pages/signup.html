@@ -309,6 +309,21 @@
         .form-footer a { color: var(--primary-blue); font-weight: 700; text-decoration: none; margin-left: 0.35rem; transition: color 0.2s; }
         .form-footer a:hover { color: var(--accent-cyan); }
 
+        .hidden { display: none; }
+        .resend-link { text-align: center; margin-top: 0.5rem; font-size: 0.73rem; }
+        .resend-link a { color: var(--primary-blue); text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.2s; }
+        .resend-link a:hover { color: var(--accent-cyan); }
+        .resend-link a:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .field-error {
+            font-size: 0.7rem;
+            color: #ef4444;
+            margin-top: 0.3rem;
+            padding-left: 0.25rem;
+            display: none;
+        }
+        .field-error.visible { display: block; }
+
         /* Responsive */
         @media (max-width: 820px) {
             body { flex-direction: column; height: auto; overflow-y: auto; }
@@ -364,50 +379,84 @@
     <!-- FORM PANEL -->
     <div class="form-panel">
         <div class="form-box">
-            <div class="form-top">
-                <div class="chip"><i class="fas fa-user-plus"></i> New Account</div>
-                <h2>Get Started</h2>
-                <p>Create your analyst account — it's free</p>
+            <!-- Step 1: Signup form -->
+            <div id="signupStep">
+                <div class="form-top">
+                    <div class="chip"><i class="fas fa-user-plus"></i> New Account</div>
+                    <h2>Get Started</h2>
+                    <p>Create your analyst account — it's free</p>
+                </div>
+
+                <form id="signupForm">
+                    <div class="grid-2">
+                        <div class="field" style="margin-bottom:0">
+                            <div class="field-icon"><i class="fas fa-user"></i></div>
+                            <input type="text" placeholder="First Name" required>
+                        </div>
+                        <div class="field" style="margin-bottom:0">
+                            <div class="field-icon"><i class="fas fa-user"></i></div>
+                            <input type="text" placeholder="Last Name" required>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-icon"><i class="fas fa-at"></i></div>
+                        <input type="text" placeholder="Username" required>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-icon"><i class="fas fa-envelope"></i></div>
+                        <input type="email" placeholder="Email Address" required>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-icon"><i class="fas fa-lock"></i></div>
+                        <input type="password" id="signupPwd" placeholder="Create Password" required>
+                        <button type="button" class="eye-btn" onclick="togglePwd('signupPwd',this)" tabindex="-1"><i class="fas fa-eye"></i></button>
+                    </div>
+
+                    <div class="terms-row">
+                        <input type="checkbox" required>
+                        <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Create Account</button>
+                </form>
+
+                <div class="form-footer">
+                    Already have an account?<a href="login.html">Sign in</a>
+                </div>
             </div>
 
-            <form id="signupForm">
-                <div class="grid-2">
-                    <div class="field" style="margin-bottom:0">
-                        <div class="field-icon"><i class="fas fa-user"></i></div>
-                        <input type="text" placeholder="First Name" required>
-                    </div>
-                    <div class="field" style="margin-bottom:0">
-                        <div class="field-icon"><i class="fas fa-user"></i></div>
-                        <input type="text" placeholder="Last Name" required>
-                    </div>
+            <!-- Step 2: Email Verification -->
+            <div id="verifyStep" class="hidden">
+                <div class="form-top">
+                    <div class="chip"><i class="fas fa-shield-alt"></i> Verify Email</div>
+                    <h2>Check Your Inbox</h2>
+                    <p>We sent a 6-digit code to <strong id="verifyEmailDisplay" style="color:#0ea5e9;"></strong></p>
                 </div>
 
-                <div class="field">
-                    <div class="field-icon"><i class="fas fa-at"></i></div>
-                    <input type="text" placeholder="Username" required>
+                <div style="text-align:center;margin:2rem 0;">
+                    <input type="text" id="verifyCode" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="off"
+                           style="width:220px;padding:1.2rem;text-align:center;font-size:2rem;letter-spacing:12px;font-weight:700;font-family:'Courier New',monospace;
+                                  background:var(--bg-main);border:1px solid var(--border-subtle);border-radius:0.75rem;color:#0ea5e9;outline:none;"
+                           placeholder="000000">
+                    <div class="field-error" id="verifyCodeError" style="text-align:center;margin-top:0.5rem;">Enter the 6-digit code from your email</div>
                 </div>
 
-                <div class="field">
-                    <div class="field-icon"><i class="fas fa-envelope"></i></div>
-                    <input type="email" placeholder="Email Address" required>
+                <button class="btn-submit" id="verifyBtn" style="margin-bottom:1rem;">
+                    <i class="fas fa-check-circle"></i> Verify Email
+                </button>
+
+                <div class="resend-link" style="text-align:center;margin-bottom:0.5rem;">
+                    <a id="verifyResendLink" style="color:var(--primary-blue);text-decoration:none;font-weight:600;cursor:pointer;font-size:0.73rem;">Resend code</a>
                 </div>
 
-                <div class="field">
-                    <div class="field-icon"><i class="fas fa-lock"></i></div>
-                    <input type="password" id="signupPwd" placeholder="Create Password" required>
-                    <button type="button" class="eye-btn" onclick="togglePwd('signupPwd',this)" tabindex="-1"><i class="fas fa-eye"></i></button>
+                <div class="form-footer">
+                    <a href="signup.html" style="margin-left:0;" onclick="location.reload()">Start over</a>
+                    &middot;
+                    <a href="login.html">Sign in</a>
                 </div>
-
-                <div class="terms-row">
-                    <input type="checkbox" required>
-                    <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
-                </div>
-
-                <button type="submit" class="btn-submit">Create Account</button>
-            </form>
-
-            <div class="form-footer">
-                Already have an account?<a href="login.html">Sign in</a>
             </div>
         </div>
     </div>

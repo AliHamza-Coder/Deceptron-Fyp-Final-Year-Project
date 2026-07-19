@@ -11,8 +11,10 @@ Class:
 """
 
 import os
+import sys
 import tempfile
 import subprocess
+from pathlib import Path
 from pydub import AudioSegment
 from speaker_diarizer import SpeakerDiarizer
 import whisper
@@ -23,7 +25,16 @@ class SegmentManager:
 
     def __init__(self, device="cpu"):
         self.diarizer = SpeakerDiarizer(device=device)
-        self.whisper_model = whisper.load_model("base")
+        # Load whisper from local cache (same location as ForensicVoiceAnalyzer)
+        if getattr(sys, 'frozen', False):
+            base_path = Path(sys._MEIPASS)
+        else:
+            base_path = Path(__file__).resolve().parent.parent
+        models_dir = base_path / "myenv" / "local_models" / "whisper"
+        if models_dir.exists():
+            self.whisper_model = whisper.load_model("base", download_root=str(models_dir))
+        else:
+            self.whisper_model = whisper.load_model("base")
 
     def get_suspect_segments(self, audio_path, suspect_label=None):
         """Identify suspect speaking turns, linked to interviewer questions.

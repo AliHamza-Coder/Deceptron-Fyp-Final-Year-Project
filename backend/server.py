@@ -1,5 +1,11 @@
 import sys
 import os
+
+# Disable ALL progress bars to fix [WinError 6] The handle is invalid on Windows
+os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
+os.environ["TQDM_DISABLE"] = "1"
+os.environ["HF_HUB_OFFLINE"] = "1"
+
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

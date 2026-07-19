@@ -10,8 +10,23 @@ import re
 import base64
 import uuid
 import time
+import smtplib
 
 from pathlib import Path
+
+# ========================================
+# EMAIL MODULE
+# ========================================
+from modules.email_sender import EmailSender, check_internet
+
+# Global email sender (initialized once SMTP config loads)
+_email_sender = None
+
+def _get_email_sender():
+    global _email_sender
+    if _email_sender is None:
+        _email_sender = EmailSender(app_config.SMTP_CONFIG)
+    return _email_sender
 
 # ========================================
 # PATH CONFIGURATION
@@ -340,6 +355,100 @@ def update_password(current_pwd, new_pwd):
         return {'success': False, 'message': 'Not logged in'}
     return database.change_password(current_user['username'], current_pwd, new_pwd)
 
+# ========================================
+# EMAIL VERIFICATION & PASSWORD RESET
+# ========================================
+
+@eel.expose
+def initiate_signup(user_data):
+    """Step 1: Create pending signup and send verification email (NO DB SAVE YET)."""
+    try:
+        result = database.create_pending_signup(user_data)
+        if not result['success']:
+            return result
+        sent, msg = False, ""
+        try:
+            if not check_internet():
+                sent, msg = False, "No internet connection. Click Resend when online."
+            else:
+                sender = _get_email_sender()
+                sender.send_verification(result['email'], result['code'])
+                sent, msg = True, "Verification code sent to your email"
+        except smtplib.SMTPAuthenticationError:
+            sent, msg = False, "Gmail login failed. Verify your App Password in .env file."
+        except smtplib.SMTPException as e:
+            sent, msg = False, f"Email server error: {e}"
+        except Exception as e:
+            sent, msg = False, f"Could not send email: {e}"
+        return {'success': True, 'email': result['email'], 'email_sent': sent, 'message': msg}
+    except Exception as e:
+        print(f"❌ Initiate signup error: {e}")
+        return {'success': False, 'message': str(e)}
+
+@eel.expose
+def resend_verification_code(email):
+    """Resend verification code to user's email."""
+    try:
+        result = database.resend_pending_code(email)
+        if result['success']:
+            sender = _get_email_sender()
+            sender.send_verification(email, result['code'])
+            return {'success': True, 'message': 'New verification code sent'}
+        return result
+    except Exception as e:
+        return {'success': False, 'message': str(e)}
+
+@eel.expose
+def verify_email(email, code):
+    """Step 2: Verify code, SAVE to DB, send welcome email."""
+    try:
+        result = database.verify_pending_signup(email, code)
+        if result['success']:
+            user = result.get('user', {})
+            name = user.get('firstName', '') or user.get('username', '')
+            try:
+                _get_email_sender().send_welcome(email, name)
+            except Exception:
+                pass
+            return {'success': True, 'message': 'Email verified successfully! You can now sign in.'}
+        return result
+    except Exception as e:
+        return {'success': False, 'message': str(e)}
+
+@eel.expose
+def send_reset_code(email):
+    """Send password reset code to user's email."""
+    try:
+        user_check = database.get_user_by_email(email)
+        if not user_check['success']:
+            return user_check
+        result = database.set_reset_code(email)
+        if result['success']:
+            sender = _get_email_sender()
+            sender.send_reset_code(email, result['code'])
+            return {'success': True, 'message': 'Reset code sent to your email'}
+        return result
+    except Exception as e:
+        return {'success': False, 'message': str(e)}
+
+@eel.expose
+def reset_password(email, code, new_password):
+    """Reset password using reset code."""
+    try:
+        return database.reset_password(email, code, new_password)
+    except Exception as e:
+        return {'success': False, 'message': str(e)}
+
+@eel.expose
+def check_smtp_status():
+    """Check if SMTP is configured."""
+    try:
+        cfg = app_config.get_smtp_config()
+        ok = bool(cfg.get("SMTP_USER") and cfg.get("SMTP_PASS"))
+        return {'success': True, 'configured': ok}
+    except Exception:
+        return {'success': False, 'configured': False}
+
 @eel.expose
 def save_preferences(preferences):
     """
@@ -437,6 +546,10 @@ def run_full_pipeline(relative_path):
     except Exception as e:
         print(f"❌ Pipeline API Error: {e}")
         return {'success': False, 'message': str(e)}
+
+@eel.expose
+def get_backend_url():
+    return app_config.BACKEND_URL
 
 @eel.expose
 def save_analysis_report(report_data):

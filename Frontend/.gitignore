@@ -4,3 +4,4 @@
 /.zenflow
 /myenv
 /__pycache__
+.env
