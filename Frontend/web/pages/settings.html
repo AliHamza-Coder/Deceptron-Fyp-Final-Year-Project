@@ -10,18 +10,18 @@
     <link rel="stylesheet" href="../styles/sidebar.css">
     <style>
         :root {
-            --primary-blue: #2563eb; /* Professional Royal Blue */
+            --primary-blue: #2563eb; /* Royal Blue */
             --accent-cyan: #0ea5e9; /* Sky Blue */
             --accent-rose: #ef4444;
             --sidebar-width: 260px;
 
-            /* Vibrant University Pro Theme */
+            /* theme colors */
             --bg-main: #0f172a; /* Deep Navy */
             --text-main: #ffffff;
             --text-dim: #94a3b8;
             --sidebar-bg: #0f172a;
-            --card-bg: #1e293b; /* Solid Professional Surface */
-            --border-subtle: #334155; /* Visible Slate Border */
+            --card-bg: #1e293b; /* card surface */
+            --border-subtle: #334155; /* slate border */
             --input-bg: #0f172a;
         }
 
@@ -157,7 +157,7 @@
             padding: 1rem 1.5rem;
             font-size: 0.85rem;
             font-weight: 700;
-            color: #ffffff !important; /* Force white text */
+            color: #ffffff !important; /* keep text white */
             text-transform: uppercase;
             transition: all 0.3s ease;
             width: 100%;
@@ -226,7 +226,7 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar Component Container -->
+    <!-- Sidebar -->
     <script type="text/javascript" src="/eel.js"></script>
     <script src="../js/components/sidebar.js"></script>
     <script>
@@ -332,7 +332,7 @@
             </div>
 
             <div class="space-y-6">
-                <!-- Select Camera at Top -->
+                <!-- camera selector -->
                 <div class="setting-card">
                     <div class="space-y-4">
                         <label class="text-[11px] text-slate-400 font-black uppercase tracking-[0.2em]">Primary Camera Interface</label>
@@ -374,12 +374,12 @@
         let mediaStream = null;
         let videoTrack = null;
 
-        // --- Sidebar Logic ---
+        // sidebar logic
 
 
-        // --- Initialization ---
+        // page setup
         document.addEventListener('DOMContentLoaded', async () => {
-            // Check session
+            // check if user is logged in
             try {
                 const result = await eel.get_current_user()();
                 const user = (result.success && result.data) ? result.data : null;
@@ -389,23 +389,23 @@
                     return;
                 }
                 
-                // Update Name
+                // show user name
                 const activeMember = document.querySelector('.active-member-info span.ml-1');
                 if (activeMember) activeMember.textContent = `${user.firstName} ${user.lastName} • Unit #${user.username.toUpperCase()}`;
             } catch (err) { console.error("Session check failed:", err); }
 
 
-            // Initialize Sliders
+            // set up sliders
             setupSliders();
             loadSliderValues();
             setupLogoutHandler();
         
-            // Populate Devices
+            // list cameras
             await populateCameras(); 
             await loadSavedPreferences();
         });
 
-        // --- Camera & Settings Logic ---
+        // camera and settings
         async function populateCameras() {
             const camSelect = document.getElementById('camSelect');
             if (!camSelect) return;
@@ -523,7 +523,7 @@
             try {
                 const constraints = type === 'video' ? { video: true } : { audio: true };
                 const stream = await navigator.mediaDevices.getUserMedia(constraints);
-                // Immediately stop the stream as we only wanted to trigger the permission prompt
+                // stop the stream, we only needed the permission prompt
                 stream.getTracks().forEach(track => track.stop());
                 alert(`${type.charAt(0).toUpperCase() + type.slice(1)} permission granted!`);
                 if (type === 'video') populateCameras();

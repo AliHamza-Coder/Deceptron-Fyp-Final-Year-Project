@@ -1,7 +1,7 @@
 import sys
 import os
 
-# Disable ALL progress bars to fix [WinError 6] The handle is invalid on Windows
+# Disable all progress bars to fix [WinError 6] The handle is invalid on Windows
 os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
 os.environ["TQDM_DISABLE"] = "1"
 os.environ["HF_HUB_OFFLINE"] = "1"
@@ -11,9 +11,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-# ========================================
-# DECEPTRON BACKEND - MODULAR SERVER
-# ========================================
+# Deceptron backend - modular server
 
 # 1. Path Configuration
 if getattr(sys, 'frozen', False):
@@ -34,7 +32,7 @@ RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 # 2. Initialize FastAPI
 app = FastAPI(
     title="Deceptron Modular API",
-    description="Professional Forensic Analysis Suite",
+    description="Multi-modal deception analysis API",
     version="4.0.0"
 )
 

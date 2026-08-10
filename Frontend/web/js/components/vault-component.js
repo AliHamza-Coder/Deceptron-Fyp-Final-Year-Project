@@ -1,7 +1,4 @@
-/**
- * DECEPTRON Vault Component
- * A reusable premium UI for selecting uploaded evidence.
- */
+/** Vault component - lets the user pick an uploaded file. */
 
 const VaultComponent = (function() {
     let vaultModal = null;
@@ -21,8 +18,8 @@ const VaultComponent = (function() {
                                 <i class="fas fa-vault text-primary-blue text-xl"></i>
                             </div>
                             <div>
-                                <h3 class="text-sm font-black text-white uppercase tracking-[0.2em]">Forensic Vault</h3>
-                                <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-1">Secure Evidence Selection</p>
+                                <h3 class="text-sm font-black text-white uppercase tracking-[0.2em]">Evidence Vault</h3>
+                                <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-1">Select a file</p>
                             </div>
                         </div>
                         <button onclick="VaultComponent.close()" class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all flex items-center justify-center">
@@ -32,7 +29,7 @@ const VaultComponent = (function() {
 
                     <div class="p-8 pb-6">
                         <div class="relative group">
-                            <input type="text" id="vaultSearch" placeholder="Search evidence vault..." 
+                            <input type="text" id="vaultSearch" placeholder="Search files..." 
                                    class="w-full bg-black/20 border-2 border-white/5 rounded-2xl py-4 px-6 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-primary-blue transition-all">
                             <i class="fas fa-search absolute right-6 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-primary-blue transition-colors pointer-events-none"></i>
                         </div>
@@ -140,7 +137,7 @@ const VaultComponent = (function() {
                     <div class="absolute inset-0 border-4 border-cyan-500/10 rounded-full"></div>
                     <div class="absolute inset-0 border-4 border-t-cyan-500 rounded-full animate-spin shadow-[0_0_15px_rgba(0,219,255,0.3)]"></div>
                 </div>
-                <p class="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400 animate-pulse">Syncing with Forensics Cloud...</p>
+                <p class="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400 animate-pulse">Loading...</p>
             </div>
         `;
     }
@@ -149,7 +146,7 @@ const VaultComponent = (function() {
         document.getElementById('vaultList').innerHTML = `
             <div class="flex flex-col items-center justify-center h-full space-y-4 text-red-400">
                 <i class="fas fa-exclamation-triangle text-2xl"></i>
-                <p class="text-[10px] font-bold uppercase tracking-widest text-center">Encryption Link Severed.<br>Please re-authenticate.</p>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-center">Could not load files.<br>Please try again.</p>
             </div>
         `;
     }
@@ -168,7 +165,7 @@ const VaultComponent = (function() {
                     <div class="w-16 h-16 rounded-full bg-cyan-500/5 flex items-center justify-center border border-cyan-500/10">
                         <i class="fas fa-ghost text-3xl text-cyan-400"></i>
                     </div>
-                    <p class="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Neural Buffer Empty: No Records</p>
+                    <p class="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">No records found</p>
                 </div>
             `;
             return;

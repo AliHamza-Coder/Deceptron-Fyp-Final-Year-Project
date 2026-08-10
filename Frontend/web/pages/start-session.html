@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Deceptron - Live Analysis Unit</title>
   <link rel="icon" href="../assets/images/Eye icon.png">
-  <!-- Eel for Python-JavaScript Communication -->
+  <!-- eel connects Python to the browser -->
   <script src="/eel.js"></script>
   <link rel="stylesheet" href="../styles/output.css" />
   <script src="../scripts/chart.min.js"></script>
@@ -26,7 +26,7 @@
       --accent-cyan: #0ea5e9;
       --sidebar-width: 260px;
 
-      /* Vibrant University Pro Theme */
+      /* theme colors */
       --bg-main: #0f172a;
       --text-main: #ffffff;
       --text-dim: #94a3b8;
@@ -180,7 +180,7 @@
       border-color: var(--primary-blue);
     }
 
-    /* Dropdown Styling Fix */
+    /* dropdown styling */
     select {
       -webkit-appearance: none;
       appearance: none;
@@ -461,7 +461,7 @@
 </head>
 
 <body>
-  <!-- Sidebar Component Container -->
+  <!-- Sidebar -->
   <!-- Common utilities -->
   <script src="../js/common/constants.js"></script>
   <script src="../js/common/utils.js"></script>
@@ -499,7 +499,7 @@
       </div>
     </header>
 
-    <!-- Top Grid: Video & Config -->
+    <!-- top grid: video and config -->
     <div class="grid grid-cols-12 gap-6 px-4">
       <!-- Video Column -->
       <div class="col-span-12 xl:col-span-9 space-y-4">
@@ -534,7 +534,7 @@
             </button>
           </div>
 
-          <!-- Notification Toast inside Video -->
+          <!-- notification toast over the video -->
           <div id="videoToast"
             class="absolute top-20 left-1/2 -translate-x-1/2 z-30 transition-all duration-500 opacity-0 translate-y-4">
             <div
@@ -642,7 +642,7 @@
 
     <!-- Forensic Analytics & Detailed Breakdown -->
     <div class="col-span-12 grid grid-cols-12 gap-6 pb-8">
-      <!-- AI Analysis Results Section Header -->
+      <!-- analysis results header -->
       <div class="col-span-12 mb-2">
         <div class="flex items-center space-x-3 text-cyan-400 mb-2">
           <div class="h-[1px] flex-1 bg-cyan-500/20"></div>
@@ -653,9 +653,9 @@
         </div>
       </div>
 
-      <!-- Forensic Analytics & Detailed Breakdown -->
+    <!-- analysis results section -->
       <div class="col-span-12 grid grid-cols-12 gap-6 pb-8">
-        <!-- NLP Deception Indicators Card -->
+        <!-- nlp deception card -->
         <div class="col-span-12" id="nlpCard">
           <div class="glass p-6 border-cyan-500/10">
             <div class="flex items-center justify-between mb-5">
@@ -667,6 +667,24 @@
                 <i class="fas fa-language text-[10px]"></i> <span id="nlpLangLabel">UR</span>
               </button>
             </div>
+
+            <!-- NLP score summary -->
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20 flex-shrink-0">
+                <i class="fas fa-brain text-lg"></i>
+              </div>
+              <div class="flex-1">
+                <div class="flex justify-between items-end gap-2">
+                  <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">NLP Deception Score</p>
+                  <p class="text-xl font-black text-white tabular-nums" id="nlpScoreDisplay">--</p>
+                </div>
+                <div class="h-2 bg-white/5 rounded-full overflow-hidden mt-1">
+                  <div class="h-full bg-purple-500 rounded-full transition-all duration-1000" style="width:0%" id="nlpScoreBar"></div>
+                </div>
+                <p class="text-[10px] mt-1 text-gray-500" id="nlpScoreLabel">Awaiting analysis...</p>
+              </div>
+            </div>
+
             <div id="nlpFlagsContainer" class="flex flex-wrap gap-2 mb-4 min-h-[28px]">
               <span class="text-[10px] text-gray-500 italic">Awaiting analysis...</span>
             </div>
@@ -677,7 +695,7 @@
           </div>
         </div>
 
-        <!-- Hero: Main Truth Level Chart -->
+        <!-- main truth level chart -->
         <div class="col-span-12 truth-chart-card">
           <div class="flex justify-between items-start mb-10">
             <div>
@@ -694,9 +712,9 @@
           </div>
         </div>
 
-        <!-- Visual Circular Graphs Section -->
+        <!-- circular graphs -->
         <div id="circularGraphsSection" class="col-span-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <!-- Graph 1: Emotion Distribution -->
+          <!-- graph 1: emotion distribution -->
           <article class="glass p-6">
             <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4">
               <i class="fas fa-chart-pie mr-2 text-emerald-400"></i> Emotion Distribution
@@ -711,7 +729,7 @@
             <div id="emotionLegend" class="mt-4 space-y-2 text-[10px]"></div>
           </article>
 
-          <!-- Graph 2: Gaze Stability -->
+          <!-- graph 2: gaze stability -->
           <article class="glass p-6">
             <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4">
               <i class="fas fa-eye mr-2 text-blue-400"></i> Gaze Stability
@@ -726,7 +744,7 @@
             <div id="gazeLegend" class="mt-4 space-y-2 text-[10px]"></div>
           </article>
 
-          <!-- Graph 3: Lip & Jaw Stress -->
+          <!-- graph 3: lip and jaw stress -->
           <article class="glass p-6">
             <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4">
               <i class="fas fa-grip-lines mr-2 text-amber-400"></i> Lip & Jaw Stress
@@ -741,7 +759,7 @@
             <div id="oralLegend" class="mt-4 space-y-2 text-[10px]"></div>
           </article>
 
-          <!-- Graph 4: Head Pose Analysis -->
+          <!-- graph 4: head pose -->
           <article class="glass p-6">
             <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4">
               <i class="fas fa-user mr-2 text-purple-400"></i> Head Pose Analysis
@@ -756,7 +774,7 @@
             <div id="poseLegend" class="mt-4 space-y-2 text-[10px]"></div>
           </article>
 
-          <!-- Graph 5: Facial Asymmetry -->
+          <!-- graph 5: facial asymmetry -->
           <article class="glass p-6">
             <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4">
               <i class="fas fa-balance-scale mr-2 text-cyan-400"></i> Facial Asymmetry
@@ -771,7 +789,7 @@
             <div id="asymLegend" class="mt-4 space-y-2 text-[10px]"></div>
           </article>
 
-          <!-- Graph 6: Touch Detection -->
+          <!-- graph 6: touch detection -->
           <article class="glass p-6">
             <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-4">
               <i class="fas fa-hand-paper mr-2 text-rose-400"></i> Touch Detection
@@ -808,9 +826,9 @@
           </section>
         </div>
 
-        <!-- Dual Section: Transcript and AI Reasoning -->
+        <!-- transcript and reasoning -->
         <div class="col-span-12 grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">
-          <!-- Full Text Transcript Section -->
+          <!-- transcript section -->
           <div class="glass transcript-section-card p-10">
             <h3 class="text-sm font-black heading-font uppercase tracking-[0.2em] text-white mb-8 flex items-center">
               <i class="fas fa-comment-dots mr-3 text-cyan-400"></i> Forensic Transcript
@@ -825,7 +843,7 @@
         </div>
       </div>
 
-      <!-- Forensic Vocal Timeline Table -->
+      <!-- vocal timeline table -->
       <div class="col-span-12 pb-4">
         <article class="glass p-8 border-white/5">
           <div class="flex justify-between items-center mb-6">
@@ -853,7 +871,7 @@
         </article>
       </div>
 
-      <!-- Facial Analysis: Tabbed Interface -->
+      <!-- facial analysis tabs -->
       <div id="facialAnalysisTables" class="col-span-12 hidden">
         <div class="glass p-6 border-white/5">
           <div class="flex items-center justify-between mb-5">
@@ -933,16 +951,16 @@
       </div>
     </div>
 
-    <!-- Fusion Breakdown: 2-Column Layout -->
+    <!-- fusion breakdown layout -->
     <section class="px-4 space-y-4" id="fusionBreakdownSection">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Left: Fusion Score Breakdown -->
+        <!-- left: fusion score breakdown -->
         <div class="glass p-6 border-cyan-500/10">
           <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-5">
             <i class="fas fa-chart-bar mr-2 text-cyan-400"></i> Fusion Score Breakdown
           </h3>
           <div class="space-y-4" id="fusionBreakdownBars">
-            <div class="space-y-1.5">
+            <div class="space-y-1.5" id="rowFaceBehavioral">
               <div class="flex justify-between text-[9px] font-bold uppercase tracking-wider">
                 <span class="text-cyan-400">Face Behavioral</span>
                 <span class="text-white" id="fbFaceBehavioral">0%</span>
@@ -951,46 +969,46 @@
                 <div class="h-full bg-cyan-400 rounded-full transition-all duration-1000" style="width:0%" id="barFaceBehavioral"></div>
               </div>
             </div>
-            <div class="space-y-1.5">
+            <div class="space-y-1.5" id="rowFaceEmotion">
               <div class="flex justify-between text-[9px] font-bold uppercase tracking-wider">
                 <span class="text-emerald-400">Face Emotion</span>
                 <span class="text-white" id="fbFaceEmotion">0%</span>
               </div>
               <div class="h-2 bg-white/5 rounded-full overflow-hidden">
-                <div class="h-full bg-emerald-400 rounded-full transition-all duration-1000" style="width:0%" id="barFaceEmotion"></div>
+                <div class="h-full bg-emerald-500 rounded-full transition-all duration-1000" style="width:0%" id="barFaceEmotion"></div>
               </div>
             </div>
-            <div class="space-y-1.5">
+            <div class="space-y-1.5" id="rowVoiceStress">
               <div class="flex justify-between text-[9px] font-bold uppercase tracking-wider">
                 <span class="text-amber-400">Voice Stress</span>
                 <span class="text-white" id="fbVoiceStress">0%</span>
               </div>
               <div class="h-2 bg-white/5 rounded-full overflow-hidden">
-                <div class="h-full bg-amber-400 rounded-full transition-all duration-1000" style="width:0%" id="barVoiceStress"></div>
+                <div class="h-full bg-amber-500 rounded-full transition-all duration-1000" style="width:0%" id="barVoiceStress"></div>
               </div>
             </div>
-            <div class="space-y-1.5">
+            <div class="space-y-1.5" id="rowNlpDeception">
               <div class="flex justify-between text-[9px] font-bold uppercase tracking-wider">
                 <span class="text-purple-400">NLP Deception</span>
                 <span class="text-white" id="fbNlpDeception">0%</span>
               </div>
               <div class="h-2 bg-white/5 rounded-full overflow-hidden">
-                <div class="h-full bg-purple-400 rounded-full transition-all duration-1000" style="width:0%" id="barNlpDeception"></div>
+                <div class="h-full bg-purple-500 rounded-full transition-all duration-1000" style="width:0%" id="barNlpDeception"></div>
               </div>
             </div>
-            <div class="space-y-1.5">
+            <div class="space-y-1.5" id="rowMismatch">
               <div class="flex justify-between text-[9px] font-bold uppercase tracking-wider">
                 <span class="text-rose-400">Mismatch Bonus</span>
                 <span class="text-white" id="fbMismatch">0%</span>
               </div>
               <div class="h-2 bg-white/5 rounded-full overflow-hidden">
-                <div class="h-full bg-rose-400 rounded-full transition-all duration-1000" style="width:0%" id="barMismatch"></div>
+                <div class="h-full bg-rose-500 rounded-full transition-all duration-1000" style="width:0%" id="barMismatch"></div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Right: Cross-Modal Flags + Verdict -->
+        <!-- right: cross-modal flags and verdict -->
         <div class="glass p-6 border-cyan-500/10 flex flex-col">
           <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center mb-5">
             <i class="fas fa-exchange-alt mr-2 text-cyan-400"></i> Cross-Modal Signals
@@ -1010,6 +1028,13 @@
               <button id="fusionVerdictToggle" onclick="toggleVerdictLanguage()" class="ml-auto text-[9px] px-2.5 py-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-bold uppercase rounded-lg hover:bg-cyan-500 hover:text-white transition-all">
                 <i class="fas fa-language mr-1"></i><span id="fusionVerdictLang">UR</span>
               </button>
+            </div>
+            <button id="fusionReasoningToggle" onclick="toggleFusionReasoning()"
+              class="mt-3 text-[9px] px-2.5 py-1 bg-white/5 border border-white/10 text-gray-400 font-bold uppercase rounded-lg hover:bg-white/10 hover:text-cyan-400 transition-all flex items-center gap-1">
+              <i class="fas fa-chevron-down text-[10px]"></i> <span id="fusionReasoningLabel">View Reasoning</span>
+            </button>
+            <div id="fusionReasoningWrap" class="hidden mt-3 bg-black/30 rounded-lg p-3 border border-white/5 overflow-y-auto" style="max-height:10rem">
+              <p id="fusionReasoningText" class="text-[10px] text-gray-400 leading-relaxed"></p>
             </div>
           </div>
         </div>
@@ -1074,11 +1099,11 @@
   <script>
     const body = document.body;
 
-    // Charts Initialization
+    // set up the charts
     Chart.defaults.color = "#64748b";
     Chart.defaults.font.family = "'Inter', sans-serif";
 
-    // 1. Emotion (Donut) - only init if canvas exists
+    // 1. emotion donut chart, only if the canvas exists
     const emotionChartEl = document.getElementById("emotionChart");
     if (emotionChartEl) new Chart(emotionChartEl.getContext("2d"), {
       type: "doughnut",
@@ -1102,9 +1127,9 @@
       },
     });
 
-    // 2. Radial Metrics (removed — content now in Fusion Breakdown & Circular Charts)
+    // radial charts were removed; content moved to the fusion section
 
-    // --- Neural Vision Output Logic ---
+    // neural vision output
     const neuralCanvas = document.getElementById("neuralVisionCanvas");
     const neuralCtx = neuralCanvas ? neuralCanvas.getContext("2d") : null;
 
@@ -1234,7 +1259,7 @@
             on.style.opacity = "1";
 
             const hasAudio = mediaStream.getAudioTracks().length > 0;
-            toast.querySelector("div").innerText = hasAudio ? "Scanner & Voice Online" : "Scanner Online (Mic Offline)";
+            toast.querySelector("div").innerText = hasAudio ? "Camera & Mic Online" : "Camera Online (Mic Offline)";
             toast.classList.remove("opacity-0", "translate-y-4");
             toast.classList.add("opacity-1", "translate-y-0");
             setTimeout(() => {
@@ -1301,7 +1326,7 @@
         return;
       }
 
-      Loader.show("Running Multi-Modal Forensic Pipeline...");
+      Loader.show("Running analysis...");
       try {
         const result = await runFullPipeline(currentFilePath);
         
@@ -1323,15 +1348,6 @@
           }
 
           updatePipelineUI(reportData);
-          
-          const dbReportData = {
-            type: 'pipeline',
-            source_file: currentFilePath,
-            full_data: reportData,
-            timestamp: new Date().toISOString(),
-            analysis_date: new Date().toISOString()
-          };
-          await eel.save_analysis_report(dbReportData)();
           
           document.getElementById("saveReportBtn").classList.remove("hidden");
           
@@ -1380,16 +1396,16 @@
         const riskLabel = riskIndexDisplay?.nextElementSibling;
         if (riskLabel) riskLabel.innerText = deceptionScore > 50 ? 'Session Risk Index' : 'Session Credibility';
 
-        // 1. Update Timeline Chart
+        // 1. update the timeline chart
         updateTimelineChart(data.timeline);
 
-        // 4. Update Transcript
+        // 4. show the transcript
         updateTranscriptUI(data.segments);
 
-        // 5. Update NLP Card
+        // 5. show the nlp card
         updateNlpUI(data.segments);
 
-        // 5. Update Fusion Breakdown
+        // 5. update the fusion breakdown
         if (data.segments && data.segments.length > 0) {
             updateVoiceTable(data.segments);
             
@@ -1404,10 +1420,10 @@
             if (raw.hand_touch) updateTouchUI(raw.hand_touch.summary || raw.hand_touch);
 
             updateFusionBreakdown(firstSeg.fusion.breakdown);
-            updateCrossModalSection(firstSeg.fusion.cross_modal_flags, firstSeg.reasoning, firstSeg.fusion.final_deception_score);
+            updateCrossModalSection(firstSeg.fusion.cross_modal_flags, firstSeg.reasoning, firstSeg.fusion.final_deception_score, firstSeg.fusion.verdict);
         }
 
-        // 6. Show Video Output if available
+        // 6. show the video output if there is one
         const videoSection = document.getElementById('sessionVideoSection');
         if (videoSection && data.processed_video) {
             videoSection.classList.remove('hidden');
@@ -1449,12 +1465,6 @@
         window._lastSegments = segments;
         
         container.innerHTML = segments.map((seg, idx) => {
-            const qHtml = seg.question && seg.question.text
-                ? `<div class="mb-2 pl-3 border-l-2 border-amber-500/40">
-                      <span class="text-[9px] font-bold text-amber-400 uppercase tracking-widest">Interviewer Question</span>
-                      <p class="text-xs text-amber-300/80 mt-0.5 italic">"${seg.question.text}"</p>
-                   </div>`
-                : '';
             const nlp = seg.raw_scores && seg.raw_scores.nlp;
             const tu = nlp && nlp.translated_urdu;
             const te = nlp && nlp.translated_english;
@@ -1471,16 +1481,15 @@
                 </div>` : '';
             return `
             <div class="transcript-item">
-                ${qHtml}
                 <div class="flex justify-between mb-2 mt-2">
-                    <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Subject [${seg.start_sec.toFixed(2)}s - ${seg.end_sec.toFixed(2)}s]</span>
+                    <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Segment #${idx + 1} • ${(seg.end_sec - seg.start_sec).toFixed(2)}s</span>
                     <span class="text-[9px] px-2 py-0.5 ${seg.fusion.is_deceptive ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'} rounded-full font-bold">
                         Risk: ${seg.fusion.final_deception_score.toFixed(1)}%
                     </span>
                 </div>
                 <p class="text-sm text-gray-300 leading-relaxed italic">"${seg.transcript_original}"</p>
                 ${transHtml}
-                <p class="text-[10px] text-cyan-500/70 mt-2 font-mono">${seg.reasoning.split('\n')[0]}</p>
+                <p class="text-[10px] text-cyan-500/70 mt-2 font-mono">${(seg.fusion && seg.fusion.verdict) ? seg.fusion.verdict.split(' / ').pop().trim() : (seg.reasoning ? seg.reasoning.split('\n')[0] : '')}</p>
             </div>
         `}).join('');
     }
@@ -1809,7 +1818,7 @@
       saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
       closeSaveModal();
-      Loader.show("Encrypting & Saving to Vault...");
+      Loader.show("Saving to Vault...");
 
       try {
         const blob = new Blob(recordedChunks, { type: "video/webm" });
@@ -1844,7 +1853,7 @@
           offset += CHUNK_SIZE;
           const progress = Math.min(100, Math.round((offset / size) * 100));
           const loaderText = document.querySelector("#globalLoader p");
-          if (loaderText) loaderText.innerText = `Encrypting & Saving... ${progress}%`;
+          if (loaderText) loaderText.innerText = `Saving... ${progress}%`;
         }
 
         const finalResult = await eel.finalize_upload(uploadId)();
@@ -1853,7 +1862,7 @@
           Loader.hide();
 
           const toast = document.getElementById("videoToast");
-          toast.querySelector("div").innerText = "Session Saved & Secured";
+          toast.querySelector("div").innerText = "Session Saved";
           toast.querySelector("div").className = "px-6 py-2 bg-emerald-500 text-white text-[10px] font-bold uppercase rounded-full shadow-lg shadow-emerald-500/40";
           toast.classList.remove("opacity-0", "translate-y-4");
           toast.classList.add("opacity-1", "translate-y-0");
@@ -1865,7 +1874,7 @@
           video.setAttribute("controls", "true");
           video.muted = false;
           
-          // Respect Mirror Preference from Advanced Tools
+          // apply the mirror setting from the settings page
           const prefs = await eel.load_preferences()();
           if (prefs.success && prefs.preferences && prefs.preferences.mirror_camera) {
             video.style.transform = "scaleX(-1)";
@@ -1964,14 +1973,14 @@
       }
     }
 
-    // Populate vocal timeline table
+    // fill the vocal timeline table
     function populateFrameTable() {
       const tbody = document.getElementById('frameTableBody');
       if (!tbody) return;
       tbody.innerHTML = `<tr><td colspan="8" class="text-center text-gray-500 py-8 text-[10px] italic">No vocal analysis data. Record and analyse a session to populate.</td></tr>`;
     }
 
-    // Download frame data as CSV
+    // download the table as CSV
     function downloadFrameData() {
       const csvContent = "data:text/csv;charset=utf-8," + 
         "Segment,Timestamp,Transcription,Emotion,Pitch,Jitter,Confidence,Status\n" +
@@ -1992,7 +2001,7 @@
       document.body.removeChild(link);
     }
 
-    // Initialize emotion analysis components
+    // set up the emotion analysis components
     function initEmotionAnalysis() {
       populateFrameTable();
     }
@@ -2083,7 +2092,7 @@
       `).join('');
     }
 
-    // ── Face Analysis Tab Switcher ────────────────────────────────────────
+    // face analysis tab switcher
     function switchFaceTab(tab) {
       document.querySelectorAll('.face-tab').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.face-tab-content').forEach(c => c.classList.add('hidden'));
@@ -2091,7 +2100,7 @@
       document.getElementById(`faceTab-${tab}`).classList.remove('hidden');
     }
 
-    // ── Segment Translation Toggle ──────────────────────────────────────
+    // segment translation toggle
     let segTransState = {};
 
     function toggleSegTrans(idx) {
@@ -2105,7 +2114,7 @@
       document.getElementById('segTransText_' + idx).innerText = text ? '"' + text + '"' : '';
     }
 
-    // ── NLP Language Toggle ──────────────────────────────────────────────
+    // nlp language toggle
     let nlpShowUrdu = false;
     let nlpDataCache = { en: '', ur: '' };
 
@@ -2128,7 +2137,24 @@
       const summary = nlp.summary || '';
       const indicators = nlp.deception_indicators || {};
 
-      // Parse bilingual summary
+      // show the NLP score with simple wording
+      const nlpScore = Math.round(nlp.overall_deception_score || 0);
+      const scoreEl = document.getElementById('nlpScoreDisplay');
+      if (scoreEl) scoreEl.innerText = nlpScore + '%';
+      const barEl = document.getElementById('nlpScoreBar');
+      if (barEl) barEl.style.width = nlpScore + '%';
+      const labelEl = document.getElementById('nlpScoreLabel');
+      if (labelEl) {
+        let text, cls;
+        if (nlpScore <= 20) { text = 'Words show no sign of deception'; cls = 'text-emerald-400'; }
+        else if (nlpScore <= 40) { text = 'Words show mild signs'; cls = 'text-amber-400'; }
+        else if (nlpScore <= 60) { text = 'Words show clear deception signs'; cls = 'text-rose-400'; }
+        else { text = 'Words strongly suggest deception'; cls = 'text-rose-500 font-bold'; }
+        labelEl.className = 'text-[10px] mt-1 ' + cls;
+        labelEl.innerText = text;
+      }
+
+      // split the summary into english and urdu parts
       let enPart = summary;
       let urPart = '';
       const ruMatch = summary.match(/(?:Roman Urdu|URDU):\s*(.+)/i);
@@ -2143,7 +2169,7 @@
       document.getElementById('nlpLangHint').classList.remove('hidden');
       document.getElementById('nlpLangToggle').style.display = '';
 
-      // Flag color mapping
+      // map each flag type to a color class
       const flagColors = {
         evasion: 'nlp-flag-rose',
         over_explanation: 'nlp-flag-amber',
@@ -2168,24 +2194,26 @@
       }
     }
 
-    // ── Fusion Breakdown ─────────────────────────────────────────────────
+    // fusion breakdown
     function updateFusionBreakdown(breakdown) {
       if (!breakdown) return;
       const items = [
-        { key: 'face_behavioral', id: 'fbFaceBehavioral', bar: 'barFaceBehavioral', color: 'bg-cyan-400' },
-        { key: 'face_emotion', id: 'fbFaceEmotion', bar: 'barFaceEmotion', color: 'bg-emerald-400' },
-        { key: 'voice_stress', id: 'fbVoiceStress', bar: 'barVoiceStress', color: 'bg-amber-400' },
-        { key: 'nlp_deception', id: 'fbNlpDeception', bar: 'barNlpDeception', color: 'bg-purple-400' },
-        { key: 'mismatch_bonus', id: 'fbMismatch', bar: 'barMismatch', color: 'bg-rose-400' },
+        { key: 'face_behavioral', id: 'fbFaceBehavioral', bar: 'barFaceBehavioral', row: 'rowFaceBehavioral', color: 'bg-cyan-400' },
+        { key: 'face_emotion', id: 'fbFaceEmotion', bar: 'barFaceEmotion', row: 'rowFaceEmotion', color: 'bg-emerald-500' },
+        { key: 'voice_stress', id: 'fbVoiceStress', bar: 'barVoiceStress', row: 'rowVoiceStress', color: 'bg-amber-500' },
+        { key: 'nlp_deception', id: 'fbNlpDeception', bar: 'barNlpDeception', row: 'rowNlpDeception', color: 'bg-purple-500' },
+        { key: 'mismatch_bonus', id: 'fbMismatch', bar: 'barMismatch', row: 'rowMismatch', color: 'bg-rose-500' },
       ];
       items.forEach(item => {
         const val = Math.round(breakdown[item.key] || 0);
+        const rowEl = document.getElementById(item.row);
+        if (rowEl) rowEl.style.display = val > 0 ? '' : 'none';
         document.getElementById(item.id).innerText = val + '%';
         document.getElementById(item.bar).style.width = val + '%';
       });
     }
 
-    // ── Cross-Modal Flags + Verdict ──────────────────────────────────────
+    // cross-modal flags and verdict
     let verdictDataCache = { en: '', ur: '' };
     let verdictShowUrdu = false;
 
@@ -2198,42 +2226,55 @@
       }
     }
 
-    function updateCrossModalSection(crossFlags, reasoning, fusionScore) {
+    function updateCrossModalSection(crossFlags, reasoning, fusionScore, verdict) {
       const flagsContainer = document.getElementById('crossModalFlags');
       const hasRealFlags = crossFlags && crossFlags.length > 0 && !(crossFlags.length === 1 && (crossFlags[0] === 'None' || crossFlags[0] === 'none'));
       if (!hasRealFlags) {
         flagsContainer.innerHTML = '<div class="text-[10px] text-emerald-400 italic">No cross-modal conflicts detected.</div>';
       } else {
+        const flagLabels = {
+          'RULE1: multi_cue_clustering': 'Several facial cues active together',
+          'RULE2: nlp_lip_confirmation': 'Words and lip behaviour both suggest suppression',
+          'face_neutral_but_voice_high_stress': 'Calm face but stressed voice',
+          'nlp_emotion_mismatch': 'Words and emotions disagree',
+        };
         flagsContainer.innerHTML = crossFlags.map(f => {
-          const isWarning = f.includes('mismatch') || f.includes('Conflict');
+          const isWarning = f.includes('mismatch') || f.includes('Conflict') || f.includes('neutral_but_voice');
+          const label = flagLabels[f] || f.replace(/_/g, ' ');
           return `<div class="flex items-center gap-2 text-[10px] ${isWarning ? 'text-rose-400' : 'text-amber-400'}">
             <i class="fas fa-${isWarning ? 'exclamation-triangle' : 'info-circle'} text-[9px]"></i>
-            <span>${f}</span>
+            <span>${label}</span>
           </div>`;
         }).join('');
       }
 
-      // Parse bilingual verdict from reasoning
-      if (reasoning) {
-        const lines = reasoning.split('\n');
-        let enVerdict = reasoning;
-        let urVerdict = '';
-        const enIdx = reasoning.indexOf('ENGLISH:');
-        const urIdx = reasoning.indexOf('ROMAN URDU:');
-        if (enIdx >= 0 && urIdx > enIdx) {
-          enVerdict = reasoning.substring(enIdx + 8, urIdx).trim();
-          urVerdict = reasoning.substring(urIdx + 11).trim();
-        } else if (urIdx >= 0) {
-          urVerdict = reasoning.substring(urIdx + 11).trim();
+      // short bilingual verdict straight from fusion (matches the score)
+      if (verdict) {
+        const parts = String(verdict).split(' / ').map(p => p.trim());
+        const enVerdict = parts.length > 1 ? parts.slice(1).join(' / ') : String(verdict).trim();
+        const urVerdict = parts.length > 1 ? parts[0] : String(verdict).trim();
+        verdictDataCache = { en: enVerdict, ur: urVerdict };
+        const el = document.getElementById('fusionVerdictText');
+        if (el) {
+          el.className = 'text-xs font-bold mt-0.5 ' + ((fusionScore || 0) > 50 ? 'text-rose-400' : 'text-emerald-400');
+          el.innerText = verdictShowUrdu ? urVerdict : enVerdict;
         }
-
-        verdictDataCache = { en: enVerdict, ur: urVerdict || enVerdict };
-        document.getElementById('fusionVerdictText').innerText = verdictShowUrdu ? verdictDataCache.ur : verdictDataCache.en;
         document.getElementById('fusionVerdictBadge').classList.remove('hidden');
       }
+
+      // full reasoning stays available behind a toggle
+      const reasoningText = document.getElementById('fusionReasoningText');
+      if (reasoningText && reasoning) reasoningText.innerText = reasoning;
     }
 
-    // Neural vision is no longer used; keep no-op for safety
+    function toggleFusionReasoning() {
+      const wrap = document.getElementById('fusionReasoningWrap');
+      const label = document.getElementById('fusionReasoningLabel');
+      if (wrap) wrap.classList.toggle('hidden');
+      if (label) label.innerText = wrap.classList.contains('hidden') ? 'View Reasoning' : 'Hide Reasoning';
+    }
+
+    // neural vision is unused now, kept as a no-op
     function startNeuralVision() {}
 
     function toggleSidebar() {
@@ -2241,7 +2282,7 @@
       localStorage.setItem("sidebarCollapsed", body.classList.contains("sidebar-collapsed"));
     }
 
-    // Populate Camera and Microphone Sources
+    // list the cameras and microphones
     async function populateDevices() {
       const camSelect = document.getElementById("cameraSelect");
       const micSelect = document.getElementById("microphoneSelect");
@@ -2360,7 +2401,7 @@
         video.src = currentFilePath;
         video.setAttribute("controls", "true");
         
-        // Respect Mirror Preference from Advanced Tools
+        // apply the mirror setting from the settings page
         const prefs = await eel.load_preferences()();
         if (prefs.success && prefs.preferences && prefs.preferences.mirror_camera) {
           video.style.transform = "scaleX(-1)";
@@ -2385,7 +2426,7 @@
       });
     }
 
-    // Initial Load
+    // on page load
     document.addEventListener("DOMContentLoaded", async () => {
       const result = await eel.get_current_user()();
       const user = result.success && result.data ? result.data : null;

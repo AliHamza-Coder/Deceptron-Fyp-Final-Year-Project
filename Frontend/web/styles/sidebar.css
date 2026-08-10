@@ -1,7 +1,4 @@
-/* ============================================================
-   DECEPTRON - GLOBAL SIDEBAR STYLES
-   Extracting shared navigation and layout logic
-   ============================================================ */
+/* Shared sidebar navigation and layout styles */
 
 :root {
     --sidebar-width: 260px;

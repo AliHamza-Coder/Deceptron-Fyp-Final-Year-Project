@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 class EyeGazeAnalyzer:
-    """Analyzes eye gaze and blink detection with high accuracy and detailed reporting."""
+    """Analyzes eye gaze direction and blink detection."""
 
     def __init__(self):
         self.mp_face_mesh = mp.solutions.face_mesh

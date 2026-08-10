@@ -1,7 +1,4 @@
-// ========================================
-// DECEPTRON - COMMON UTILITIES
-// Shared helper functions used across pages
-// ========================================
+// Shared helper functions used across pages.
 
 /**
  * Format bytes to human-readable file size
@@ -131,7 +128,7 @@ function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
 
-// ── Media / Device Utilities ─────────────────────────────────────────────────
+// Media and device utilities
 
 /**
  * Return an object with separated camera, microphone and speaker lists.

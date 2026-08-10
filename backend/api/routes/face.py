@@ -7,7 +7,7 @@ from datetime import datetime
 import traceback
 import cv2
 
-# Setup robust paths
+# Setup paths
 BASE_DIR = Path(__file__).resolve().parent.parent.parent # Points to 'backend'
 MODULES_DIR = BASE_DIR / "modules"
 if str(MODULES_DIR) not in sys.path:
@@ -28,7 +28,7 @@ from asymmetry_module import AsymmetryAnalyzer
 from hand_face_touch_module import HandFaceTouchAnalyzer
 from emotion_detection_module import EmotionAnalyzer
 
-# Pre-load for high performance
+# Pre-load analyzers once at startup
 eye_analyzer = EyeGazeAnalyzer()
 pose_analyzer = HeadPoseAnalyzer()
 lip_analyzer = LipJawAnalyzer()
@@ -153,7 +153,7 @@ async def analyze_face_full(file_path: str = Query(None), path_form: str = Form(
         u_id = str(uuid.uuid4())[:6]
         orig_name = os.path.basename(path).split('.')[0]
         
-        # Parallel Execution for High Performance
+        # Run the six analyzers in parallel
         tasks = [
             asyncio.to_thread(run_analysis, eye_analyzer, path, "gaze", orig_name, u_id),
             asyncio.to_thread(run_analysis, pose_analyzer, path, "pose", orig_name, u_id),

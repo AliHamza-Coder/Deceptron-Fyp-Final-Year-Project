@@ -1,158 +1,115 @@
-# 🛡️ DECEPTRON Forensic Suite
-### Advanced Multi-Modal Behavioral Analysis & Truth Verification System
-**A high-fidelity Final Year Project (FYP) utilizing neural vision and acoustic indicators.**
+# Deceptron Frontend
+
+Desktop interface for the Deceptron deception detection system. It connects to
+the FastAPI backend for analysis and stores user data locally with TinyDB.
+
+**Version:** 1.4.0
+**Project:** Final Year Project (FYP)
+**Stack:** Python + Eel (desktop bridge), Vanilla JavaScript, HTML5, CSS
 
 ---
 
-<div align="center">
+## Overview
 
-![Project Version](https://img.shields.io/badge/Version-1.4.0--Enterprise-00dbff?style=for-the-badge&logo=shield)
-![Python Backend](https://img.shields.io/badge/Backend-Python--3.9-FFD43B?style=for-the-badge&logo=python)
-![Eel UI](https://img.shields.io/badge/Frontend-Vanilla--ES6-blue?style=for-the-badge&logo=javascript)
-![License](https://img.shields.io/badge/License-Proprietary-rose?style=for-the-badge)
-
-**"Empowering truth through forensics, one frame at a time."**
-
-</div>
+Deceptron is a desktop application for analyzing behavioral cues from video
+and audio interviews. The frontend handles login/signup, live session
+recording, media uploads, report viewing, and profile settings. All analysis
+is done by the backend and shown here in a clean interface.
 
 ---
 
-## 🎯 Project Overview
-**Deceptron** is a cutting-edge forensic desktop application designed to assist analysts in behavioral decoding and truth verification. By combining **Neural Vision** for facial micro-expressions with **Spectral Acoustic Analysis**, the suite provides a comprehensive multi-modal assessment of subjects in real-time or from recorded media.
+## Features
 
-Built for high-stakes environments, Deceptron features a **"Forensic Neon"** design system, utilizing high-contrast HSL glows, glass-morphism, and a modular architecture optimized for presentation to technical examiners.
+### Live Session
+- Records video/audio from the camera and microphone.
+- Uploads recordings in 1MB chunks to avoid memory issues.
+- Shows a live preview before analysis starts.
 
----
+### Facial Micro-Expressions
+- Dedicated module for subtle facial changes.
+- Unmirrored playback view for reviewing evidence.
+- Tabbed results for 6 face analysis types: Emotion, Eyes, Lip/Jaw, Head,
+  Asymmetry, Touch. Table IDs are kept for backward compatibility.
 
-## ✨ Core Modules & Features
+### Voice Analysis
+- Frequency stability and acoustic jitter indicators.
+- Emotion cards with color coding.
+- Interactive zoomable waveform using WaveSurfer.js.
 
-### 📡 Live Analysis Unit
-*   **Neural Vision Mapping**: Real-time subject tracking with localized forensic glows.
-*   **Multi-Modal Stream**: Dedicated panels for live neural data, acoustic indicators, and subject emotion mapping.
-*   **Low-Latency Capture**: High-performance video/audio recording with **.mp4** standard and **1MB chunked** storage.
+### NLP Deception Analysis
+- Color-coded flags: evasion/contradiction (rose),
+  cognitive_load/distancing_language (purple), vagueness/over_explanation
+  (amber).
+- Toggle between English and Roman Urdu summaries.
+- Uses Groq-hosted Llama-3.3-70B for text analysis.
 
-### 🎭 Facial Micro-Expressions
-*   **High-Fidelity Detection**: Specialized module for subtle facial changes.
-    *   *Real-time indicator feedback using the Deceptron standard (Cyan/Rose).*
-*   **Natural View Playback**: Integrated YouTube-style playback (Unmirrored) for accurate evidence review.
-*   **Forensic Video Preview**: Clean containerized output with professional telemetry overlays.
-*   **Tabbed Face Analysis**: 6-tab switcher (Emotion, Eyes, Lip/Jaw, Head, Asymmetry, Touch) organizes analysis results without clutter. All table body IDs preserved for backward compatibility.
+### Fusion Breakdown
+- 5 weighted bars: Face Behavioral, Face Emotion, Voice Stress, NLP
+  Deception, Mismatch.
+- Warning/info flags for conflicts between modules.
+- Verdict badge with English/Urdu toggle.
 
-### 🎙️ Forensic Voice Analysis
-*   **Spectral Indicators**: Real-time frequency stability and acoustic jitter tracking.
-*   **Emotion Mapping**: High-contrast HSL emotion cards (Cyan, Purple, Amber, Rose).
-*   **Waveform Visualization**: Interactive zoomable waveforms using `WaveSurfer.js`.
-
-### 🧠 NLP Deception Analysis
-*   **Flag Pills**: Color-coded deception flags — evasion/contradiction (rose), cognitive_load/distancing_language (purple), vagueness/over_explanation (amber).
-*   **Bilingual Summary**: Toggle between English and Roman Urdu summary via `toggleNlpLanguage()`.
-*   **Groq-Powered**: Llama-3.3-70B reasoning with `max_tokens=2048` for forensic text analysis.
-
-### 🔗 Fusion Breakdown
-*   **5 Weighted Bars**: Face Behavioral (cyan), Face Emotion (emerald), Voice Stress (amber), NLP Deception (purple), Mismatch (rose).
-*   **Cross-Modal Flags**: Warning/info indicators for inter-module conflicts.
-*   **Bilingual Verdict**: Verdict badge with EN/UR language toggle.
-
-### 🗂️ Case Reports & Management
-*   **Automated Case Reports**: Instant generation of forensic metrics with trend visualizations.
-*   **Evidence Vault**: Secure, persistent storage in `~/.deceptron/recordings/` for all case evidence.
-*   **Universal Search**: Quickly locate cases by analyst, ID, or subject name.
+### Reports & Media
+- Auto-generated case reports with trend charts.
+- Media is stored under `~/.deceptron/recordings/`.
+- Search for cases by analyst, ID, or subject name.
 
 ---
 
-## 🛠️ Technical Stack & Architecture
+## Tech Stack
 
-### Frontend (User Interface)
-*   **Engine**: EEL (Python-JS Bridge) via Bottle server.
-*   **Logic**: Pure ES6 Vanilla JavaScript — Zero heavy frameworks for maximum presentation speed.
-*   **Aesthetics**: 
-    *   **Forensic Glow System**: HSL-based localized glows for visual telemetry.
-    *   **Typography**: *Orbitron* (Telemetry) & *Inter* (Data).
-    *   **Responsiveness**: Grid and Flexbox-driven layout with full theme support.
+### Frontend
+- **Bridge**: Eel (Python-JS) over a Bottle server.
+- **Logic**: Plain ES6 JavaScript, no heavy frameworks.
+- **Styling**: Custom CSS with HSL-based glow effects. Fonts: Orbitron
+  (headings) and Inter (body). Layout uses Grid and Flexbox.
 
-### Backend (Process Management)
-*   **Persistent Storage**: `TinyDB` database engine.
-    *   *Persistent Architecture*: All databases and media are stored in a secure `.deceptron` directory in the user's local AppData/Home folder to survive system resets.
-*   **Execution Runtime**: Python 3.9+ with `gevent` event loop handling.
+### Backend / Storage
+- **Database**: TinyDB, stored in `~/.deceptron` so it survives restarts.
+- **Runtime**: Python 3.9+ with the gevent event loop.
 
 ---
 
-## 📦 Installation & Setup
+## Installation & Setup
 
 ### Requirements
-*   **Python 3.9** (Recommended for forensic module stability)
-*   **Chrome/Edge** (For application window rendering)
-*   **Camera/Mic** (Physical hardware required; virtual drivers filtered)
+- **Python 3.9**
+- **Chrome/Edge** (used for the application window)
+- **Camera/Mic** (physical devices; virtual drivers are filtered out)
 
-### 1. Manual Installation (Standard Pip)
+### 1. Manual Installation (pip)
 ```bash
-# Clone the unit
 git clone https://github.com/AliHamza-Coder/Deceptron-Fyp-Final-Year-Project.git
 cd Deceptron-Fyp-Final-Year-Project
 
-# Activate Forensic Environment
 python -m venv venv
 venv\Scripts\activate
 
-# Install Core Sensors
 pip install -r requirements.txt
 python main.py
 ```
 
-### 2. High-Performance Run (Using UV)
-If you have [uv](https://github.com/astral-sh/uv) installed, you can launch the environment instantly:
-```bash
-uv run python main.py
-```
-
-### 3. Quick Run (Windows)
-Double-click the **`RUN.bat`** file to automatically initialize the environment and launch the forensic suite.
+### 2. Quick Run (Windows)
+Double-click **`RUN.bat`** to set up the environment and launch the app.
 
 ---
 
-## 🏗️ Building the Executable (Standalone EXE)
-To create a portable, standalone version of Deceptron for distribution:
+## Building the Executable
 
-### Using PyInstaller (Standard)
+To create a standalone version:
+
+### Using PyInstaller
 ```bash
-# Ensure dependencies are installed
 pip install pyinstaller
-# Build using the included spec file
 pyinstaller main.spec
 ```
 
-### Using UV (Recommended for Speed)
-```bash
-uv run pyinstaller main.spec
-```
-The final executable will be located in the `dist/` directory as `deceptron.exe`.
+The executable will be in the `dist/` directory as `deceptron.exe`.
 
 ---
 
-## 🚀 Presentation Guide (For FYP Examiners)
-When presenting Deceptron, ensure the following modules are showcased:
-1.  **Auth Flow**: Demonstrate the secure login with password eye-toggles.
-2.  **Live Session**: Start the camera to show the live preview panel.
-3.  **Analysis Pipeline**: Run analysis on a recording to demonstrate:
-    - **NLP Card**: Flag pills with bilingual EN/UR summary toggle.
-    - **Face Tables**: Tab switcher across all 6 face analysis dimensions.
-    - **Fusion Breakdown**: Weighted bars + cross-modal flags + bilingual verdict.
-4.  **Dashboard Hub**: Showcase the metrics overview and recent case history.
-5.  **Evidence Vault**: Show the persistent storage and case deletion flows.
-
----
-
-## 📝 Project Details
-*   **Project Title**: Deceptron — Advanced Truth Verification
-*   **Project Lead**: Ali Hamza
-*   **Designation**: Final Year Project (FYP)
-*   **Version**: 1.4.0 Standard
-
----
-
-<div align="center">
-
-**Developed with ❤️ and Precision**  
-_This project is intended for research and forensic evaluation purposes only._
-
-</div>
+## Project Details
+- **Project title**: Deceptron — Deception Detection System
+- **Project lead**: Ali Hamza
+- **Type**: Final Year Project (FYP)
+- **Version**: 1.4.0

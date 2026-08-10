@@ -27,9 +27,7 @@ class FusionEngine:
         self.last_voice = None
         self.last_nlp = None
 
-    # ------------------------------------------------------------------
-    #   Main fusion method
-    # ------------------------------------------------------------------
+    # Main fusion method
     def fuse(
         self,
         face_data: Dict[str, Any],
@@ -51,13 +49,13 @@ class FusionEngine:
         self.last_voice = voice_data
         self.last_nlp = nlp_data
 
-        # ---- Extract behavioural scores ----
+        # Extract behavioural scores
         face_scores = self._extract_face_scores(face_data)
 
-        # ---- Base weighted sum ----
+        # Base weighted sum
         base = self._compute_base_score(face_scores, voice_data, nlp_data)
 
-        # ---- Apply psychological rule bonuses ----
+        # Apply psychological rule bonuses
         triggered_rules = []
         bonus = 0
 
@@ -79,7 +77,7 @@ class FusionEngine:
         # Apply bonuses and cap at 100
         score = max(0.0, min(100.0, round(base + bonus, 1)))
 
-        # ---- Confidence level ----
+        # Confidence level
         if score <= 30:
             confidence = "LOW"
         elif score <= 50:
@@ -89,10 +87,10 @@ class FusionEngine:
         else:
             confidence = "CRITICAL"
 
-        # ---- Build active_cues list ----
+        # Build active_cues list
         active_cues = self._build_active_cues(face_scores, face_data, timestamps)
 
-        # ---- Cross-modal flags ----
+        # Cross-modal flags
         cross_flags = []
         if emotion.lower() == 'neutral' and voice_stress > 70:
             cross_flags.append("face_neutral_but_voice_high_stress")
@@ -101,13 +99,13 @@ class FusionEngine:
         if triggered_rules:
             cross_flags.extend(triggered_rules)
 
-        # ---- Verdict ----
+        # Verdict
         verdict = self._generate_verdict(score, triggered_rules)
 
-        # ---- Temporal summary ----
+        # Temporal summary
         temporal_summary = self._temporal_summary(face_data, voice_data, nlp_data, triggered_rules)
 
-        # ---- Breakdown ----
+        # Breakdown
         breakdown = {
             "face_behavioral": round(np.mean(face_scores) if face_scores else 0, 1),
             "face_emotion": round(100 - face_data.get('emotion_timeline', {}).get('emotion_variance', 0), 1),
@@ -130,9 +128,7 @@ class FusionEngine:
         self.last_result = result
         return result
 
-    # ------------------------------------------------------------------
-    #   Explanation
-    # ------------------------------------------------------------------
+    # Explanation
     def explain(self) -> str:
         """Return a human-readable breakdown of the last fusion result."""
         if self.last_result is None:
@@ -168,9 +164,7 @@ class FusionEngine:
             json.dump(self.last_result, f, indent=2, ensure_ascii=False)
         print(f"Report saved to {filepath}")
 
-    # ------------------------------------------------------------------
-    #   Private helpers
-    # ------------------------------------------------------------------
+    # Private helpers
     def _extract_face_scores(self, face: Dict) -> List[float]:
         """Return a list of individual cue scores (0-100) from face data."""
         scores = []

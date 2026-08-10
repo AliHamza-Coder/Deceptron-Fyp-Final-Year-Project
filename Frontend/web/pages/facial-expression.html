@@ -28,7 +28,7 @@
       --sidebar-width: 260px;
       --config-width: 320px;
 
-      /* Vibrant University Pro Theme */
+      /* theme colors */
       --bg-main: #0f172a;
       --text-main: #ffffff;
       --text-dim: #94a3b8;
@@ -432,7 +432,7 @@
 
     <div class="h-[1px] bg-slate-100"></div>
 
-    <!-- Forensic Module Selection -->
+    <!-- module selection -->
     <div class="space-y-4">
       <label class="text-[9px] text-dim font-bold uppercase tracking-widest block">Forensic Modules</label>
       
@@ -545,11 +545,11 @@
             muted></video>
         </div>
 
-        <!-- Notification Toast inside Video -->
+        <!-- notification toast over the video -->
         <div id="videoToast"
           class="absolute top-20 left-1/2 -translate-x-1/2 z-30 transition-all duration-500 opacity-0 translate-y-4">
           <div class="px-6 py-2 bg-primary-blue text-white text-[10px] font-bold uppercase rounded-full shadow-[0_0_20px_rgba(37,99,235,0.4)]">
-            Scanner & Interface Online
+            Camera & Interface Online
           </div>
         </div>
       </div>
@@ -626,7 +626,7 @@
       </div>
     </section>
 
-    <!-- AI Analysis Results Section -->
+    <!-- analysis results -->
     <section class="px-4 pb-8 space-y-6">
       <div class="flex items-center space-x-3 text-blue-500">
         <div class="h-[1px] flex-1 bg-white/5"></div>
@@ -634,7 +634,7 @@
         <div class="h-[1px] flex-1 bg-white/5"></div>
       </div>
 
-       <!-- Emotions Detection Analysis -->
+       <!-- emotion detection table -->
        <article class="glass p-6 border-slate-100/50">
          <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
            <i class="fas fa-smile mr-2 text-emerald-400"></i> Emotion Detection
@@ -654,7 +654,7 @@
          </div>
        </article>
 
-       <!-- Visual Focus & Eye Dynamics -->
+       <!-- eye gaze table -->
        <article class="glass p-6 border-slate-100">
          <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
            <i class="fas fa-eye mr-2 text-blue-400"></i> Eye Gaze Tracking
@@ -675,7 +675,7 @@
          </div>
        </article>
 
-       <!-- Oral & Jaw Activity -->
+       <!-- lip and jaw table -->
        <article class="glass p-6 border-slate-100">
          <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
            <i class="fas fa-comment-dots mr-2 text-rose-400"></i> Lip & Jaw Analysis
@@ -696,7 +696,7 @@
          </div>
        </article>
 
-      <!-- Head Pose & Stiffness -->
+      <!-- head pose table -->
       <article class="glass p-6 border-slate-100">
         <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
           <i class="fas fa-user-check mr-2 text-purple-400"></i> Head Pose Analysis
@@ -718,7 +718,7 @@
         </div>
       </article>
 
-       <!-- Facial Asymmetry & Micro-Tremors -->
+       <!-- asymmetry table -->
        <article class="glass p-6 border-slate-100">
          <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
            <i class="fas fa-balance-scale mr-2 text-cyan-400"></i> Facial Asymmetry
@@ -740,7 +740,7 @@
          </div>
        </article>
 
-       <!-- Hand-to-Face Touch Detection -->
+       <!-- touch detection table -->
        <article class="glass p-6 border-slate-100">
          <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
            <i class="fas fa-hand-paper mr-2 text-amber-400"></i> Touch Detection
@@ -761,7 +761,7 @@
          </div>
        </article>
 
-      <!-- Visual Circular Graphs Section -->
+      <!-- circular graphs -->
       <div id="circularGraphsSection" class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <article class="glass p-6">
           <h3 class="text-[10px] font-bold text-dim uppercase tracking-widest flex items-center mb-4">
@@ -850,7 +850,7 @@
     </section>
   </main>
 
-  <!-- Modal for Saving Session -->
+  <!-- save session modal -->
   <div id="saveModal"
     class="fixed inset-0 bg-slate-950/10 backdrop-blur-md z-[999] hidden flex items-center justify-center opacity-0 transition-all duration-300">
     <div
@@ -870,7 +870,7 @@
         <button
           class="w-full py-4 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[11px] font-black uppercase rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)] transform hover:-translate-y-0.5 transition-all"
           onclick="saveData()">
-          Save to Forensic Vault
+          Save to Evidence Vault
         </button>
         <div class="flex space-x-3">
           <button
@@ -919,14 +919,14 @@
         const centerY = analysisCanvas.height / 2;
 
         if (!window.isAnalysisRunning) {
-          // Premium No Signal Look
+          // placeholder look when not analyzing
           const grad = analysisCtx.createRadialGradient(centerX, centerY, 0, centerX, centerY, analysisCanvas.width / 1.5);
           grad.addColorStop(0, '#1e293b');
           grad.addColorStop(1, '#0f172a');
           analysisCtx.fillStyle = grad;
           analysisCtx.fillRect(0, 0, analysisCanvas.width, analysisCanvas.height);
           
-          // Scanning Line effect
+          // animated scan line
           analysisCtx.beginPath();
           analysisCtx.strokeStyle = 'rgba(37, 99, 235, 0.1)';
           analysisCtx.lineWidth = 2;
@@ -943,7 +943,7 @@
           analysisCtx.letterSpacing = '4px';
           analysisCtx.fillText("AWAITING FORENSIC DATA", centerX, centerY);
           
-          // Subtle Pulsing Dot
+          // small pulsing dot
           const opacity = 0.3 + Math.sin(time * 3) * 0.2;
           analysisCtx.fillStyle = `rgba(37, 99, 235, ${opacity})`;
           analysisCtx.beginPath();
@@ -985,7 +985,7 @@
 
     // Sidebar Logic
 
-    // Camera & Devices Logic
+    // camera and devices
     async function populateDevices() {
       const vSelect = document.getElementById('videoSource');
       if (!vSelect) return;
@@ -1202,13 +1202,13 @@
       const originalText = saveBtn.innerText;
       saveBtn.disabled = true;
 
-      Loader.show("Securing Forensic Data...");
+      Loader.show("Saving data...");
       try {
         const blob = new Blob(recordedChunks, { type: 'video/mp4' });
         
-        // Use the progress callback to update UI if needed
+        // update the loader with upload progress
         const finalResult = await uploadFile(new File([blob], filename, { type: 'video/mp4' }), true, (progress) => {
-            Loader.show(`Securing Forensic Data... ${progress}%`);
+            Loader.show(`Saving data... ${progress}%`);
         });
         
         if (finalResult.success) {
@@ -1221,7 +1221,7 @@
           video.src = currentFilePath;
           video.setAttribute('controls', 'true');
           video.muted = true;
-          // Respect Mirror Preference from Advanced Tools
+          // apply the mirror setting from the settings page
           const prefs = await eel.load_preferences()();
           if (prefs.success && prefs.preferences) {
             const mirror = prefs.preferences.mirror_camera || false;
@@ -1271,13 +1271,13 @@
       if (timerInterval) clearInterval(timerInterval);
       document.getElementById("recIndicator").classList.add("hidden");
       
-      // Clear Tables
+      // clear the tables
       ['emotion', 'eyeGaze', 'lipJaw', 'headPose', 'asymmetry', 'touch'].forEach(id => {
           const el = document.getElementById(id + 'TableBody');
           if (el) el.innerHTML = '';
       });
       
-      // Clear Video Grid to default canvas
+      // reset the video grid
       const grid = document.getElementById('videoOutputGrid');
       grid.innerHTML = `
           <div id="mainVideoWrap" class="relative video-inner-wrap rounded-xl overflow-hidden bg-black col-span-full">
@@ -1289,7 +1289,7 @@
       const canvas = document.getElementById("analysisOutputCanvas");
       if (canvas) {
           const ctx = canvas.getContext("2d");
-          // The startAnalysisProcessing loop is already running and will pick up the new canvas if we use global reference
+          // the loop already picks up the new canvas automatically
       }
     }
 
@@ -1310,7 +1310,7 @@
     function updateEmotionUI(summary) {
       if (!summary) return;
       
-      // Update Table (use frames if available)
+      // fill the table from frames
       const frames = summary.frames || [];
       const tbody = document.getElementById('emotionTableBody');
       if (frames.length > 0) {
@@ -1329,16 +1329,18 @@
       `).join('');
       }
 
-      // Update Circular Chart & Distribution
+      // update the chart and distribution
       if (emotionChart && summary.distribution) {
         const labels = Object.keys(summary.distribution);
         const values = labels.map(l => summary.distribution[l].percentage);
         
+        const colors = ['#10b981', '#f59e0b', '#ef4444', '#6366f1', '#ec4899', '#06b6d4', '#8b5cf6'];
         emotionChart.data.labels = labels;
         emotionChart.data.datasets[0].data = values;
+        emotionChart.data.datasets[0].backgroundColor = colors.slice(0, labels.length);
         emotionChart.update();
         
-        // Find dominant
+        // find the most common emotion
         let dominant = labels[0];
         labels.forEach(l => {
             if (summary.distribution[l].percentage > summary.distribution[dominant].percentage) dominant = l;
@@ -1347,8 +1349,7 @@
         document.getElementById('dominantEmotionPercent').innerText = `${summary.distribution[dominant].percentage.toFixed(0)}%`;
         document.getElementById('dominantEmotionLabel').innerText = dominant;
         
-        // Update Legend with vibrant markers
-        const colors = ['#10b981', '#f59e0b', '#ef4444', '#6366f1', '#ec4899', '#06b6d4', '#8b5cf6'];
+        // build the legend
         document.getElementById('emotionLegend').innerHTML = labels.map((l, i) => `
             <div class="flex justify-between items-center bg-white/5 px-3 py-2 rounded-lg border border-white/5">
               <span class="flex items-center gap-2">
@@ -1504,8 +1505,23 @@
           }).join('');
           
           if (stressChart) {
-              const dist = summary.region_distribution || summary.distribution || { "None": 100 };
-              updateModuleChart(stressChart, dist, 'stressLegend', ['#f43f5e', '#fbbf24', '#818cf8']);
+              // region_distribution comes back as an empty {} when nothing
+              // touches the face, so fall back to one neutral ring instead
+              // of leaving the chart blank
+              let dist = summary.region_distribution || summary.distribution || {};
+              const distKeys = Object.keys(dist);
+              const ringColors = distKeys.length ? ['#f43f5e', '#fbbf24', '#818cf8'] : ['#64748b'];
+              if (!distKeys.length) {
+                  dist = { 'No Touch': 100 };
+              } else {
+                  // the backend counts frames per region, so convert the counts
+                  // to percentages to match the other circular charts
+                  const total = distKeys.reduce((sum, k) => sum + (dist[k] || 0), 0) || 1;
+                  const pct = {};
+                  distKeys.forEach(k => { pct[k] = Math.round((dist[k] / total) * 1000) / 10; });
+                  dist = pct;
+              }
+              updateModuleChart(stressChart, dist, 'stressLegend', ringColors);
               
               const touchCount = summary.touch_count || frames.filter(f => (f.confidence || 0) > 0).length;
               document.getElementById('touchScorePercent').innerText = touchCount;
@@ -1557,7 +1573,7 @@
         video.src = item.filepath;
         video.setAttribute('controls', 'true');
 
-        // Respect Mirror Preference from Advanced Tools
+        // apply the mirror setting from the settings page
         const prefs = await eel.load_preferences()();
         if (prefs.success && prefs.preferences && prefs.preferences.mirror_camera) {
           video.style.transform = "scaleX(-1)";
@@ -1584,7 +1600,7 @@
       updateStatusUI('ready', 'System Ready');
       resetUIState();
       
-      // Clear Charts
+      // reset the charts
       [emotionChart, eyeChart, jawChart, poseChart, asymChart, stressChart].forEach(c => {
           if (c) {
               c.data.datasets[0].data = [100];
@@ -1728,7 +1744,7 @@
         return;
       }
 
-      Loader.show(mode === 'pipeline' ? "Engaging Parallel Neural Pipeline..." : `Running Forensic ${aloneModule} Analysis...`);
+      Loader.show(mode === 'pipeline' ? "Running full analysis..." : `Running ${aloneModule} analysis...`);
 
       try {
         let result;
@@ -1751,7 +1767,7 @@
         const titles = [];
 
         if (result.results) {
-            // Combined Analysis
+            // full pipeline results
             const res = result.results;
             if (res.eye_gaze) { updateFaceUI(res.eye_gaze.summary, 'gaze'); urls.push(res.eye_gaze.video); titles.push('Eye Gaze'); }
             if (res.head_pose) { updateFaceUI(res.head_pose.summary, 'pose'); urls.push(res.head_pose.video); titles.push('Head Pose'); }
@@ -1760,7 +1776,7 @@
             if (res.hand_touch) { updateFaceUI(res.hand_touch.summary, 'touch'); urls.push(res.hand_touch.video); titles.push('Hand Touch'); }
             if (res.emotion) { updateEmotionUI(res.emotion.summary); urls.push(res.emotion.video); titles.push('Emotion'); }
         } else {
-            // Single Module
+            // single module result
             if (result.type === 'emotion') {
                 updateEmotionUI(result.summary);
             } else {
@@ -1787,7 +1803,7 @@
         showToast("No analysis data to save", "warning");
         return;
       }
-      Loader.show("Saving Facial Analysis Report...");
+      Loader.show("Saving report...");
       try {
         const report = {
           type: 'facial',

@@ -1,7 +1,4 @@
-// ========================================
-// DECEPTRON - API WRAPPER
-// Centralized EEL API functions
-// ========================================
+// API wrapper - all calls to the Python backend go through here.
 
 /**
  * Get current logged-in user

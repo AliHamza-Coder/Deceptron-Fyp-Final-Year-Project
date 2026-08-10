@@ -1,7 +1,4 @@
-// ========================================
-// DECEPTRON - DASHBOARD PAGE
-// Dashboard initialization and user data display
-// ========================================
+// Dashboard page - loads user data and sets up the dashboard.
 
 // Load user data and display
 async function loadUserData() {

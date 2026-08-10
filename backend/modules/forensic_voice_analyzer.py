@@ -65,9 +65,7 @@ class ForensicVoiceAnalyzer:
         self.sample_rate = 16000
         self.baseline = None
 
-    # ------------------------------------------------------------------
     # Public API
-    # ------------------------------------------------------------------
     def calibrate(self, neutral_wav_path: str) -> Dict[str, float]:
         features = self._analyze_core_from_file(neutral_wav_path)
         if features is None:
@@ -115,7 +113,15 @@ class ForensicVoiceAnalyzer:
             return None
         full_dur = len(y_full) / sr
 
-        # tolerance for floating-point drift between segment timing and audio export
+        # Segment timing can drift a little from the exported audio length,
+        # so trim small overhangs into the audio instead of rejecting the
+        # whole segment (a rejected segment kills the entire pipeline run).
+        if start < 0 and start >= -0.5:
+            start = 0.0
+        if end > full_dur and end - full_dur <= 0.5:
+            end = full_dur
+
+        # anything still out of range is a real error, not just timing drift
         if start < 0 or end > full_dur + 0.02 or start >= end:
             print(f"Segment [{start}-{end}] out of range (duration {full_dur}s).")
             return None
@@ -205,9 +211,7 @@ class ForensicVoiceAnalyzer:
             json.dump(result, f, indent=2, ensure_ascii=False)
         print(f"Report saved to {output_path}")
 
-    # ------------------------------------------------------------------
     # Audio loading (soundfile, no librosa.load)
-    # ------------------------------------------------------------------
     def _load_audio(self, path: str):
         try:
             y, orig_sr = sf.read(path)
@@ -221,9 +225,7 @@ class ForensicVoiceAnalyzer:
             print(f"[Voice] Error loading audio file: {e}")
             return None, None
 
-    # ------------------------------------------------------------------
     # Core extraction
-    # ------------------------------------------------------------------
     def _analyze_core_from_file(self, wav_path: str) -> Optional[Dict[str, Any]]:
         y, sr = self._load_audio(wav_path)
         if y is None:
@@ -266,9 +268,7 @@ class ForensicVoiceAnalyzer:
             print(f"Cannot create Parselmouth Sound from array: {e}")
             return None
 
-    # ------------------------------------------------------------------
     # Spectral centroid (pure numpy)
-    # ------------------------------------------------------------------
     def _compute_spectral_centroid(self, y, sr):
         """Compute mean and std of spectral centroid using numpy FFT."""
         try:
@@ -290,9 +290,7 @@ class ForensicVoiceAnalyzer:
             pass
         return 0.0, 0.0
 
-    # ------------------------------------------------------------------
-    # Temporal dynamics – pure numpy
-    # ------------------------------------------------------------------
+    # Temporal dynamics (pure numpy)
     def _extract_temporal(self, y: np.ndarray, sr: int, duration: float) -> Dict[str, Any]:
         # 1. Compute RMS energy manually
         frame_length = 1024
@@ -361,9 +359,7 @@ class ForensicVoiceAnalyzer:
             "status": status
         }
 
-    # ------------------------------------------------------------------
-    # Energy profile – pure numpy
-    # ------------------------------------------------------------------
+    # Energy profile (pure numpy)
     def _extract_energy(self, y, sr):
         # RMS energy
         frame_length = 1024
@@ -395,9 +391,7 @@ class ForensicVoiceAnalyzer:
         return {"rms_mean": round(rms_mean, 5), "rms_std": round(rms_std, 5),
                 "rms_trend": trend, "zcr_mean": round(zcr, 5)}
 
-    # ------------------------------------------------------------------
-    # All other extractors (Praat) – unchanged
-    # ------------------------------------------------------------------
+    # Other extractors (Praat), unchanged
     def _extract_f0(self, snd):
         pitch = snd.to_pitch(time_step=0.01, pitch_floor=75, pitch_ceiling=600)
         pitches = pitch.selected_array['frequency']

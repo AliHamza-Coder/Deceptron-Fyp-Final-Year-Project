@@ -1,7 +1,4 @@
-# ========================================
-# DECEPTRON - MAIN APPLICATION
-# Deception Analysis System
-# ========================================
+# Main application - desktop entry point
 
 import eel
 import sys
@@ -14,9 +11,7 @@ import smtplib
 
 from pathlib import Path
 
-# ========================================
-# EMAIL MODULE
-# ========================================
+# Email module
 from modules.email_sender import EmailSender, check_internet
 
 # Global email sender (initialized once SMTP config loads)
@@ -28,9 +23,7 @@ def _get_email_sender():
         _email_sender = EmailSender(app_config.SMTP_CONFIG)
     return _email_sender
 
-# ========================================
-# PATH CONFIGURATION
-# ========================================
+# Path configuration
 # Resolve absolute paths relative to this script
 BASE_DIR = Path(__file__).resolve().parent
 WEB_DIR = BASE_DIR / "web"
@@ -38,16 +31,14 @@ WEB_DIR = BASE_DIR / "web"
 import config as app_config
 BACKEND_URL = app_config.BACKEND_URL
 
-# Persistent storage directory (survives app restarts and PyInstaller extraction)
+# Persistent storage for user data (survives restarts and PyInstaller extraction)
 DATA_DIR = Path.home() / ".deceptron"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 # Import our custom modules
 from modules import database
 
-# ========================================
-# INITIALIZE EEL
-# ========================================
+# Initialize Eel
 
 # Set web folder location
 eel.init(str(WEB_DIR))
@@ -59,22 +50,15 @@ def server_static(filepath):
     return eel.btl.static_file(filepath, root=str(DATA_DIR))
 
 print("\n" + "="*60)
-print("🚀 DECEPTRON - TRUTH VERIFICATION SYSTEM")
+print("DECEPTRON - Deception Detection System")
 print("="*60 + "\n")
 
-# ========================================
-# LOAD EMOTION MODEL AT STARTUP
-# ========================================
-# Emotion detection is currently disabled and no model is loaded at startup.
+# Emotion detection is disabled, so no model is loaded at startup.
 
-# ========================================
-# EEL EXPOSED FUNCTIONS (callable from JavaScript)
-# ========================================
+# Eel functions exposed to JavaScript
 
 
-# ========================================
-# DATABASE & AUTHENTICATION FUNCTIONS
-# ========================================
+# Database and authentication functions
 
 current_user = None
 
@@ -84,10 +68,10 @@ def signup(user_data):
     Handle user signup from the frontend.
     """
     try:
-        print(f"📝 New signup attempt: {user_data.get('username')}")
+        print(f"New signup attempt: {user_data.get('username')}")
         return database.signup_user(user_data)
     except Exception as e:
-        print(f"❌ Signup error: {e}")
+        print(f"Signup error: {e}")
         return {'success': False, 'message': str(e)}
 
 @eel.expose
@@ -96,13 +80,13 @@ def login(identity, password):
     Handle user login from the frontend.
     """
     global current_user
-    print(f"🔑 Login attempt for: {identity}")
+    print(f"Login attempt for: {identity}")
     result = database.login_user(identity, password)
     if result['success']:
         current_user = result['user']
         # Update last login timestamp
         database.update_last_login(current_user['username'])
-        print(f"✅ Login successful: {current_user['username']}")
+        print(f"Login successful: {current_user['username']}")
     return result
 
 # Helper for consistent frontend responses
@@ -125,7 +109,7 @@ def logout():
     """Log out the current user (standardized)"""
     global current_user
     if current_user:
-        print(f"🚪 User logged out: {current_user['username']}")
+        print(f"User logged out: {current_user['username']}")
     current_user = None
     return response()
 
@@ -187,7 +171,7 @@ def append_upload_chunk(upload_id, base64_data):
             
         upload_info = active_uploads[upload_id]
         
-        # Faster decoding: only split if prefix is present
+        # Only strip the base64 prefix if it is present
         if base64_data.startswith('data:'):
              base64_data = base64_data.split(',', 1)[1]
             
@@ -234,7 +218,7 @@ def finalize_upload(upload_id):
         return database.add_upload(username, info['filename'], info['type'], info['size_str'], relative_path)
     except Exception as e:
         import traceback
-        print(f"❌ Error finalizing upload: {e}")
+        print(f"Error finalizing upload: {e}")
         print(traceback.format_exc())
         return response(success=False, message=str(e))
 
@@ -266,7 +250,7 @@ def save_recording(filename, base64_data, category):
         with open(file_path, 'wb') as f:
             f.write(file_content)
             
-        print(f"🎥 Recording saved: {file_path}")
+        print(f"Recording saved: {file_path}")
         
         size_mb = f"{len(file_content) / (1024*1024):.1f} MB"
         relative_path = f"/data/{username}/recordings/{safe_filename}"
@@ -280,7 +264,7 @@ def save_recording(filename, base64_data, category):
         )
         
     except Exception as e:
-        print(f"❌ Error saving recording: {e}")
+        print(f"Error saving recording: {e}")
         return response(success=False, message=str(e))
 
 @eel.expose
@@ -305,16 +289,16 @@ def delete_upload_record(upload_id):
                     if file_path.exists():
                         try:
                             file_path.unlink()
-                            print(f"🗑️ Physically deleted: {file_path}")
+                            print(f"Physically deleted: {file_path}")
                         except Exception as e:
-                            print(f"⚠️ Failed to delete physical file: {e}")
+                            print(f"Failed to delete physical file: {e}")
             
             return response()
         else:
             return result
             
     except Exception as e:
-        print(f"❌ Error in delete_upload_record: {e}")
+        print(f"Error in delete_upload_record: {e}")
         return response(success=False, message=str(e))
 
 
@@ -355,13 +339,11 @@ def update_password(current_pwd, new_pwd):
         return {'success': False, 'message': 'Not logged in'}
     return database.change_password(current_user['username'], current_pwd, new_pwd)
 
-# ========================================
-# EMAIL VERIFICATION & PASSWORD RESET
-# ========================================
+# Email verification and password reset
 
 @eel.expose
 def initiate_signup(user_data):
-    """Step 1: Create pending signup and send verification email (NO DB SAVE YET)."""
+    """Create a pending signup and send a verification email (not saved to DB yet)."""
     try:
         result = database.create_pending_signup(user_data)
         if not result['success']:
@@ -382,7 +364,7 @@ def initiate_signup(user_data):
             sent, msg = False, f"Could not send email: {e}"
         return {'success': True, 'email': result['email'], 'email_sent': sent, 'message': msg}
     except Exception as e:
-        print(f"❌ Initiate signup error: {e}")
+        print(f"Initiate signup error: {e}")
         return {'success': False, 'message': str(e)}
 
 @eel.expose
@@ -400,7 +382,7 @@ def resend_verification_code(email):
 
 @eel.expose
 def verify_email(email, code):
-    """Step 2: Verify code, SAVE to DB, send welcome email."""
+    """Verify the code, save the user to DB, and send a welcome email."""
     try:
         result = database.verify_pending_signup(email, code)
         if result['success']:
@@ -486,11 +468,11 @@ def run_voice_analysis(relative_path):
         clean_path = relative_path.replace('/data/', '', 1)
         abs_path = str(DATA_DIR / clean_path)
         
-        print(f"🎤 Running Voice Analysis on: {abs_path}")
+        print(f"Running Voice Analysis on: {abs_path}")
         response = requests.get(f"{BACKEND_URL}/analyze/voice?file_path={abs_path}")
         return response.json()
     except Exception as e:
-        print(f"❌ Voice API Error: {e}")
+        print(f"Voice API Error: {e}")
         return {'success': False, 'message': str(e)}
 
 @eel.expose
@@ -501,11 +483,11 @@ def run_emotion_analysis(relative_path):
         clean_path = relative_path.replace('/data/', '', 1)
         abs_path = str(DATA_DIR / clean_path)
         
-        print(f"🎭 Running Emotion Analysis on: {abs_path}")
+        print(f"Running Emotion Analysis on: {abs_path}")
         response = requests.get(f"{BACKEND_URL}/analyze/face/emotion?file_path={abs_path}")
         return response.json()
     except Exception as e:
-        print(f"❌ Emotion API Error: {e}")
+        print(f"Emotion API Error: {e}")
         return {'success': False, 'message': str(e)}
 
 @eel.expose
@@ -519,7 +501,7 @@ def run_facial_analysis(relative_path, module_type="pipeline"):
         if module_type == "lips":
             module_type = "lipjaw"
             
-        print(f"👁️ Running Face Analysis ({module_type}) on: {abs_path}")
+        print(f"Running Face Analysis ({module_type}) on: {abs_path}")
         
         if module_type and module_type not in ("pipeline", "full", "combined"):
             endpoint = f"{BACKEND_URL}/analyze/face/{module_type}?file_path={abs_path}"
@@ -529,7 +511,7 @@ def run_facial_analysis(relative_path, module_type="pipeline"):
         response = requests.get(endpoint)
         return response.json()
     except Exception as e:
-        print(f"❌ Facial API Error: {e}")
+        print(f"Facial API Error: {e}")
         return {'success': False, 'message': str(e)}
 
 @eel.expose
@@ -540,11 +522,11 @@ def run_full_pipeline(relative_path):
         clean_path = relative_path.replace('/data/', '', 1)
         abs_path = str(DATA_DIR / clean_path)
         
-        print(f"⚙️ Running Full Pipeline on: {abs_path}")
+        print(f"Running Full Pipeline on: {abs_path}")
         response = requests.get(f"{BACKEND_URL}/analyze/pipeline?file_path={abs_path}")
         return response.json()
     except Exception as e:
-        print(f"❌ Pipeline API Error: {e}")
+        print(f"Pipeline API Error: {e}")
         return {'success': False, 'message': str(e)}
 
 @eel.expose
@@ -581,19 +563,17 @@ def delete_report(report_id):
     except Exception as e:
         return response(success=False, message=str(e))
 
-# ========================================
-# START THE APPLICATION
-# ========================================
+# Start the app
 
 if __name__ == "__main__":
     print("="*60)
-    print("🌐 Starting DECEPTRON Desktop App...")
+    print("Starting DECEPTRON Desktop App...")
     print("="*60 + "\n")
     
     try:
-        # Force 'chrome' for a true desktop app feel. If Chrome isn't found, Eel will try others.
-        # Setting port to 0 lets Eel find any available open port.
-        print("🖥️  Opening desktop window...")
+        # Use 'chrome' so it opens like a desktop app. If Chrome is missing, Eel tries another browser.
+        # Port 0 lets Eel pick any available free port.
+        print("Opening desktop window...")
         eel.start(
             'index.html',
             size=(1500, 950),
@@ -603,10 +583,10 @@ if __name__ == "__main__":
         )
     except (SystemExit, KeyboardInterrupt):
         print("\n\n" + "="*60)
-        print("👋 Shutting down DECEPTRON...")
+        print("Shutting down DECEPTRON...")
         print("="*60)
         sys.exit()
     except EnvironmentError:
         # Fallback if no browser found
-        print("⚠️  No suitable browser found. Opening in default browser...")
+        print("No suitable browser found. Opening in default browser...")
         eel.start('index.html', size=(1400, 900), port=8000)

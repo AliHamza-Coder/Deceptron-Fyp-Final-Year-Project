@@ -1,11 +1,8 @@
-// ========================================
-// DECEPTRON - SETTINGS PAGE
-// Depends on: constants.js, utils.js, api.js, auth.js
-// ========================================
+// Settings page (uses constants, utils, api, auth).
 
 let previewStream = null;
 
-// ── Save ──────────────────────────────────────────────────────────────────────
+// Save
 
 async function saveSettings(event) {
     const btn          = event.currentTarget;
@@ -35,7 +32,7 @@ async function saveSettings(event) {
     }
 }
 
-// ── Camera preview ────────────────────────────────────────────────────────────
+// Camera preview
 
 async function startCameraPreview() {
     try {
@@ -51,7 +48,7 @@ async function startCameraPreview() {
     }
 }
 
-// ── Initialisation ────────────────────────────────────────────────────────────
+// Page setup
 
 initializePage(async () => {
     const { cameras, microphones } = await enumerateMediaDevices();

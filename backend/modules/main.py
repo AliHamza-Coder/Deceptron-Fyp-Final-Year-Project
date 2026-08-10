@@ -1,8 +1,8 @@
 """
-main.py – Deceptron FYP Master Integration
-===========================================
-Processes a video directly, without prompting for an interview question.
-All results (annotated videos + JSON report) are saved in results/ and reports/.
+main.py
+
+Processes a video directly, without asking for an interview question.
+Annotated videos and the JSON report are saved in results/ and reports/.
 
 Usage:
     python main.py
@@ -41,7 +41,7 @@ def main():
         print("Error: File not found.")
         return
 
-    # Use an empty question context – the pipeline will still work
+    # No question context is needed - the pipeline works without one
     question_context = ""
 
     # Check for a pre‑extracted audio file alongside the video

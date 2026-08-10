@@ -224,9 +224,7 @@ class EmotionAnalyzer:
         print("=" * 50)
 
 
-# -------------------------------------------------------------------------
-#   Standalone execution
-# -------------------------------------------------------------------------
+# Standalone execution
 if __name__ == "__main__":
     input_path = input("Enter the video file path: ").strip().strip('"').strip("'")
     if not os.path.exists(input_path):

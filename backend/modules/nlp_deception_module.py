@@ -128,9 +128,7 @@ class NLPDeceptionAnalyzer:
         self._cache[cache_key] = result.copy()
         return result
 
-    # ------------------------------------------------------------------
-    #   Text Pre-processing
-    # ------------------------------------------------------------------
+    # Text pre-processing
     def _preprocess_text(self, text: str) -> Dict[str, Any]:
         """Count filler words, measure sentence length, return metadata."""
         cleaned = self.FILLER_REGEX.sub('', text)
@@ -166,9 +164,7 @@ class NLPDeceptionAnalyzer:
             cl['score'] = min(100, cl['score'] + 10)
             cl['flagged'] = cl['score'] > 60
 
-    # ------------------------------------------------------------------
-    #   Prompt Building
-    # ------------------------------------------------------------------
+    # Prompt building
     def _build_prompt(self, text: str, voice_stress: float, question: str,
                       processed: Dict, previous_segments: Optional[List[Dict]] = None) -> str:
         """Construct the system + user prompt with few-shot examples and optional cross-segment context."""
@@ -365,9 +361,7 @@ class NLPDeceptionAnalyzer:
         return base
 
 
-# -------------------------------------------------------------------------
-#   Example usage
-# -------------------------------------------------------------------------
+# Example usage
 if __name__ == "__main__":
     analyzer = NLPDeceptionAnalyzer()  # requires GROQ_API_KEY env var
 

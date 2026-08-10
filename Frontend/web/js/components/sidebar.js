@@ -1,11 +1,7 @@
-// ========================================
-// DECEPTRON - SIDEBAR COMPONENT
-// Reusable Navigation Sidebar
-// ========================================
+// Sidebar component - the navigation menu shown on every page.
 
 /**
- * Navigation Items Configuration
- * Each item has: id (for active detection), label, icon, and link
+ * Navigation items. Each one has an id, label, icon and page link.
  */
 const NAV_ITEMS = {
     main: [
@@ -150,7 +146,7 @@ async function logout() {
                 const result = await eel.logout()();
             }
             
-            // Redirect regardless of backend result to ensure user isn't stuck
+            // Go to login page no matter what the backend returned.
             window.location.href = 'login.html';
         } catch (error) {
             console.error("Logout failed:", error);

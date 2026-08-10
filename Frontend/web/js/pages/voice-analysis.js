@@ -1,6 +1,4 @@
-// ========================================
-// DECEPTRON - VOICE ANALYSIS UNIT LOGIC
-// ========================================
+// Voice analysis page logic.
 
 let currentFilePath = null;
 let mediaStream = null;
@@ -12,7 +10,7 @@ let timerInterval = null;
 let analysisData = null;
 let currentLanguage = 'en';
 
-// ── Status Management ─────────────────────────────────────────────────────────
+// Status
 
 function updateStatusUI(status, label) {
     const tag = document.querySelector('#statusTag span');
@@ -29,7 +27,7 @@ function updateStatusUI(status, label) {
     }
 }
 
-// ── Recording Logic ───────────────────────────────────────────────────────────
+// Recording
 
 async function toggleRecording() {
     const btn = document.getElementById('recordBtn');
@@ -110,7 +108,7 @@ function togglePlayback() {
     }
 }
 
-// ── Save Logic ────────────────────────────────────────────────────────────────
+// Save
 
 function openSaveModal() {
     const m = document.getElementById("saveModal");
@@ -130,7 +128,7 @@ function closeSaveModal() {
 
 async function saveVoiceData() {
     const subjectId = document.getElementById('subjectIdInput').value || "Unknown_Subject";
-    Loader.show("Securing Forensic Audio...");
+    Loader.show("Saving audio...");
     
     try {
         const timestamp = new Date().getTime();
@@ -148,7 +146,7 @@ async function saveVoiceData() {
             currentFilePath = finalResult.data.filepath;
             document.getElementById('playBtn').disabled = false;
             document.getElementById('analyseBtn').classList.remove('hidden');
-            updateStatusUI('active', 'Acoustic Data Saved');
+            updateStatusUI('active', 'Audio Saved');
             showToast("Session stored in evidence vault", "success");
         } else {
             throw new Error(finalResult.message);
@@ -169,7 +167,7 @@ function discardSession() {
     }
 }
 
-// ── Analysis Logic ────────────────────────────────────────────────────────────
+// Analysis
 
 async function finalizeAnalysis() {
     if (!currentFilePath) {
@@ -177,23 +175,23 @@ async function finalizeAnalysis() {
         return;
     }
 
-    Loader.show("Engaging Acoustic Forensic Engine...");
+    Loader.show("Analyzing voice...");
     try {
-        console.log("🎤 Finalizing analysis for:", currentFilePath);
+        console.log("Finalizing analysis for:", currentFilePath);
         
-        // Use the Eel bridge for consistency and reliability
+        // Run the analysis through the backend API.
         const result = await runVoiceAnalysis(currentFilePath);
 
         if (result.success) {
             updateUI(result.data);
-            showToast("Forensic Analysis Complete", "success");
+            showToast("Analysis complete", "success");
         } else {
             console.error("Analysis failed:", result.message);
             showToast("Analysis Error: " + result.message, "error");
         }
     } catch (error) {
-        console.error("Forensic Engine Error:", error);
-        showToast("Forensic Engine Connection Failed", "error");
+        console.error("Analysis error:", error);
+        showToast("Analysis connection failed", "error");
     } finally {
         Loader.hide();
     }
@@ -276,7 +274,7 @@ function updateUI(data) {
     document.getElementById('transcriptionContent').innerText = data.transcription_original || "No transcription available.";
 }
 
-// ── Save Report ────────────────────────────────────────────────────────────────
+// Save report
 
 async function saveVoiceReport() {
     if (!analysisData) {
@@ -350,7 +348,7 @@ function getStabilityClass(status) {
     return 'pill-danger';
 }
 
-// ── UI Helpers ────────────────────────────────────────────────────────────────
+// UI helpers
 
 function resetUIState() {
     currentFilePath = null;
@@ -371,14 +369,14 @@ function openVaultSelection() {
             showToast("Select an audio or video file", "warning"); 
             return; 
         }
-        Loader.show("Syncing Forensic Data");
+        Loader.show("Loading file...");
         currentFilePath = item.filepath;
         wavesurfer.load(item.filepath);
         wavesurfer.on('ready', () => {
             Loader.hide();
             document.getElementById('playBtn').disabled = false;
             document.getElementById('analyseBtn').classList.remove('hidden');
-            updateStatusUI('active', 'Vault Data Loaded');
+            updateStatusUI('active', 'File Loaded');
         });
     });
 }
@@ -402,7 +400,7 @@ async function populateMicrophones() {
     }
 }
 
-// ── Lifecycle ─────────────────────────────────────────────────────────────────
+// Page setup
 
 document.addEventListener("DOMContentLoaded", async () => {
     const user = await getCurrentUser();
@@ -421,7 +419,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         wavesurfer.on('ready', () => {
             document.getElementById('playBtn').disabled = false;
             document.getElementById('analyseBtn').classList.remove('hidden');
-            updateStatusUI('active', 'Vault Data Loaded');
+            updateStatusUI('active', 'File Loaded');
             finalizeAnalysis();
         });
     }

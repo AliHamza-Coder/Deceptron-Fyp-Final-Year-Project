@@ -1,7 +1,4 @@
-// ========================================
-// DECEPTRON - CONSTANTS
-// App-wide constants and configuration
-// ========================================
+// Constants and config used across the app.
 
 // Upload configuration
 const CHUNK_SIZE = 512 * 1024; // 512KB chunks

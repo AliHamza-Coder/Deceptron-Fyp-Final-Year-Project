@@ -1,7 +1,4 @@
-// ========================================
-// DECEPTRON - UPLOADS PAGE
-// File upload and management
-// ========================================
+// Uploads page - list, upload and delete files.
 
 // Load and display uploads
 async function loadUploads() {

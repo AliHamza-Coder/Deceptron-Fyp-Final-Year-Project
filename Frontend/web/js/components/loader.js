@@ -11,7 +11,7 @@ const Loader = (function() {
                     <div class="w-16 h-16 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin shadow-[0_0_15px_rgba(0,219,255,0.2)]"></div>
                     
                     <div class="text-center">
-                        <h2 id="loader-title" class="text-xs font-black text-white uppercase tracking-[0.8em] animate-pulse">Securing Evidence</h2>
+                        <h2 id="loader-title" class="text-xs font-black text-white uppercase tracking-[0.8em] animate-pulse">Processing...</h2>
                     </div>
                 </div>
             </div>
@@ -30,7 +30,7 @@ const Loader = (function() {
         loaderEl = document.getElementById('deceptron-global-loader');
     }
 
-    function show(title = "Securing Evidence", status = "") {
+    function show(title = "Processing...", status = "") {
         init();
         const titleEl = document.getElementById('loader-title');
         const statusEl = document.getElementById('loader-status');

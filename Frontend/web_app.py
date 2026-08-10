@@ -9,10 +9,10 @@ import sys
 if __name__ == "__main__":
     port = 8000
     print("\n" + "="*60)
-    print("🚀 DECEPTRON - WEB INTERFACE MODE")
+    print("DECEPTRON - Web Interface Mode")
     print("="*60)
-    print(f"\n✅ Server is starting on port {port}")
-    print(f"🔗 Click the link below to open the app in your browser:")
+    print(f"\nServer is starting on port {port}")
+    print(f"Click the link below to open the app in your browser:")
     print(f"\n    http://localhost:{port}/index.html")
     print("\n" + "="*60)
     print("Press Ctrl+C to stop the server\n")
@@ -32,7 +32,7 @@ if __name__ == "__main__":
             eel.sleep(1.0)
             
     except (SystemExit, KeyboardInterrupt):
-        print("\n👋 Shutting down server...")
+        print("\nShutting down server...")
         sys.exit()
     except Exception as e:
-        print(f"\n❌ Error: {e}")
+        print(f"\nError: {e}")

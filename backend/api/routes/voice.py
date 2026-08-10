@@ -14,7 +14,7 @@ import tempfile
 from forensic_voice_analyzer import ForensicVoiceAnalyzer
 import soundfile as sf
 
-# Pre-load analyzer for speed
+# Pre-load analyzer once at startup
 analyzer = ForensicVoiceAnalyzer()
 
 def resolve_path(file_path: str):

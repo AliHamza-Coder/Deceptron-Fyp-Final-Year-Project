@@ -1,7 +1,4 @@
-// ========================================
-// DECEPTRON - PROFILE PAGE
-// User profile management
-// ========================================
+// Profile page - edit name, title, avatar and password.
 
 let pendingAvatarBase64 = null;
 

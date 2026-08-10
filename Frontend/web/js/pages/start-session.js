@@ -1,12 +1,9 @@
-// ========================================
-// DECEPTRON - LIVE SESSION PAGE
-// Depends on: constants.js, utils.js, api.js, auth.js, media-recorder.js
-// ========================================
+// Live session page (uses constants, utils, api, auth, media-recorder).
 
 const recorder = new MediaRecorderManager();
 let activeStream = null;
 
-// ── Camera control ────────────────────────────────────────────────────────────
+// Camera control
 
 async function startCamera() {
     try {
@@ -31,7 +28,7 @@ function stopCamera() {
     updateStatusUI('ready', 'System Ready');
 }
 
-// ── Recording control ─────────────────────────────────────────────────────────
+// Recording control
 
 async function startRecording() {
     if (!activeStream) {
@@ -56,7 +53,7 @@ async function stopRecording() {
     setTimeout(() => showSaveDialog(), 500);
 }
 
-// ── Save ──────────────────────────────────────────────────────────────────────
+// Save
 
     async function saveRecording() {
     const blob = recorder.getBlob('video/webm');
@@ -66,7 +63,7 @@ async function stopRecording() {
     if (ok) recorder.reset();
 }
 
-// ── Initialisation ────────────────────────────────────────────────────────────
+// Page setup
 
 initializePage(async () => {
     const { cameras, microphones } = await enumerateMediaDevices();

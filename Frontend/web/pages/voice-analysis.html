@@ -242,7 +242,7 @@
             <div>
                 <h1 class="text-3xl font-bold heading-font text-white tracking-tight">Voice Analysis Unit</h1>
                 <div class="flex items-center mt-2 text-[10px] text-cyan-400 font-bold tracking-[0.2em] uppercase">
-                    Acoustic Forensic Lab • Online
+                    Voice Analysis • Online
                 </div>
             </div>
             <div class="flex items-center space-x-3">
@@ -285,7 +285,7 @@
             </div>
         </section>
 
-        <!-- Verdict Amazing Box -->
+        <!-- verdict box -->
         <section id="resultsSection" class="px-4 mb-6 hidden">
             <div id="verdictBox" class="glass p-8 amazing-box mb-6">
                 <div class="flex justify-between items-start mb-6">
@@ -328,7 +328,7 @@
                 </div>
             </div>
 
-            <!-- Detailed Metrics Grid -->
+            <!-- metrics grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                 <!-- Fundamental Frequency -->
                 <div class="glass p-6">
@@ -456,7 +456,7 @@
                 </div>
 
                 <!-- Transcription -->
-                <div class="glass p-6">
+                <div class="glass p-6 lg:col-span-3">
                     <h4 class="text-[10px] font-bold text-dim uppercase tracking-widest mb-4 flex items-center">
                         <i class="fas fa-closed-captioning mr-2 text-blue-400"></i> Transcription
                     </h4>
@@ -479,11 +479,11 @@
         </section>
     </main>
 
-    <!-- Modal for Saving Session -->
+    <!-- save session modal -->
     <div id="saveModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xl z-[999] hidden flex items-center justify-center opacity-0 transition-all duration-300">
         <div class="bg-card-bg border border-border-subtle p-10 rounded-3xl w-full max-w-lg transform scale-95 transition-all duration-300 shadow-2xl">
             <h2 class="text-2xl font-bold heading-font text-white mb-2 uppercase">Secure Voice Record</h2>
-            <p class="text-[10px] text-dim mb-8 uppercase tracking-widest font-bold">Encrypting acoustic data for vault</p>
+            <p class="text-[10px] text-dim mb-8 uppercase tracking-widest font-bold">Saving audio data to vault</p>
 
             <div class="space-y-5">
                 <div class="space-y-2">
@@ -495,7 +495,7 @@
 
             <div class="mt-10 flex flex-col space-y-3">
                 <button class="w-full py-4 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[11px] font-black uppercase rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)] transform hover:-translate-y-0.5 transition-all" onclick="saveVoiceData()">
-                    Save to Forensic Vault
+                    Save to Evidence Vault
                 </button>
                 <div class="flex space-x-3">
                     <button class="flex-1 py-4 bg-white/5 hover:bg-white/10 text-[10px] font-bold uppercase rounded-xl transition-all text-dim border border-border-subtle" onclick="closeSaveModal()">
@@ -511,7 +511,7 @@
 
     <script src="../js/pages/voice-analysis.js"></script>
     <script>
-        // Init WaveSurfer
+        // set up the waveform
         const wavesurfer = WaveSurfer.create({
             container: '#waveform',
             waveColor: '#1e293b',

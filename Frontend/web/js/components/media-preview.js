@@ -1,15 +1,11 @@
 /**
- * DECEPTRON Media Preview - Simplified Procedural Version
+ * Media preview - audio and video preview modals.
  */
 
-// ============================================
-// GLOBAL STATE
-// ============================================
+// Global state
 let activeWaveSurfer = null;
 
-// ============================================
-// AUDIO PREVIEW FUNCTIONS
-// ============================================
+// Audio preview
 
 /**
  * Initialize Audio Modal once
@@ -210,9 +206,7 @@ function setAudioVolume(val) {
     if (activeWaveSurfer) activeWaveSurfer.setVolume(val / 100);
 }
 
-// ============================================
-// VIDEO PREVIEW FUNCTIONS
-// ============================================
+// Video preview
 
 function initVideoModal() {
     if (document.getElementById('videoPreviewModal')) return;
@@ -324,9 +318,7 @@ function closeVideoPreview() {
     }, 300);
 }
 
-// ============================================
-// HELPERS
-// ============================================
+// Helpers
 
 function formatSeconds(seconds) {
     if (isNaN(seconds)) return '00:00';

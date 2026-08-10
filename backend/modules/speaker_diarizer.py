@@ -81,9 +81,7 @@ class SpeakerDiarizer:
         return segments
 
 
-# ---------------------------------------------------------------------
 # Example usage
-# ---------------------------------------------------------------------
 if __name__ == "__main__":
     d = SpeakerDiarizer()
     segs = d.diarize("sample_audio.wav")

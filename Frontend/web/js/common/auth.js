@@ -1,7 +1,4 @@
-// ========================================
-// DECEPTRON - AUTHENTICATION
-// Session management and auth checks
-// ========================================
+// Auth helpers - checks login state and handles logout.
 
 /**
  * Check if user is authenticated

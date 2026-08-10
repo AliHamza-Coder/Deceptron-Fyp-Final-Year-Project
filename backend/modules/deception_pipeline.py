@@ -4,7 +4,7 @@ deception_pipeline.py
 Master orchestrator for the Deceptron deception detection system.
 Takes a video (or video+audio), extracts suspect answer segments,
 runs all analyzers per segment, fuses results, and generates a
-comprehensive JSON report with natural‑language reasoning.
+full JSON report with natural‑language reasoning.
 
 Output:
     - Full annotated videos (one per module) in the "results" directory.
@@ -130,9 +130,7 @@ class DeceptionPipeline:
         print(f"  DECEPTRON DECEPTION PIPELINE - Session {session_id}")
         print(f"{'='*60}\n")
 
-        # ------------------------------------------------------------------
         # 1. Handle audio: extract from video if needed
-        # ------------------------------------------------------------------
         if audio_path is None:
             print("Extracting audio from video...")
             audio_path = self._extract_audio(video_path)
@@ -142,18 +140,14 @@ class DeceptionPipeline:
         else:
             print(f"Using provided audio: {audio_path}")
 
-        # ------------------------------------------------------------------
         # 2. Generate full annotated videos (including emotion)
-        # ------------------------------------------------------------------
         stem = os.path.splitext(os.path.basename(video_path))[0]
         self._generate_annotated_videos(video_path, stem)
 
-        # ---- Combine selected videos into a 2x2 presentation video with audio ----
+        # Combine selected videos into a 2x2 presentation video with audio
         self._create_combined_video(stem, audio_path)
 
-        # ------------------------------------------------------------------
         # 3. Get suspect answer segments
-        # ------------------------------------------------------------------
         print("\nRunning speaker diarization & segmentation...")
         segments = self.segment_manager.get_suspect_segments(audio_path)
         if not segments:
@@ -161,9 +155,7 @@ class DeceptionPipeline:
             return None
         print(f"Found {len(segments)} suspect speaking segments.")
 
-        # ------------------------------------------------------------------
-        # 4. Get video FPS and total frames for time‑to‑frame conversion
-        # ------------------------------------------------------------------
+        # 4. Get video FPS and total frames for time-to-frame conversion
         cap = cv2.VideoCapture(video_path)
         if not cap.isOpened():
             raise ValueError(f"Cannot open video: {video_path}")
@@ -171,9 +163,7 @@ class DeceptionPipeline:
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         cap.release()
 
-        # ------------------------------------------------------------------
         # 4.5 Establish Behavioral Baseline (First 10 seconds)
-        # ------------------------------------------------------------------
         print("\nEstablishing behavioral baseline (first 10 seconds)...")
         baseline_duration = min(10.0, total_frames / fps)
         baseline_end_frame = int(baseline_duration * fps)
@@ -185,9 +175,7 @@ class DeceptionPipeline:
             print(f"Warning: Baseline analysis failed ({e}). Using defaults.")
             self.baseline_metrics = {}
 
-        # ------------------------------------------------------------------
         # 5. Process each segment
-        # ------------------------------------------------------------------
         segment_results = []
         previous_segments = []  # For cross-segment contradiction tracking
         full_timeline = []  # Deception score per second for the whole video
@@ -204,7 +192,7 @@ class DeceptionPipeline:
             start_frame = max(1, int(start_sec * fps))
             end_frame = min(total_frames, int(end_sec * fps))
 
-            # ---- Voice analysis ----
+            # Voice analysis
             voice_result = self.voice_analyzer.analyze_segment(
                 seg_audio, 0, end_sec - start_sec, suppress_terminal=True)
             if voice_result is None:
@@ -223,7 +211,7 @@ class DeceptionPipeline:
                 print(f"  Empty transcription (silence/noise only). Skipping.")
                 continue
 
-            # ---- All face analyzers in parallel ----
+            # All face analyzers in parallel
             face_analyzers = {
                 'eye': self.eye_analyzer,
                 'lip': self.lip_analyzer,
@@ -251,7 +239,7 @@ class DeceptionPipeline:
                         print(f"  Face module '{name}' failed: {e}")
                         face_raw[name] = None
 
-            # --- Eye gaze ---
+            # Eye gaze
             eye_data = face_raw.get('eye')
             if eye_data:
                 gazes = [f['gaze'] for f in eye_data]
@@ -272,7 +260,7 @@ class DeceptionPipeline:
                                'fixation_score': 100, 'blink_rate_spike': False}
                 eye_full = {}
 
-            # --- Lip/jaw ---
+            # Lip/jaw
             lip_data = face_raw.get('lip')
             if lip_data:
                 avg_jaw = np.mean([f['jaw_tightness'] for f in lip_data])
@@ -291,7 +279,7 @@ class DeceptionPipeline:
                                'chin_tremor': 0, 'lip_disappear': False}
                 lip_full = {}
 
-            # --- Head pose ---
+            # Head pose
             head_data = face_raw.get('head')
             if head_data:
                 avg_withdr = np.mean([f['withdrawal_score'] for f in head_data])
@@ -310,7 +298,7 @@ class DeceptionPipeline:
                                 'is_nodding': False, 'is_shaking': False}
                 head_full = {}
 
-            # --- Asymmetry ---
+            # Asymmetry
             asym_data = face_raw.get('asym')
             if asym_data:
                 avg_total_asym = np.mean([f['total_asym'] for f in asym_data])
@@ -326,7 +314,7 @@ class DeceptionPipeline:
                 asym_summary = {'total_asym': 0, 'mouth_asym': 0, 'brow_asym': 0}
                 asym_full = {}
 
-            # --- Hand/face touch ---
+            # Hand/face touch
             hand_data = face_raw.get('hand')
             if hand_data:
                 touches = [f for f in hand_data if f['touches']]
@@ -346,7 +334,7 @@ class DeceptionPipeline:
                 touch_summary = {'touch_score': 0, 'touch_region': 'NONE', 'touch_duration': 0}
                 hand_full = {}
 
-            # --- Emotion ---
+            # Emotion
             emotion_data = face_raw.get('emotion')
             if emotion_data:
                 emotions = [f['emotion'] for f in emotion_data]
@@ -376,14 +364,14 @@ class DeceptionPipeline:
                 'emotion_timeline': emotion_summary
             }
 
-            # ---- Extract question context for this segment ----
+            # Extract question context for this segment
             q_text = ""
             if seg.get('question') and seg['question'].get('text'):
                 q_text = seg['question']['text']
                 print(f"  Question: \"{q_text[:100]}{'...' if len(q_text) > 100 else ''}\"")
             per_segment_context = q_text if q_text else (question_context if question_context else "What can you tell us about this situation?")
 
-            # ---- NLP analysis with question context ----
+            # NLP analysis with question context
             text_for_nlp = voice_transcript_en if voice_transcript_en else voice_transcript_orig
             nlp_result = self.nlp_analyzer.analyze(
                 text=text_for_nlp,
@@ -394,7 +382,7 @@ class DeceptionPipeline:
             if nlp_result is None:
                 nlp_result = {'overall_deception_score': 0, 'triggered_flags': []}
 
-            # ---- Voice data for fusion ----
+            # Voice data for fusion
             voice_data = {
                 'jitter': voice_result.get('micro_tremors', {}).get('jitter_local_percent', 0),
                 'shimmer': voice_result.get('micro_tremors', {}).get('shimmer_local_percent', 0),
@@ -406,7 +394,7 @@ class DeceptionPipeline:
                 'deception_score': voice_deception.get('overall_deception_score', 0)
             }
 
-            # ---- Fusion ----
+            # Fusion
             fusion_result = self.fusion_engine.fuse(
                 face_data=face_data,
                 voice_data=voice_data,
@@ -414,7 +402,7 @@ class DeceptionPipeline:
                 timestamps=None
             )
 
-            # ---- Advanced Analysis (Baseline comparison & Conflicts) ----
+            # Advanced analysis (baseline comparison and conflicts)
             # Detect mismatches (e.g. Happy face + Stressed voice)
             face_summary_for_conflict = {
                 'eye_gaze': eye_summary,
@@ -445,7 +433,7 @@ class DeceptionPipeline:
                         'severity': 100, 'timestamp': f"{start_sec:.2f}", 'duration': end_sec - start_sec
                     })
 
-            # ---- Reasoning ----
+            # Reasoning
             reasoning_input = {
                 'text': text_for_nlp,
                 'question': per_segment_context,
@@ -458,7 +446,7 @@ class DeceptionPipeline:
             }
             reason = self.reasoning_engine.explain(reasoning_input)
 
-            # ---- Compile segment result ----
+            # Compile segment result
             seg_result = {
                 'segment_id': seg_id,
                 'start_sec': start_sec,
@@ -493,43 +481,59 @@ class DeceptionPipeline:
             if fusion_result['is_deceptive']:
                 print(f"     Deceptive cues active!")
             
-            # ---- CLEANUP: Remove temporary segment audio file ----
+            # Cleanup: remove temporary segment audio file
             try:
                 if seg_audio and os.path.exists(seg_audio):
                     os.remove(seg_audio)
             except Exception as e:
                 print(f"  Warning: Could not delete segment file {seg_audio}: {e}")
 
-        # ------------------------------------------------------------------
         # 6. Overall summary & report
-        # ------------------------------------------------------------------
         if not segment_results:
+            # No segment could be scored - return a minimal report so the
+            # caller still gets a valid response instead of nothing
             print("No valid segments analyzed.")
-            return None
+            total_segs = 0
+            deceptive_segments = 0
+            overall_score = float(self.baseline_metrics.get('voice_stress', 25))
+            print("\nGenerating session-wide timeline data...")
+            full_timeline = []
+            for sec in range(int(video_duration_sec) + 1):
+                full_timeline.append({
+                    "second": sec,
+                    "timestamp": f"{int(sec//60):02d}:{int(sec%60):02d}",
+                    "deception_score": round(overall_score, 1)
+                })
+        else:
+            overall_score = np.mean([s['fusion']['final_deception_score'] for s in segment_results])
+            deceptive_segments = sum(1 for s in segment_results if s['fusion']['is_deceptive'])
+            total_segs = len(segment_results)
 
-        overall_score = np.mean([s['fusion']['final_deception_score'] for s in segment_results])
-        deceptive_segments = sum(1 for s in segment_results if s['fusion']['is_deceptive'])
-        total_segs = len(segment_results)
+            # 6. Generate Session Timeline (Deception score per second)
+            print("\nGenerating session-wide timeline data...")
+            full_timeline = []
+            for sec in range(int(video_duration_sec) + 1):
+                # Check if this second falls within any analyzed segment
+                matching_seg = next((s for s in segment_results if s['start_sec'] <= sec <= s['end_sec']), None)
+                if matching_seg:
+                    score = matching_seg['fusion']['final_deception_score']
+                else:
+                    # Default baseline score for non-suspect segments
+                    score = self.baseline_metrics.get('voice_stress', 25)
+                
+                full_timeline.append({
+                    "second": sec,
+                    "timestamp": f"{int(sec//60):02d}:{int(sec%60):02d}",
+                    "deception_score": round(float(score), 1)
+                })
 
-        # ------------------------------------------------------------------
-        # 6. Generate Session Timeline (Deception score per second)
-        # ------------------------------------------------------------------
-        print("\nGenerating session-wide timeline data...")
-        full_timeline = []
-        for sec in range(int(video_duration_sec) + 1):
-            # Check if this second falls within any analyzed segment
-            matching_seg = next((s for s in segment_results if s['start_sec'] <= sec <= s['end_sec']), None)
-            if matching_seg:
-                score = matching_seg['fusion']['final_deception_score']
-            else:
-                # Default baseline score for non-suspect segments
-                score = self.baseline_metrics.get('voice_stress', 25)
-            
-            full_timeline.append({
-                "second": sec,
-                "timestamp": f"{int(sec//60):02d}:{int(sec%60):02d}",
-                "deception_score": round(float(score), 1)
-            })
+        if total_segs:
+            conclusion = (
+                f"Across {total_segs} analyzed responses, the average deception score was {overall_score:.1f}%. "
+                f"{deceptive_segments} segment(s) flagged as deceptive."
+            )
+        else:
+            conclusion = "No analyzable speech was detected, so no segments could be scored."
 
         report = {
             'session_id': session_id,
@@ -542,10 +546,7 @@ class DeceptionPipeline:
             'total_segments': total_segs,
             'timeline': full_timeline,
             'segments': segment_results,
-            'conclusion': (
-                f"Across {total_segs} analyzed responses, the average deception score was {overall_score:.1f}%. "
-                f"{deceptive_segments} segment(s) flagged as deceptive."
-            )
+            'conclusion': conclusion
         }
 
         # Save JSON report
@@ -593,9 +594,7 @@ class DeceptionPipeline:
 
         return report_path
 
-    # ------------------------------------------------------------------
-    #   Generate annotated full videos (including emotion)
-    # ------------------------------------------------------------------
+    # Generate annotated full videos (including emotion)
     def _generate_annotated_videos(self, video_path: str, stem: str):
         """Run each visual module on the full video in PARALLEL and save annotated copies at 720p."""
         # Calculate scale for 720p target height
@@ -630,9 +629,7 @@ class DeceptionPipeline:
 
         print("Annotated videos complete.\n")
 
-    # ------------------------------------------------------------------
-    #   Create 2x2 combined presentation video with audio
-    # ------------------------------------------------------------------
+    # Create 2x2 combined presentation video with audio
     def _create_combined_video(self, stem: str, audio_path: str):
         """Stack eye_gaze, emotion, hand_face, lip_jaw in 2x2 grid,
         add original audio, and save as 'stem_combined_presentation.mp4'.
@@ -671,9 +668,7 @@ class DeceptionPipeline:
         except subprocess.CalledProcessError as e:
             print(f"  ffmpeg error: {e.stderr}")
 
-    # ------------------------------------------------------------------
-    #   Audio extraction
-    # ------------------------------------------------------------------
+    # Audio extraction
     def _extract_audio(self, video_path: str) -> Optional[str]:
         """Extract audio stream from video using ffmpeg."""
         audio_path = tempfile.mktemp(suffix=".wav")
@@ -756,9 +751,7 @@ class DeceptionPipeline:
         return spikes
 
 
-# ---------------------------------------------------------------------
-#   Command‑line entry point
-# ---------------------------------------------------------------------
+# Command-line entry point
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Deceptron Deception Detection Pipeline")
     parser.add_argument("video", help="Path to interrogation video file")

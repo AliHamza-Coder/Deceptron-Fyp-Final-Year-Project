@@ -19,22 +19,22 @@
     <style>
         :root {
             --primary-blue: #2563eb;
-            /* Professional Royal Blue */
+            /* Royal Blue */
             --accent-cyan: #0ea5e9;
             /* Sky Blue */
             --accent-rose: #ef4444;
             --sidebar-width: 260px;
 
-            /* Vibrant University Pro Theme */
+            /* theme colors */
             --bg-main: #0f172a;
             /* Deep Navy */
             --text-main: #ffffff;
             --text-dim: #94a3b8;
             --sidebar-bg: #0f172a;
             --card-bg: #1e293b;
-            /* Solid Professional Surface */
+            /* card surface */
             --border-subtle: #334155;
-            /* Visible Slate Border */
+            /* slate border */
             --input-bg: #0f172a;
             --glass-bg: rgba(30, 41, 59, 0.7);
         }
@@ -174,7 +174,7 @@
             height: 100%;
         }
 
-        /* --- Forensic Glow System --- */
+        /* card glow on hover */
         .glow-cyan {
             border: 1px solid var(--border-subtle) !important;
         }
@@ -273,7 +273,7 @@
         </header>
 
         <div class="space-y-8">
-            <!-- Hero: Main Truth Level Chart -->
+            <!-- main truth level chart -->
             <div class="glass p-10">
                 <div class="flex justify-between items-start mb-10">
                     <div>
@@ -304,7 +304,7 @@
                 </div>
             </div>
 
-            <!-- Full Text Transcript Section -->
+            <!-- transcript section -->
             <div class="glass p-10">
                 <h3 class="text-sm font-bold heading-font uppercase tracking-[0.2em] text-white mb-8 flex items-center">
                     <i class="fas fa-comment-dots mr-3 text-primary-blue"></i> Session Transcript
@@ -346,7 +346,7 @@
                 </div>
             </div>
 
-            <!-- Dynamic Analysis Results per Type -->
+            <!-- analysis results per report type -->
             <div id="analysisResultsSection" class="hidden">
                 <div class="glass p-8">
                     <h3 class="text-sm font-bold heading-font uppercase tracking-[0.2em] text-white mb-6 flex items-center">
@@ -356,9 +356,9 @@
                 </div>
             </div>
 
-            <!-- Standardized 3-Card Analysis Output Row -->
+            <!-- three analysis cards -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Card 1: Output Context -->
+                <!-- card 1: context -->
                 <article class="glass p-8 space-y-5 border-white/5 group">
                     <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center">
                         <div
@@ -387,7 +387,7 @@
                     </div>
                 </article>
 
-                <!-- Card 2: Description -->
+                <!-- card 2: conclusion -->
                 <article class="glass p-8 space-y-5 border-rose-500/10 group">
                     <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center">
                         <div
@@ -422,7 +422,7 @@
                     </div>
                 </article>
 
-                <!-- Card 3: Analysis % -->
+                <!-- card 3: analysis breakdown -->
                 <article class="glass p-8 space-y-8 border-cyan-500/10 group">
                     <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center">
                         <div
@@ -456,7 +456,7 @@
                 </article>
             </div>
 
-            <!-- Investigator Notes (Extended Bottom Section) -->
+            <!-- analyst notes at bottom -->
             <div class="glass p-10">
                 <h3 class="text-xs font-bold uppercase tracking-[0.2em] mb-6 text-white flex items-center">
                     <i class="fas fa-clipboard-list mr-3 text-primary-blue"></i> Analyst Notes & Disposition
@@ -506,7 +506,7 @@
         }
 
         function renderReport(report) {
-            // Normalize: data may be nested inside full_data
+            // data may be nested under full_data
             if (report.full_data && typeof report.full_data === 'object') {
                 Object.keys(report.full_data).forEach(k => {
                     if (report[k] === undefined) report[k] = report.full_data[k];
@@ -516,7 +516,7 @@
             document.querySelector('h1').innerText = report.type.toUpperCase() + " Intelligence Report";
             document.querySelector('.text-dim.font-bold').innerText = `Session Identity: #${report.id.substring(0,8)} • Verified`;
             
-            // Video/Audio source
+            // video or audio source
             const video = document.getElementById('reportVideo');
             const videoWrap = video.closest('.video-container');
             const heroChartGrid = document.querySelector('.grid.grid-cols-1.lg\\:grid-cols-2');
@@ -545,7 +545,7 @@
             let label = "Confidence Rating";
             
             if (report.type === 'pipeline') {
-                score = Math.round(report.overall_deception_score || 0);
+                score = Math.round((report.full_data || {}).overall_deception_score || report.overall_deception_score || 0);
                 label = "Deception Risk";
             } else if (report.type === 'voice') {
                 const da = report.deception_analysis || {};
@@ -572,15 +572,16 @@
 
             const noteArea = document.querySelector('textarea');
             if (noteArea) {
-                noteArea.value = report.conclusion || '';
+                noteArea.value = (report.full_data || {}).conclusion || report.conclusion || '';
             }
 
             updateMainChart(report, score);
 
-            // Update Transcript
+            // fill in the transcript
             const transcriptBox = document.querySelector('.transcript-box');
-            if (report.type === 'pipeline' && report.segments && report.segments.length) {
-                transcriptBox.innerHTML = report.segments.map((seg, i) => {
+            const segs = (report.full_data || {}).segments || report.segments || [];
+            if (report.type === 'pipeline' && segs.length) {
+                transcriptBox.innerHTML = segs.map((seg, i) => {
                     const f = seg.fusion || {};
                     const rs = seg.raw_scores || {};
                     const emo = (rs.emotion && rs.emotion.dominant_emotion) || 'Neutral';
@@ -623,7 +624,7 @@
                     </div>`;
             }
 
-            // Analysis Results per Type
+            // show analysis results for this report type
             const analysisSection = document.getElementById('analysisResultsSection');
             const analysisContent = document.getElementById('analysisResultsContent');
             const analysisTitle = document.getElementById('analysisResultsTitle');
@@ -691,7 +692,7 @@
                 analysisSection.classList.add('hidden');
             }
 
-            // Context Card
+            // fill the context card
             const contextItems = document.querySelectorAll('article.glass:nth-child(1) .flex.justify-between span:last-child');
             if (contextItems.length >= 4) {
                 contextItems[0].innerText = (report.source_file || '').split('/').pop() || 'N/A';
@@ -699,18 +700,18 @@
                 contextItems[3].innerText = (report.id || '').substring(0,12);
             }
 
-            // Conclusion Card
+            // fill the conclusion card
             const conclusionP = document.querySelector('article.glass:nth-child(2) p');
             const conclusionList = document.querySelector('article.glass:nth-child(2) ul');
             const verdictSpan = document.querySelector('article.glass:nth-child(2) span.px-3');
 
             if (report.type === 'pipeline') {
-                const risk = Math.round(report.overall_deception_score || 0);
+                const risk = Math.round((report.full_data || {}).overall_deception_score || report.overall_deception_score || 0);
                 const flags = report.key_flags || [];
-                conclusionP.innerText = report.conclusion || "Full multi-modal analysis concluded.";
+                conclusionP.innerText = (report.full_data || {}).conclusion || report.conclusion || "Full multi-modal analysis concluded.";
                 conclusionList.innerHTML = `
                     <li class="flex items-center"><span class="w-1 h-1 bg-rose-500 rounded-full mr-2"></span> Risk: ${risk}%</li>
-                    <li class="flex items-center"><span class="w-1 h-1 bg-rose-500 rounded-full mr-2"></span> Markers: ${(report.segments || []).length} segments</li>
+                    <li class="flex items-center"><span class="w-1 h-1 bg-rose-500 rounded-full mr-2"></span> Markers: ${((report.full_data || {}).segments || report.segments || []).length} segments</li>
                     <li class="flex items-center"><span class="w-1 h-1 bg-rose-500 rounded-full mr-2"></span> Flags: ${flags.length > 0 ? flags.join(', ') : 'None'}</li>`;
                 verdictSpan.innerText = `Verdict: ${risk > 60 ? 'HIGH RISK' : 'STABLE'}`;
                 verdictSpan.className = risk > 60 ? 'px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 text-rose-500 text-[9px] font-bold uppercase rounded-lg shadow-[0_0_15px_rgba(244,63,94,0.1)]' : 'px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[9px] font-bold uppercase rounded-lg shadow-[0_0_15px_rgba(16,185,129,0.1)]';
@@ -724,8 +725,8 @@
                     <li class="flex items-center"><span class="w-1 h-1 bg-cyan-500 rounded-full mr-2"></span> Jitter: ${(mt.jitter_local_percent || 0).toFixed(4)}</li>
                     <li class="flex items-center"><span class="w-1 h-1 bg-cyan-500 rounded-full mr-2"></span> Shimmer: ${(mt.shimmer_local_percent || 0).toFixed(4)}</li>
                     <li class="flex items-center"><span class="w-1 h-1 bg-cyan-500 rounded-full mr-2"></span> HNR: ${(sc.hnr_db || 0).toFixed(2)} dB</li>`;
-                verdictSpan.innerText = `Verdict: ${score > 60 ? 'AUTHENTIC' : 'SUSPICIOUS'}`;
-                verdictSpan.className = score > 60 ? 'px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[9px] font-bold uppercase rounded-lg' : 'px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 text-rose-500 text-[9px] font-bold uppercase rounded-lg';
+                verdictSpan.innerText = `Verdict: ${score > 60 ? 'SUSPICIOUS' : 'AUTHENTIC'}`;
+                verdictSpan.className = score > 60 ? 'px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 text-rose-500 text-[9px] font-bold uppercase rounded-lg' : 'px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[9px] font-bold uppercase rounded-lg';
             } else {
                 const res = report.results || {};
                 const emo = res.emotion || report.emotion || {};
@@ -823,10 +824,11 @@
             let labelB = "Secondary";
 
             if (report.type === 'pipeline') {
-                const firstSeg = report.segments && report.segments[0];
+                const pipeSegs = (report.full_data || {}).segments || report.segments || [];
+                const firstSeg = pipeSegs[0];
                 const raw = firstSeg && firstSeg.raw_scores;
                 const vs = raw && raw.voice_stress;
-                valA = Math.round((report.overall_deception_score || 0));
+                valA = Math.round((report.full_data || {}).overall_deception_score || report.overall_deception_score || 0);
                 valB = Math.round((vs && vs.vocal_strain_score) || 0);
                 labelA = "Deception";
                 labelB = "Vocal Stress";
@@ -923,10 +925,10 @@
                 const stem = 'deceptron_report_' + reportId.substring(0, 8);
                 const zip = new JSZip();
 
-                // 1. JSON
+                // add the JSON file
                 zip.file(stem + '.json', JSON.stringify(report, null, 2));
 
-                // 2. CSV
+                // add the CSV file
                 let csvContent = '';
                 if (report.type === 'pipeline') {
                     csvContent = 'Segment,Start,End,Transcript,Emotion,Deception Score,Verdict\n';
@@ -965,7 +967,7 @@
                 }
                 if (csvContent) zip.file(stem + '.csv', csvContent);
 
-                // 3. Media file (video/audio)
+                // add the media file if it exists
                 let mediaPath = '';
                 if (report.type === 'voice' && report.source_file) {
                     mediaPath = report.source_file;
@@ -992,7 +994,7 @@
                     } catch (_) {}
                 }
 
-                // 4. Notes
+                // add analyst notes if any
                 const notesEl = document.getElementById('archiveNotes');
                 if (notesEl && notesEl.value.trim()) {
                     zip.file(stem + '_notes.txt', notesEl.value);

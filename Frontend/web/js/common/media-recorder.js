@@ -1,8 +1,4 @@
-// ========================================
-// DECEPTRON - MEDIA RECORDER MANAGER
-// Centralised recording logic shared by
-// start-session, voice-analysis, facial-expression
-// ========================================
+// Media recorder manager - shared by start-session, voice-analysis and facial-expression pages.
 
 class MediaRecorderManager {
     constructor() {
@@ -23,7 +19,7 @@ class MediaRecorderManager {
         this.stream  = stream;
         this.chunks  = [];
 
-        // Fallback: try the requested mimeType, then common alternatives
+        // Try the requested mimeType, otherwise fall back to a supported one.
         const mimeType = options.mimeType || 'video/webm';
         const resolvedOptions = MediaRecorder.isTypeSupported(mimeType)
             ? options
@@ -42,8 +38,7 @@ class MediaRecorderManager {
     }
 
     /**
-     * Stop recording and return a Promise that resolves once the
-     * recorder has fully stopped (onstop fires).
+     * Stop recording. Returns a promise that resolves once the recorder has fully stopped.
      * @returns {Promise<void>}
      */
     stopRecording() {

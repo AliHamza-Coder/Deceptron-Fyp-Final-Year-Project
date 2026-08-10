@@ -13,13 +13,13 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --primary-blue: #2563eb; /* Professional Royal Blue */
+            --primary-blue: #2563eb; /* Royal Blue */
             --accent-cyan: #0ea5e9; /* Sky Blue */
             --bg-main: #0f172a; /* Deep Navy */
             --text-main: #ffffff;
             --text-dim: #94a3b8;
-            --card-bg: #1e293b; /* Solid Professional Surface */
-            --border-subtle: #334155; /* Visible Slate Border */
+            --card-bg: #1e293b; /* card surface */
+            --border-subtle: #334155; /* slate border */
         }
 
         body {
@@ -35,7 +35,7 @@
                 radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.05) 0, transparent 50%);
         }
 
-        /* ── BRAND PANEL ── */
+        /* brand panel */
         .brand-panel {
             width: 45%;
             min-width: 340px;
@@ -50,7 +50,7 @@
             border-right: 1px solid var(--border-subtle);
         }
 
-        /* Subtle grid overlay */
+        /* grid background */
         .brand-panel::before {
             content: '';
             position: absolute; inset: 0;
@@ -141,7 +141,7 @@
         .dot-3 { width: 5px; height: 5px; background: rgba(0,219,255,0.5); top: 65%; left: 8%; animation-delay: 3s; }
         @keyframes pulse { 0%,100%{transform:scale(1);opacity:.5} 50%{transform:scale(1.5);opacity:1} }
 
-        /* ── FORM PANEL ── */
+        /* form panel */
         .form-panel {
             flex: 1;
             height: 100%;
@@ -316,7 +316,7 @@
                 <img src="../assets/images/Logo1.png" alt="Deceptron">
             </div>
 
-            <p class="brand-tagline">Truth Verification System</p>
+            <p class="brand-tagline">Deception Detection System</p>
             <div class="brand-divider"></div>
 
             <p class="brand-desc">
@@ -366,7 +366,7 @@
         </div>
     </div>
 
-    <!-- Backend scripts — untouched -->
+    <!-- backend scripts -->
     <script src="../js/common/constants.js"></script>
     <script src="../js/common/utils.js"></script>
     <script src="../js/common/api.js"></script>

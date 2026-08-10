@@ -11,18 +11,18 @@
     <script type="text/javascript" src="/eel.js"></script>
     <style>
     :root {
-        --primary-blue: #2563eb; /* Professional Royal Blue */
+        --primary-blue: #2563eb; /* Royal Blue */
         --accent-cyan: #0ea5e9; /* Sky Blue */
         --accent-rose: #ef4444;
         --sidebar-width: 260px;
         
-        /* Vibrant University Pro Theme */
+        /* theme colors */
         --bg-main: #0f172a; /* Deep Navy */
         --text-main: #ffffff;
         --text-dim: #94a3b8;
         --sidebar-bg: #0f172a;
-        --card-bg: #1e293b; /* Solid Professional Surface */
-        --border-subtle: #334155; /* Visible Slate Border */
+        --card-bg: #1e293b; /* card surface */
+        --border-subtle: #334155; /* slate border */
         --input-bg: #0f172a;
     }
 
@@ -102,7 +102,7 @@
         .avatar-wrapper:hover .avatar-edit-overlay i, 
         .avatar-wrapper:hover .avatar-edit-overlay span { transform: translateY(0); }
 
-        /* Delete Button - Sleek Corner Placement */
+        /* delete button */
         .delete-avatar-btn {
             position: absolute; top: 5px; right: 5px;
             width: 34px; height: 34px;
@@ -115,7 +115,7 @@
         }
         .delete-avatar-btn:hover { background: #ff6b81; transform: scale(1.1) rotate(90deg); }
 
-        /* Pending Confirmation Overlay */
+        /* confirm overlay */
         .avatar-confirm-overlay {
             position: absolute; inset: 0;
             background: rgba(0, 219, 255, 0.15);
@@ -323,7 +323,7 @@
         border: 1px solid var(--border-subtle);
         border-radius: 1.5rem;
         width: 100%; max-width: 700px;
-        padding: 3rem;
+        padding: 2.5rem;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         color: var(--text-main);
         max-height: 90vh;
@@ -331,7 +331,22 @@
         position: relative;
     }
 
-    /* Slim custom scrollbar for modal */
+    /* modal form refinements */
+    .modal-content .input-group { margin-bottom: 0; }
+    .modal-pwd-wrap { position: relative; }
+    .modal-pwd-eye {
+        position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+        background: none; border: none; color: rgba(148, 163, 184, 0.6);
+        cursor: pointer; font-size: 0.8rem; padding: 4px;
+        transition: color 0.2s ease;
+    }
+    .modal-pwd-eye:hover { color: var(--text-main); }
+    .modal-content .update-btn { padding: 0.85rem 1.4rem; font-size: 0.8rem; letter-spacing: 0.08em; }
+    @media (max-width: 640px) {
+        .modal-content { padding: 1.75rem; }
+    }
+
+    /* scrollbar for modal */
     .modal-content::-webkit-scrollbar { width: 5px; }
     .modal-content::-webkit-scrollbar-track { background: transparent; }
     .modal-content::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 10px; }
@@ -374,7 +389,7 @@
             cursor: pointer; z-index: 100; box-shadow: 0 0 15px rgba(0, 219, 255, 0.4);
         }
 
-        /* --- Forensic Glow System --- */
+        /* card glow on hover */
         .glow-cyan { border: 1px solid var(--border-subtle) !important; }
         .glow-purple { border: 1px solid var(--border-subtle) !important; }
         .glow-blue { border: 1px solid var(--border-subtle) !important; }
@@ -390,7 +405,7 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar Component Container -->
+    <!-- Sidebar -->
     <script src="../js/components/sidebar.js"></script>
     <script>
         initSidebar();
@@ -467,10 +482,10 @@
                 </div>
                 
                 <div class="space-y-6">
-                    <!-- TOP ROW: Avatar + Info -->
+                    <!-- avatar and info row -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <!-- Avatar Column -->
-                        <div class="md:col-span-1 flex flex-col items-center justify-start pt-2">
+                        <div class="md:col-span-1 flex flex-col items-center justify-start pt-4">
                             <div class="modal-avatar-section">
                                 <div class="modal-avatar-wrapper" onclick="document.getElementById('modal-avatar-upload').click()">
                                     <div class="modal-avatar-preview">
@@ -487,9 +502,9 @@
 
                         <!-- Info Column -->
                         <div class="md:col-span-2 space-y-4">
-                            <div class="flex items-center gap-2 mb-1">
+                            <div class="flex items-center gap-3 mb-2">
                                 <i class="fas fa-id-card text-cyan-400 text-xs"></i>
-                                <h4 class="text-[10px] font-black uppercase tracking-wider text-slate-400">General Information</h4>
+                                <h4 class="text-[10px] font-black uppercase tracking-wider text-dim" style="color: var(--text-dim)">General Information</h4>
                             </div>
                             <div class="input-group">
                                 <label>Full Name</label>
@@ -506,30 +521,34 @@
                         </div>
                     </div>
 
-                    <!-- SECURITY SECTION -->
-                    <div class="pt-2 border-t border-slate-200">
-                        <div class="flex items-center gap-2 mb-4">
-                            <div class="w-7 h-7 rounded-lg bg-blue-500/10 flex items-center justify-center glow-blue">
+                    <!-- security section -->
+                    <div class="pt-4" style="border-top: 1px solid var(--border-subtle)">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center glow-blue">
                                 <i class="fas fa-lock text-blue-500 text-xs"></i>
                             </div>
-                            <h4 class="text-[10px] font-black uppercase tracking-wider text-slate-500">Account Security</h4>
+                            <h4 class="text-[10px] font-black uppercase tracking-wider" style="color: var(--text-dim)">Account Security</h4>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="input-group" style="position:relative">
+                            <div class="input-group">
                                 <label>Current Password</label>
-                                <input type="password" class="cyber-input" id="edit-current-pwd" placeholder="Enter current password" style="padding-right:2.5rem">
-                                <button type="button" onclick="toggleModalPwd('edit-current-pwd',this)" style="position:absolute;right:12px;bottom:13px;background:none;border:none;color:rgba(148,163,184,0.5);cursor:pointer;font-size:0.75rem;" tabindex="-1"><i class="fas fa-eye"></i></button>
+                                <div class="modal-pwd-wrap">
+                                    <input type="password" class="cyber-input" id="edit-current-pwd" placeholder="Enter current password" style="padding-right:2.5rem">
+                                    <button type="button" class="modal-pwd-eye" onclick="toggleModalPwd('edit-current-pwd',this)" tabindex="-1"><i class="fas fa-eye"></i></button>
+                                </div>
                             </div>
-                            <div class="input-group" style="position:relative">
+                            <div class="input-group">
                                 <label>New Password</label>
-                                <input type="password" class="cyber-input" id="edit-new-pwd" placeholder="Enter new password" style="padding-right:2.5rem">
-                                <button type="button" onclick="toggleModalPwd('edit-new-pwd',this)" style="position:absolute;right:12px;bottom:13px;background:none;border:none;color:rgba(148,163,184,0.5);cursor:pointer;font-size:0.75rem;" tabindex="-1"><i class="fas fa-eye"></i></button>
+                                <div class="modal-pwd-wrap">
+                                    <input type="password" class="cyber-input" id="edit-new-pwd" placeholder="Enter new password" style="padding-right:2.5rem">
+                                    <button type="button" class="modal-pwd-eye" onclick="toggleModalPwd('edit-new-pwd',this)" tabindex="-1"><i class="fas fa-eye"></i></button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- ACTION BUTTONS -->
-                    <div class="flex gap-4 pt-2">
+                    <!-- action buttons -->
+                    <div class="flex gap-4 pt-4">
                         <button class="update-btn flex-1" style="background: rgba(128,128,128,0.1); color: var(--text-main); border: 1px solid var(--border-subtle); box-shadow: none;" onclick="closeModal()">Cancel</button>
                         <button class="update-btn flex-1" onclick="saveProfile()">Save Changes</button>
                     </div>
@@ -551,7 +570,7 @@
 
                 console.log("Profile data:", { name, title });
 
-                // Handle Avatar Update
+                // save new avatar first
                 if (pendingAvatarBase64 !== null) {
                     console.log("Updating avatar...");
                     const avatarResult = await eel.update_avatar(pendingAvatarBase64)();
@@ -563,7 +582,7 @@
                     pendingAvatarBase64 = null;
                 }
 
-                // Update Profile Info
+                // then update name and title
                 console.log("Updating profile...");
                 const result = await eel.update_profile(name, title)();
                 console.log("Profile result:", result);
@@ -575,7 +594,7 @@
                     return;
                 }
 
-                // Update Password if fields are filled
+                // update password only if both fields are filled
                 if (currentPwd && newPwd) {
                     console.log("Updating password...");
                     const pwdResult = await eel.update_password(currentPwd, newPwd)();
@@ -608,7 +627,7 @@
             document.getElementById('display-title').innerText = title;
             document.getElementById('display-email').innerText = email;
 
-            // Updated Realtime Data
+            // set last login and member since dates
             const lastLogin = user.last_login ? new Date(user.last_login).toLocaleString() : 'Just now';
             const memberSince = user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A';
             
@@ -622,7 +641,7 @@
             avatarImg.src = avatarUrl;
             modalAvatarImg.src = avatarUrl;
             
-            // Update input fields
+            // fill the edit form with current values
             document.getElementById('edit-name').value = name;
             document.getElementById('edit-title').value = title;
             document.getElementById('edit-email').value = email;
@@ -653,15 +672,15 @@
 
         // Logout logic is handled globally by sidebar.js
 
-        // Initial Load
+        // on page load
         document.addEventListener('DOMContentLoaded', async () => {
-            // Fetch real user data immediately and update UI
+            // load user data and show it on the page
             try {
                 const result = await eel.get_current_user()();
                 if (result.success && result.data) {
                     updateProfileUI(result.data);
                 } else {
-                    // Redirect if no session
+                    // no session, go to login
                     window.location.href = 'login.html';
                 }
             } catch (err) {

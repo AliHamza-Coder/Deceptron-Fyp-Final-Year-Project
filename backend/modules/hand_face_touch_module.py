@@ -5,7 +5,7 @@ import os
 from collections import defaultdict
 
 class HandFaceTouchAnalyzer:
-    """Detects hand-to-face touches (self-adaptors) with high accuracy using scaling radius logic."""
+    """Detects hand-to-face touches (self-adaptors) using a scaling radius check."""
 
     def __init__(self):
         self.mp_hands = mp.solutions.hands
@@ -26,8 +26,8 @@ class HandFaceTouchAnalyzer:
             min_tracking_confidence=0.5
         )
 
-        # Precise Landmark Clusters (Optimized for Forensic Accuracy)
-        self.NOSE_REGION = [1, 2, 5, 168, 19, 94, 4, 6, 197, 195] # Comprehensive nose coverage
+        # Face landmark clusters that define the touch regions
+        self.NOSE_REGION = [1, 2, 5, 168, 19, 94, 4, 6, 197, 195] # Covers the nose area
         self.MOUTH_REGION = [0, 13, 14, 17, 37, 267, 61, 291, 78, 308, 11, 12] # Lips and philtrum
         self.FOREHEAD = 10
         self.EYES_REGION = [33, 133, 157, 158, 159, 160, 161, 263, 362, 384, 385, 386, 387, 388]
@@ -59,7 +59,7 @@ class HandFaceTouchAnalyzer:
         face_h = abs(chin.y - nose.y) * img_h
         baselen = min(face_w, face_h)
 
-        # Region configuration with optimized radii to prevent overlap
+        # Region sizes, tuned so nearby areas don't overlap
         radii = {
             'NOSE': 0.05 * baselen,
             'MOUTH': 0.06 * baselen,

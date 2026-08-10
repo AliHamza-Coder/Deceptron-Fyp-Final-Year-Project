@@ -5,7 +5,7 @@ from collections import deque
 import os
 
 class LipJawAnalyzer:
-    """Analyzes lip compression, jaw tightness, and chin tremor with high accuracy."""
+    """Analyzes lip compression, jaw tightness, and chin tremor."""
 
     def __init__(self):
         self.mp_face_mesh = mp.solutions.face_mesh

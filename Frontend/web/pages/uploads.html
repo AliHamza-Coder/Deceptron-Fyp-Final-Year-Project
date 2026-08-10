@@ -12,18 +12,18 @@
     <script type="text/javascript" src="/eel.js"></script>
     <style>
     :root {
-        --primary-blue: #2563eb; /* Professional Royal Blue */
+        --primary-blue: #2563eb; /* Royal Blue */
         --accent-cyan: #0ea5e9; /* Sky Blue */
         --accent-rose: #ef4444;
         --sidebar-width: 260px;
         
-        /* Vibrant University Pro Theme */
+        /* theme colors */
         --bg-main: #0f172a; /* Deep Navy */
         --text-main: #ffffff;
         --text-dim: #94a3b8;
         --sidebar-bg: #0f172a;
-        --card-bg: #1e293b; /* Solid Professional Surface */
-        --border-subtle: #334155; /* Visible Slate Border */
+        --card-bg: #1e293b; /* card surface */
+        --border-subtle: #334155; /* slate border */
         --input-bg: #0f172a;
     }
 
@@ -269,7 +269,7 @@
         filter: drop-shadow(0 0 10px rgba(0, 219, 255, 0.5));
     }
 
-    /* Custom Toast Styles */
+    /* toast styles */
     .toast {
         background: var(--card-bg);
         border: 1px solid var(--primary-blue);
@@ -285,7 +285,7 @@
         max-width: 360px;
     }
 
-    /* --- Forensic Glow System --- */
+    /* card glow on hover */
     .glow-cyan { border: 1px solid var(--border-subtle) !important; }
     .glow-purple { border: 1px solid var(--border-subtle) !important; }
     .glow-blue { border: 1px solid var(--border-subtle) !important; }
@@ -305,14 +305,14 @@
             to { transform: translateX(100%) scale(0.9); opacity: 0; }
         }
 
-        /* Modal Specific Styles */
+        /* modal styles */
         body.sidebar-collapsed #restore-sidebar {
             z-index: 90;
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar Component Container -->
+    <!-- Sidebar -->
     <script src="../js/components/sidebar.js"></script>
     <script src="../js/components/media-preview.js"></script>
     <script src="../js/components/vault-component.js"></script>
@@ -351,7 +351,7 @@
             </div>
 
             <div class="space-y-4" id="mediaList">
-                <!-- Records will be loaded here dynamically -->
+                <!-- records load here -->
             </div>
         </div>
     </main>
@@ -360,10 +360,10 @@
 
 
 
-    <!-- Custom Toast Notification -->
+    <!-- toast notification -->
     <div id="toast-container" class="fixed bottom-10 right-10 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
-    <!-- Custom Confirmation Modal -->
+    <!-- confirmation modal -->
     <div id="confirm-modal" class="fixed inset-0 z-[110] hidden items-center justify-center p-4">
         <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm modal-overlay"></div>
         <div class="glass relative w-full max-w-md p-8 shadow-2xl transform transition-all duration-300 scale-95 opacity-0 modal-content">
@@ -387,11 +387,11 @@
 
     <script>
         function filterMedia(type, btn) {
-            // Update buttons
+            // highlight the active filter button
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
 
-            // Filter items
+            // show or hide items by type
             const items = document.querySelectorAll('.media-item');
             items.forEach(item => {
                 if (type === 'all' || item.getAttribute('data-type') === type) {
@@ -403,7 +403,7 @@
         }
 
 
-        // Real Data Integration
+        // load real data
         const mediaList = document.getElementById('mediaList');
         const fileInput = document.getElementById('fileInput');
         const activeMemberName = document.querySelector('.active-member-info span.ml-1');
@@ -440,9 +440,9 @@
                 const analyzeBtn = isVideo ? 'Analyze Face Emotion' : 'Analyze Voice Stress';
                 const analyzeLoc = isVideo ? 'facial-expression.html' : 'voice-analysis.html';
 
-                // Path strategy:
-                // 1. Check if we have a real physical path from DB
-                // 2. Fallback to common uploads folder
+                // use the stored path from the database
+                // 1. check for a real path if we have one
+                // 2. otherwise fall back to the uploads folder
                 const mediaSource = item.filepath || `../uploads/${item.filename}`;
 
                 const div = document.createElement('div');
@@ -459,18 +459,18 @@
                         </div>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <!-- 1. Download Button -->
+                        <!-- 1. download button -->
                         <button class="btn-outline px-6 py-3 text-[10px]" onclick="downloadFile('${mediaSource}', '${item.filename}')">
                             <i class="fas fa-download mr-2 text-primary-blue"></i> Download
                         </button>
 
-                        <!-- 2. Eye Icon (Preview) -->
+                        <!-- 2. eye icon to preview -->
                         <button class="w-12 h-12 rounded-2xl bg-primary-blue/5 border-2 border-primary-blue/10 text-primary-blue hover:bg-primary-blue hover:text-white transition-all flex items-center justify-center group/eye" 
                                 onclick="${isVideo ? 'videoPreview' : 'audioPreview'}.open('${item.filename}', '${mediaSource}', {size: '${item.size}', date: '${item.timestamp}'})" title="Preview Media">
                             <i class="fas fa-eye"></i>
                         </button>
 
-                        <!-- 3. Trash Icon (Delete) -->
+                        <!-- 3. trash icon to delete -->
                         <button class="w-12 h-12 rounded-xl bg-rose-600/10 text-rose-400 hover:bg-rose-600 hover:text-white transition-all flex items-center justify-center" onclick="deleteRecord('${item.id}')" title="Delete record">
                             <i class="fas fa-trash-can"></i>
                         </button>
@@ -480,7 +480,7 @@
             });
         }
 
-        // --- Custom UI Systems ---
+        // custom ui helpers
 
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
@@ -559,27 +559,27 @@
             const type = file.type.startsWith('video') ? 'video' : 'audio';
             
             try {
-                // Show loader
-                Loader.show("Securing Evidence");
+                // show the loader
+                Loader.show("Saving...");
 
-                // 1. Initiate
+                // 1. start the upload
                 const initRes = await eel.initiate_upload(file.name, sizeStr, type)();
                 if (!initRes.success) throw new Error(initRes.message);
                 
                 const uploadId = initRes.data.upload_id;
-                const chunkSize = 15 * 1024 * 1024; // 15MB chunks (UPPED FOR SPEED)
+                const chunkSize = 15 * 1024 * 1024; // 15MB chunks
                 const totalChunks = Math.ceil(file.size / chunkSize);
                 
                 for (let i = 0; i < totalChunks; i++) {
                     const progress = Math.round((i / totalChunks) * 100);
                     Loader.updateProgress(progress);
-                    Loader.show("Securing Evidence");
+                    Loader.show("Saving...");
 
                     const start = i * chunkSize;
                     const end = Math.min(file.size, start + chunkSize);
                     const chunk = file.slice(start, end);
                     
-                    // Read chunk as base64 - STRIP PREFIX IMMEDIATELY FOR SPEED
+                    // read the chunk as base64 without the data: prefix
                     const base64Chunk = await new Promise((resolve) => {
                         const reader = new FileReader();
                         reader.onload = () => {
@@ -589,18 +589,18 @@
                         reader.readAsDataURL(chunk);
                     });
                     
-                    // Send to backend
+                    // send the chunk to the backend
                     const chunkRes = await eel.append_upload_chunk(uploadId, base64Chunk)();
                     if (!chunkRes.success) throw new Error(chunkRes.message);
                 }
                 
-                // 3. Finalize
+                // 3. finish the upload
                 Loader.updateProgress(100);
-                Loader.show("Finalizing");
+                Loader.show("Finalizing...");
                 const finalRes = await eel.finalize_upload(uploadId)();
                 if (!finalRes.success) throw new Error(finalRes.message);
                 
-                // Success
+                // done
                 Loader.hide();
                 loadUploads();
                 showToast("Evidence secured in vault");
@@ -613,9 +613,9 @@
             }
         });
 
-        // Initial Load
+        // on page load
         document.addEventListener('DOMContentLoaded', async () => {
-            // Check session
+            // check if user is logged in
             let user = null;
             try {
                 const result = await eel.get_current_user()();
@@ -629,12 +629,12 @@
                 return;
             }
 
-            // Set user info
+            // show user name
             if (activeMemberName && user) {
                 activeMemberName.textContent = `${user.firstName} ${user.lastName} • Unit #${user.username.toUpperCase()}`;
             }
 
-            // Load real data
+            // load the uploads
             loadUploads();
         });
 
